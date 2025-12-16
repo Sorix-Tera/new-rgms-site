@@ -1,0 +1,236 @@
+/* Header / nav */
+
+.top-bar {
+  position: sticky;
+  top: 0;
+  z-index: 200; /* bump a bit, to be safely above content */
+  overflow: visible; /* allow dropdowns to extend below */
+  backdrop-filter: blur(16px);
+  background: linear-gradient(
+    to bottom,
+    rgba(5, 6, 10, 0.95),
+    rgba(5, 6, 10, 0.75)
+  );
+  border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.top-bar-inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0.75rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  overflow: visible; /* critical so children (nav) can overflow */
+}
+
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(10, 13, 25, 0.95);
+  border: 1px solid rgba(242, 193, 79, 0.3);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.7);
+  cursor: pointer;
+}
+
+.brand-logo {
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: radial-gradient(circle at 30% 30%, #f9f3d9, #f2c14f);
+  box-shadow: 0 0 12px rgba(242, 193, 79, 0.9);
+  flex-shrink: 0;
+}
+
+.brand-text-main {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.brand-text-sub {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+/* ------------------------------
+   NAV (desktop + mobile-friendly)
+   ------------------------------ */
+
+.nav {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-size: 0.9rem;
+  overflow: visible;
+  position: relative;
+}
+
+/* Base items */
+.nav-item,
+.nav-item-dropdown {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 999px;
+}
+
+/* Simple link item (e.g., Nightmare Corridor) */
+.nav-item > a {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+  cursor: pointer;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.nav-item > a:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+/* Dropdown trigger (BUTTON) — styled to look like your old span pill */
+.nav-item-dropdown > .nav-dropdown-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+
+  padding: 0.35rem 0.7rem;
+  border-radius: 999px;
+
+  cursor: pointer;
+  color: var(--text-muted);
+
+  /* critical: remove native button look */
+  background: transparent;
+  border: 0;
+  margin: 0;
+  font: inherit;
+  line-height: 1;
+  text-align: left;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-label-main {
+  font-weight: 500;
+}
+
+.nav-chevron {
+  font-size: 0.7rem;
+  opacity: 0.6;
+  transition: transform 0.2s ease;
+}
+
+/* Active/open styling (JS toggles .nav-open) */
+.nav-item-dropdown.nav-open > .nav-dropdown-toggle {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+.nav-item-dropdown.nav-open .nav-chevron {
+  transform: rotate(180deg);
+}
+
+/* Hover styling ONLY on devices that truly hover */
+@media (hover: hover) and (pointer: fine) {
+  .nav-item-dropdown:hover > .nav-dropdown-toggle {
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text);
+  }
+}
+
+/* Optional: nicer keyboard focus (desktop) */
+.nav-item-dropdown > .nav-dropdown-toggle:focus-visible {
+  outline: 2px solid rgba(242, 193, 79, 0.35); /* uses your gold-ish accent vibe */
+  outline-offset: 2px;
+}
+
+/* Dropdown menu */
+.nav-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0;
+
+  min-width: 180px;
+  background: var(--bg-elevated);
+  border-radius: 14px;
+  border: 1px solid var(--border-subtle);
+  box-shadow: var(--shadow-soft);
+
+  padding: 0.4rem;
+  list-style: none;
+
+  display: none;
+  z-index: 500;
+}
+
+/* Open state driven by JS */
+.nav-item-dropdown.nav-open > .nav-dropdown-menu {
+  display: block;
+}
+
+/* Hover-open only on real hover devices (prevents sticky hover on touch) */
+@media (hover: hover) and (pointer: fine) {
+  .nav-item-dropdown:hover > .nav-dropdown-menu {
+    display: block;
+  }
+}
+
+.nav-dropdown-item a {
+  display: block;
+  padding: 0.35rem 0.55rem;
+  border-radius: 10px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-decoration: none;
+}
+
+.nav-dropdown-item a:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+/* ------------------------------
+   YOUR MOBILE LAYOUT RULES (kept)
+   ------------------------------ */
+@media (max-width: 720px) {
+  .top-bar-inner {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .nav {
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    overflow: visible;
+  }
+
+  /* Safety for narrow screens */
+  .nav-dropdown-menu {
+    max-width: 90vw;
+  }
+
+  .filters {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filters-spacer {
+    display: none;
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+

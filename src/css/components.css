@@ -1,0 +1,218 @@
+/* Filters */
+
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.75rem 0.9rem;
+  background: rgba(5, 6, 10, 0.85);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 1.25rem;
+}
+
+.filters-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.filters-label {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.filters-select,
+.filters-input {
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-elevated-soft);
+  color: var(--text);
+  font-size: 0.85rem;
+  padding: 0.3rem 0.9rem;
+  outline: none;
+  min-height: 2.1rem;
+}
+
+.filters-select:focus,
+.filters-input:focus {
+  border-color: rgba(242, 193, 79, 0.6);
+  box-shadow: 0 0 0 1px rgba(242, 193, 79, 0.35);
+}
+
+.filters-input::placeholder {
+  color: var(--text-muted);
+}
+
+.filters-spacer {
+  flex: 1 0 auto;
+}
+
+.filters-badge {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(242, 193, 79, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(242, 193, 79, 0.4);
+  white-space: nowrap;
+}
+
+/* Grid of entries */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: var(--gap);
+}
+
+.entry-card {
+  background: radial-gradient(circle at top left, #1b2136 0, var(--bg-elevated) 55%);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  box-shadow: var(--shadow-soft);
+  padding: 0.55rem 0.55rem 0.7rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.entry-card:hover {
+  border-color: rgba(242, 193, 79, 0.55);
+  transform: translateY(-1px);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+
+.entry-thumbnail-wrapper {
+  position: relative;
+  border-radius: calc(var(--radius-lg) - 4px);
+  overflow: hidden;
+  background: #11121a;
+  aspect-ratio: 4 / 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+.entry-thumbnail-placeholder {
+  width: 50%;
+  height: 50%;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #303755, #171b2f);
+  position: relative;
+}
+
+.entry-thumbnail-placeholder::after {
+  content: "";
+  position: absolute;
+  inset: 15%;
+  border-radius: 7px;
+  border: 2px solid rgba(255, 255, 255, 0.12);
+}
+
+.entry-thumbnail-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.entry-mode-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 6px;
+  padding: 0.15rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  background: rgba(5, 6, 10, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.11);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.badge-pill {
+  font-size: 0.7rem;
+  padding: 0 0.45rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  color: var(--text-muted);
+}
+
+.entry-main {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  padding: 0.1rem 0.1rem 0;
+}
+
+.entry-player {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.entry-meta-line {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.entry-meta-left {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.pill-region {
+  padding: 0.1rem 0.45rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.pill-rank {
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.entry-meta-date {
+  font-size: 0.72rem;
+  color: var(--text-muted);
+}
+
+.entry-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-top: 0.1rem;
+  padding: 0 0.1rem;
+}
+
+.entry-footer-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.entry-link {
+  font-size: 0.78rem;
+  color: var(--accent);
+}
+
+.entry-link span {
+  margin-left: 0.15rem;
+  font-size: 0.78rem;
+}
+
