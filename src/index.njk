@@ -1,0 +1,83 @@
+---
+layout: layouts/base.njk
+title: "TangledSpore's RGMs!"
+permalink: "index.html"
+---
+
+<!-- Notice / intro banner -->
+<section class="site-notice" role="note" aria-label="Site notice">
+  <div class="site-notice-inner">
+    <div class="site-notice-badge">Info</div>
+    <div class="site-notice-content">
+      <h2 class="site-notice-title">How the site works</h2>
+      <p class="site-notice-text">
+        Post your screenshot(s) as usual on the corresponding thread on Guild Discord with the following message format: <b>Rank | Region | Name</b>
+        (name is used to identify you in the leaderboard so it can be what you want, as long as it stays consistent).<br/> If you want to add any other notes, make sure to do it on the second line.
+        If you want to keep track of multiple accounts, make sure to use a different name for each account.
+        <b>Enjoy!</b>
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- Main content -->
+<main class="page">
+  <header class="page-header">
+    <h1 class="page-title">Latest updates</h1>
+    <p class="page-subtitle">
+      A live feed of the most recent RGM screenshots across Cursed Realm, Nightmare Corridor, and Treasure Scramble.
+    </p>
+    <p id="loadStatus" class="page-status"></p>
+  </header>
+
+  <!-- Filters -->
+  <section class="filters" aria-label="Filters">
+    <div class="filters-group">
+      <span class="filters-label">Mode</span>
+      <select id="modeFilter" class="filters-select">
+        <option value="">All modes</option>
+        <option value="cr">Cursed Realm</option>
+        <option value="nc">Nightmare Corridor</option>
+        <option value="ts">Treasure Scramble</option>
+      </select>
+
+      <select id="submodeFilter" class="filters-select">
+        <option value="">All sub-modes</option>
+        <!-- Cursed Realm -->
+        <option value="brute" data-mode="cr">Brute</option>
+        <option value="dune" data-mode="cr">Dune</option>
+        <option value="shemira" data-mode="cr">Shemira</option>
+        <option value="nemora" data-mode="cr">Nemora</option>
+        <option value="kane" data-mode="cr">Kane</option>
+        <option value="idre" data-mode="cr">Idre</option>
+        <!-- Nightmare Corridor -->
+        <option value="nc-base" data-mode="nc">Nightmare Corridor</option>
+        <!-- Treasure Scramble -->
+        <option value="fire" data-mode="ts">Fire</option>
+        <option value="fog" data-mode="ts">Fog</option>
+        <option value="fountain" data-mode="ts">Fountain</option>
+        <option value="frost" data-mode="ts">Frost</option>
+        <option value="forest" data-mode="ts">Forest</option>
+      </select>
+    </div>
+
+    <div class="filters-group">
+      <span class="filters-label">Player</span>
+      <input
+        id="searchPlayer"
+        class="filters-input"
+        type="search"
+        placeholder="Search by player name..."
+      />
+    </div>
+
+    <span class="filters-spacer"></span>
+
+    <div class="filters-group">
+      <span id="visibleCount" class="filters-badge">0 entries</span>
+    </div>
+  </section>
+
+  <!-- Grid of latest entries (will be filled by JS) -->
+  <section class="grid" id="entriesGrid"></section>
+</main>

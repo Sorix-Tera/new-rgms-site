@@ -1,0 +1,13 @@
+{
+  "name": "rgms-site-11ty",
+  "private": true,
+  "version": "1.0.0",
+  "description": "TangledSpore's RGMs - Eleventy refactor",
+  "scripts": {
+    "dev": "eleventy --serve --watch",
+    "build": "eleventy"
+  },
+  "devDependencies": {
+    "@11ty/eleventy": "^2.0.1"
+  }
+}

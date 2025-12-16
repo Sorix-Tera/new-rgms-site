@@ -1,0 +1,53 @@
+---
+layout: layouts/base.njk
+title: "Leaderboard · TangledSpore's RGMs!"
+permalink: "leaderboard.html"
+---
+
+<main class="page" id="leaderboardPage">
+  <header class="page-header">
+    <h1 class="page-title" id="leaderboardTitle">Leaderboard</h1>
+    <p class="page-subtitle" id="leaderboardSubtitle">
+      Select a mode from the header menu.
+    </p>
+    <p id="leaderboardLoadStatus" class="page-status"></p>
+  </header>
+
+  <section class="filters" aria-label="Filters">
+    <div class="filters-group">
+      <span class="filters-label">Player</span>
+      <input
+        id="leaderboardSearchPlayer"
+        class="filters-input"
+        type="search"
+        placeholder="Search by player name..."
+      />
+    </div>
+
+    <span class="filters-spacer"></span>
+
+    <div class="filters-group">
+      <span id="leaderboardStats" class="filters-badge">0 players</span>
+    </div>
+  </section>
+
+  <section>
+    <table class="cr-table" id="leaderboardTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Metric</th>
+          <th>Last update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+
+    <p class="page-status cr-page-note">
+      Note: rankings are based on the <strong>latest</strong> submission for each account, not the best all-time.
+    </p>
+  </section>
+</main>

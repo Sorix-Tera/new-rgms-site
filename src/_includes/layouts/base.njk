@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>{% if title %}{{ title }}{% else %}{{ site.name }}{% endif %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css" />
+  {% if extraHead %}{{ extraHead | safe }}{% endif %}
+</head>
+<body>
+  {% include "partials/header.njk" %}
+
+  {{ content | safe }}
+
+  {% include "partials/footer.njk" %}
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  {% if extraScripts %}{{ extraScripts | safe }}{% endif %}
+  <script src="js/main.js" defer></script>
+</body>
+</html>

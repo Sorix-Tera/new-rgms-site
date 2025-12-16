@@ -1,0 +1,78 @@
+---
+layout: layouts/base.njk
+title: "Player details · TangledSpore's RGMs!"
+permalink: "details.html"
+extraScripts: '<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>'
+---
+
+<main class="page" id="playerDetailPage">
+  <header class="page-header">
+    <h1 class="page-title" id="detailTitle">Player details</h1>
+    <p class="page-subtitle" id="detailSubtitle">
+      Loading player data...
+    </p>
+    <p class="page-status" id="detailStatus"></p>
+  </header>
+
+  <section class="filters" aria-label="Recap">
+    <div class="filters-group">
+      <span class="filters-label">Player</span>
+      <span class="filters-badge" id="detailPlayerName">—</span>
+    </div>
+
+    <div class="filters-group">
+      <span class="filters-label">Region</span>
+      <span class="filters-badge" id="detailRegion">—</span>
+    </div>
+
+    <div class="filters-group">
+      <span class="filters-label" id="detailMetricLabel">Metric</span>
+      <span class="filters-badge" id="detailMetricValue">—</span>
+    </div>
+
+    <span class="filters-spacer"></span>
+
+    <div class="filters-group">
+      <span class="filters-label">Last update</span>
+      <span class="filters-badge" id="detailLastUpdate">—</span>
+    </div>
+  </section>
+
+  <section>
+    <h2 class="page-section-title">History</h2>
+    <div class="chart-card">
+      <canvas id="detailChart"></canvas>
+    </div>
+    <p class="page-status detail-chart-note">
+      Showing up to the last 20 submissions for this mode.
+    </p>
+  </section>
+
+  <section aria-label="Summary" id="detailCompsSection">
+    <h2 class="page-section-title">Summary</h2>
+    <p class="page-status" id="detailCompsStatus"></p>
+    <div class="comps-grid" id="detailCompsGrid">
+      <!-- Filled by JS -->
+    </div>
+  </section>
+
+  <section>
+    <h2 class="page-section-title">Screenshots</h2>
+    <p class="page-status" id="detailScreensStatus"></p>
+    <div class="entries-grid" id="detailScreenshotsGrid">
+      <!-- Filled by JS -->
+    </div>
+  </section>
+</main>
+
+<!-- Lightbox overlay for enlarged screenshots -->
+<div id="lightboxOverlay" class="lightbox-overlay" aria-hidden="true">
+  <div class="lightbox-inner">
+    <button id="lightboxClose" class="lightbox-close" aria-label="Close screenshot">
+      ×
+    </button>
+    <img id="lightboxImage" src="" alt="Expanded screenshot" />
+    <div id="lightboxCaption" class="lightbox-caption"></div>
+    <div id="lightboxNotes" class="lightbox-notes"></div>
+  </div>
+</div>
