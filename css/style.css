@@ -1,0 +1,11 @@
+@import './base.css';
+@import './nav.css';
+@import './layout.css';
+@import './components.css';
+@import './footer.css';
+@import './details.css';
+@import './responsive.css';
+@import './lightbox.css';
+@import './notice.css';
+
+/* NOTE: This file is intentionally kept small and only composes the split styles above. */

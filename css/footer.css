@@ -1,0 +1,74 @@
+/* Footer */
+
+footer {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  padding: 0.6rem 1.25rem 1rem;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-align: center;
+  background: rgba(5, 6, 10, 0.9);
+}
+
+.cr-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: rgba(5, 6, 10, 0.85);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  box-shadow: var(--shadow-soft);
+}
+
+.cr-table thead {
+  background: linear-gradient(to right, #171b27, #1f2434);
+}
+
+.cr-table th,
+.cr-table td {
+  padding: 0.6rem 0.8rem;
+  font-size: 0.85rem;
+  text-align: left;
+}
+
+.cr-table th {
+  font-weight: 500;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.cr-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.cr-table tbody tr:hover {
+  background: rgba(242, 193, 79, 0.06);
+  cursor: pointer;
+}
+
+.cr-td-rank {
+  width: 40px;
+  text-align: right;
+  color: var(--text-muted);
+}
+
+.cr-td-name {
+  font-weight: 500;
+}
+
+.cr-td-damage {
+  font-family: Menlo, Consolas, Monaco, "Courier New", monospace;
+  color: var(--accent);
+}
+
+.cr-td-updated {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  text-align: right;
+}
+
+.cr-page-note {
+  margin-top: 0.6rem;
+}
+
