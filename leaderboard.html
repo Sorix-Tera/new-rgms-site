@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Leaderboard · TangledSpore&#39;s RGMs!</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="css/style.css" />
+  
+</head>
+<body>
+  <header class="top-bar">
+  <div class="top-bar-inner">
+    <a href="index.html" class="brand" aria-label="Back to TangledSpore&#39;s RGMs! homepage">
+      <div class="brand-logo"></div>
+      <div>
+        <div class="brand-text-main">TangledSpore&#39;s RGMs!</div>
+        <div class="brand-text-sub">AFK Arena rankings &amp; screenshots</div>
+      </div>
+    </a>
+
+    <nav class="nav" aria-label="Main">
+      <div class="nav-item-dropdown">
+        <span>
+          <span class="nav-label-main">Cursed Realm</span>
+          <span class="nav-chevron">▾</span>
+        </span>
+        <ul class="nav-dropdown-menu">
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=cr-brute">Brute</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=cr-dune">Dune</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=cr-shemira">Shemira</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=cr-nemora">Nemora</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=cr-kane">Kane</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=cr-idre">Idre</a></li>
+          
+        </ul>
+      </div>
+
+      <div class="nav-item">
+        <a href="leaderboard.html?mode=nightmare-corridor">
+          <span class="nav-label-main">Nightmare Corridor</span>
+        </a>
+      </div>
+
+      <div class="nav-item-dropdown">
+        <span>
+          <span class="nav-label-main">Treasure Scramble</span>
+          <span class="nav-chevron">▾</span>
+        </span>
+        <ul class="nav-dropdown-menu">
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=ts-fire">Fire</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=ts-fog">Fog</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=ts-fountain">Fountain</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=ts-frost">Frost</a></li>
+          
+            <li class="nav-dropdown-item"><a href="leaderboard.html?mode=ts-forest">Forest</a></li>
+          
+        </ul>
+      </div>
+    </nav>
+  </div>
+</header>
+
+
+  
+<main class="page" id="leaderboardPage">
+  <header class="page-header">
+    <h1 class="page-title" id="leaderboardTitle">Leaderboard</h1>
+    <p class="page-subtitle" id="leaderboardSubtitle">
+      Select a mode from the header menu.
+    </p>
+    <p id="leaderboardLoadStatus" class="page-status"></p>
+  </header>
+
+  <section class="filters" aria-label="Filters">
+    <div class="filters-group">
+      <span class="filters-label">Player</span>
+      <input
+        id="leaderboardSearchPlayer"
+        class="filters-input"
+        type="search"
+        placeholder="Search by player name..."
+      />
+    </div>
+
+    <span class="filters-spacer"></span>
+
+    <div class="filters-group">
+      <span id="leaderboardStats" class="filters-badge">0 players</span>
+    </div>
+  </section>
+
+  <section>
+    <table class="cr-table" id="leaderboardTable">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Player</th>
+          <th>Metric</th>
+          <th>Last update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Filled by JS -->
+      </tbody>
+    </table>
+
+    <p class="page-status cr-page-note">
+      Note: rankings are based on the <strong>latest</strong> submission for each account, not the best all-time.
+    </p>
+  </section>
+</main>
+
+
+  <footer>
+  TangledSpore&#39;s RGMs! · AFK Arena community project · © Sorix
+</footer>
+
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+  <script src="js/main.js" defer></script>
+</body>
+</html>
