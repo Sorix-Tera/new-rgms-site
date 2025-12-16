@@ -91,7 +91,16 @@ async function initDetailPage() {
     statusEl.textContent = 'Invalid player identifier field.';
     return;
   }
-  await loadAndRenderCompsSummary({ mode, field, value: key });
+
+  // Comps summary is only relevant for Treasure Scramble (ts-*) modes.
+  // For other modes, hide the entire Summary section.
+  const compsSectionEl = document.getElementById('detailCompsSection');
+  if (typeof mode === 'string' && mode.startsWith('ts-')) {
+    if (compsSectionEl) compsSectionEl.style.display = '';
+    await loadAndRenderCompsSummary({ mode, field, value: key });
+  } else {
+    if (compsSectionEl) compsSectionEl.style.display = 'none';
+  }
   
   const modeInfo = getModeInfo(mode);
   titleEl.textContent = `${modeInfo.mainLabel} · ${modeInfo.subLabel}`;
