@@ -36,3 +36,7 @@
   font-weight: 700;
   margin-bottom: 8px;
 }
+
+#detailChart {
+  min-height: 300px;
+}
