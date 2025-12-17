@@ -380,7 +380,8 @@ async function loadAndRenderCompsSummary({ mode, field, value }) {
     .from('comps')
     .select('heroes,pet,winrate,teams')
     .eq('mode', mode)
-    .eq(filterCol, filterVal);
+    .eq(filterCol, filterVal)
+    .not('winrate', 'is', null);
 
   const { data, error } = await q;
   if (error) {
