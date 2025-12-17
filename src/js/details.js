@@ -475,7 +475,7 @@ async function loadAndRenderCompsSummary({ mode, field, value }) {
     `4–5 teams: ${compsByBucket['4-5'].length}`,
     `6–7 teams: ${compsByBucket['6-7'].length}`,
   ];
-  statusEl.textContent = `Showing unique comps (grouped by teams bucket + heroes + pet), sorted by winrate. ${parts.join(' · ')}`;
+  statusEl.textContent = `Showing unique comps, sorted by winrate.\n ${parts.join(' · ')}`;
 
   // Render as 3 columns with a small header above each column
   renderBucketedCompsGrid(gridEl, compsByBucket, {
