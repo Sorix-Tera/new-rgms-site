@@ -46,6 +46,7 @@ async function initLeaderboardPage(table, searchInput, statsEl, statusEl, titleE
         <tr>
           <th>#</th>
           <th>Player</th>
+          <th>Region</th>
           <th>Time</th>
           <th>Last update</th>
         </tr>
@@ -55,6 +56,7 @@ async function initLeaderboardPage(table, searchInput, statsEl, statusEl, titleE
         <tr>
           <th>#</th>
           <th>Player</th>
+          <th>Region</th>
           <th>Damage</th>
           <th>Last update</th>
         </tr>
@@ -135,11 +137,13 @@ async function initLeaderboardPage(table, searchInput, statsEl, statusEl, titleE
     } else if (info.mainCode === 'nc') {
       entries = rows.map((row) => {
         const displayName = row.name || row.discord_name || 'Unknown';
+        const regionStr = row.region || '—';
         const timeStr = row.content || '';
         const timeValue = parseTimeValue(timeStr);
         return {
           row,
           displayName,
+          regionStr,
           metricStr: timeStr,
           value: timeValue,
         };
@@ -157,11 +161,13 @@ async function initLeaderboardPage(table, searchInput, statsEl, statusEl, titleE
       // CR / default: damage
       entries = rows.map((row) => {
         const displayName = row.name || row.discord_name || 'Unknown';
+        const regionStr = row.region || '—';
         const dmgStr = row.content || '';
         const dmgValue = parseDamageValue(dmgStr);
         return {
           row,
           displayName,
+          regionStr,
           metricStr: dmgStr,
           value: dmgValue,
         };
@@ -199,12 +205,10 @@ async function initLeaderboardPage(table, searchInput, statsEl, statusEl, titleE
       tr.appendChild(posTd);
       tr.appendChild(nameTd);
 
-      if (info.mainCode === 'ts') {
-        const regionTd = document.createElement('td');
-        regionTd.className = 'cr-td-region';
-        regionTd.textContent = entry.regionStr || '—';
-        tr.appendChild(regionTd);
-      }
+      const regionTd = document.createElement('td');
+      regionTd.className = 'cr-td-region';
+      regionTd.textContent = entry.regionStr || '—';
+      tr.appendChild(regionTd);
 
       const metricTd = document.createElement('td');
       metricTd.className = 'cr-td-damage';
@@ -250,6 +254,3 @@ async function initLeaderboardPage(table, searchInput, statsEl, statusEl, titleE
     statusEl.textContent = 'Unexpected error while loading data.';
   }
 }
-
-
-// Cursed Realm page logic
