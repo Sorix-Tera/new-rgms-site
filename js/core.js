@@ -173,14 +173,15 @@ function parseRankInfo(str) {
   const s = String(str).toLowerCase();
   const noSpace = s.replace(/\s/g, '');
 
-  // Percent-style: look for a "number %"
+  // Percent-style: look for a "number %" or for word top / t
   const percentMatch = s.match(/(\d+)\s*%/);
   const hasTopWord =
+    s.includes('%') ||
     s.includes('top') ||
     /^t\d+%$/.test(noSpace) ||          // "t10%"
     /^t\s*\d+%$/.test(s);               // "t 10%"
 
-  if (percentMatch && hasTopWord) {
+  if (hasTopWord) {
     const v = parseInt(percentMatch[1], 10);
     if (!Number.isNaN(v)) {
       return { kind: 'percent', value: v };
