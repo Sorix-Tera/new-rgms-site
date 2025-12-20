@@ -1,0 +1,76 @@
+---
+layout: layouts/base.njk
+title: "Comp Finder · TangledSpore's RGMs!"
+permalink: "comp-finder.html"
+---
+
+<main class="page" id="compFinderPage">
+  <header class="page-header">
+    <h1 class="page-title">Comp Finder</h1>
+    <p class="page-subtitle">
+      Browse best-performing comps aggregated across all players.
+    </p>
+    <p class="page-status" id="cfLoadStatus"></p>
+  </header>
+
+  <section class="filters" aria-label="Comp Finder filters">
+    <div class="filters-group">
+      <label class="filters-label" for="cfModeSelect">Mode</label>
+      <select id="cfModeSelect" class="filters-select">
+        {% for item in nav.treasureScramble %}
+          <option value="{{ item.mode }}" {% if item.mode == "ts-forest" %}selected{% endif %}>{{ item.label }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="filters-group cf-density-filters" aria-label="Density filters">
+      <span class="filters-label">Show</span>
+
+      <label class="cf-check">
+        <input type="checkbox" id="cfShowRed" checked />
+        <span class="cf-check-pill cf-pill-red">Low</span>
+      </label>
+
+      <label class="cf-check">
+        <input type="checkbox" id="cfShowOrange" checked />
+        <span class="cf-check-pill cf-pill-orange">Medium</span>
+      </label>
+
+      <label class="cf-check">
+        <input type="checkbox" id="cfShowGreen" checked />
+        <span class="cf-check-pill cf-pill-green">High</span>
+      </label>
+    </div>
+
+    <span class="filters-spacer"></span>
+
+    <div class="filters-group">
+      <span class="filters-label">Legend</span>
+      <span class="filters-badge">Low ≤ 3</span>
+      <span class="filters-badge">Medium 4–8</span>
+      <span class="filters-badge">High ≥ 9</span>
+    </div>
+  </section>
+
+  <section aria-label="Teams buckets">
+    <div class="cf-tabs" role="tablist" aria-label="Teams buckets">
+      <button class="cf-tab is-active" id="cfTab23" role="tab" aria-selected="true" aria-controls="cfPanel23" data-bucket="2-3">2–3 teams</button>
+      <button class="cf-tab" id="cfTab45" role="tab" aria-selected="false" aria-controls="cfPanel45" data-bucket="4-5">4–5 teams</button>
+      <button class="cf-tab" id="cfTab67" role="tab" aria-selected="false" aria-controls="cfPanel67" data-bucket="6-7">6–7 teams</button>
+    </div>
+
+    <div class="cf-panels">
+      <div class="cf-panel is-active" id="cfPanel23" role="tabpanel" aria-labelledby="cfTab23" data-bucket="2-3">
+        <div class="comps-grid" id="cfGrid23"></div>
+      </div>
+
+      <div class="cf-panel" id="cfPanel45" role="tabpanel" aria-labelledby="cfTab45" data-bucket="4-5">
+        <div class="comps-grid" id="cfGrid45"></div>
+      </div>
+
+      <div class="cf-panel" id="cfPanel67" role="tabpanel" aria-labelledby="cfTab67" data-bucket="6-7">
+        <div class="comps-grid" id="cfGrid67"></div>
+      </div>
+    </div>
+  </section>
+</main>

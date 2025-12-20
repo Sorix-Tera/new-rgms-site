@@ -364,6 +364,13 @@ document.addEventListener('DOMContentLoaded', () => {
     initTreasurePage(tsMode, tsTable, tsSearchInput, tsStats, tsStatus);
   }
 
+  // --- COMP FINDER PAGE ---
+
+  const cfRoot = document.getElementById('compFinderPage');
+  if (cfRoot && typeof initCompFinderPage === 'function') {
+    initCompFinderPage();
+  }
+
   // --- PLAYER DETAIL PAGE ---
 
   const detailRoot = document.getElementById('playerDetailPage');

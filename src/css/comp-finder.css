@@ -1,0 +1,109 @@
+/* Comp Finder: tabs + density glow */
+
+.cf-tabs {
+  display: inline-flex;
+  gap: 0;
+  background: rgba(5, 6, 10, 0.85);
+  border: 1px solid rgba(255,255,255,0.06);
+  border-radius: 999px;
+  overflow: hidden;
+  margin: 0 0 1.0rem 0;
+}
+
+.cf-tab {
+  appearance: none;
+  background: transparent;
+  border: 0;
+  padding: 0.55rem 0.9rem;
+  color: var(--text-muted);
+  font-weight: 700;
+  cursor: pointer;
+  user-select: none;
+}
+
+.cf-tab:hover {
+  color: var(--text);
+}
+
+.cf-tab.is-active {
+  color: var(--text);
+  background: rgba(242, 193, 79, 0.12);
+  border-right: 1px solid rgba(242, 193, 79, 0.25);
+  border-left: 1px solid rgba(242, 193, 79, 0.25);
+}
+
+.cf-panels {
+  margin-top: 0.25rem;
+}
+
+.cf-panel {
+  display: none;
+}
+
+.cf-panel.is-active {
+  display: block;
+}
+
+.cf-density-filters {
+  gap: 0.5rem;
+}
+
+.cf-check {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  cursor: pointer;
+}
+
+.cf-check input {
+  transform: translateY(1px);
+}
+
+.cf-check-pill {
+  font-size: 0.8rem;
+  padding: 0.2rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.10);
+  color: var(--text-muted);
+}
+
+.cf-pill-red   { background: rgba(255, 107, 107, 0.10); border-color: rgba(255, 107, 107, 0.35); }
+.cf-pill-orange{ background: rgba(242, 193, 79, 0.10);  border-color: rgba(242, 193, 79, 0.40); }
+.cf-pill-green { background: rgba(74, 222, 128, 0.10);  border-color: rgba(74, 222, 128, 0.35); }
+
+.comp-card {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Glow layer */
+.comp-card::before {
+  content: "";
+  position: absolute;
+  inset: -12px;
+  border-radius: 18px;
+  opacity: 0;
+  filter: blur(18px);
+  z-index: 0;
+  pointer-events: none;
+}
+
+.comp-card > * {
+  position: relative;
+  z-index: 1;
+}
+
+.comp-card.cf-glow-red::before {
+  opacity: 0.35;
+  background: radial-gradient(circle at 40% 35%, rgba(255, 107, 107, 0.75), transparent 60%);
+}
+
+.comp-card.cf-glow-orange::before {
+  opacity: 0.35;
+  background: radial-gradient(circle at 40% 35%, rgba(242, 193, 79, 0.75), transparent 60%);
+}
+
+.comp-card.cf-glow-green::before {
+  opacity: 0.35;
+  background: radial-gradient(circle at 40% 35%, rgba(74, 222, 128, 0.70), transparent 60%);
+}

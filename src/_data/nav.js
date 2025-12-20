@@ -15,4 +15,7 @@ module.exports = {
     { label: "Frost", mode: "ts-frost" },
     { label: "Forest", mode: "ts-forest" },
   ],
+  compFinder: [
+    { label: "Treasure Scramble", href: "comp-finder.html" },
+  ],
 };

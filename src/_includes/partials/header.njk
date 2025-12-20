@@ -38,6 +38,18 @@
           {% endfor %}
         </ul>
       </div>
+      <div class="nav-item-dropdown">
+        <span>
+          <span class="nav-label-main">Comp Finder</span>
+          <span class="nav-chevron">▾</span>
+        </span>
+        <ul class="nav-dropdown-menu">
+          {% for item in nav.compFinder %}
+            <li class="nav-dropdown-item"><a href="{{ item.href }}">{{ item.label }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+
     </nav>
   </div>
 </header>
