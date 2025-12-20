@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>TangledSpore&#39;s RGMs!</title>
+  <title>Comp Finder · TangledSpore&#39;s RGMs!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/style.css" />
   
@@ -84,82 +84,83 @@
 
 
   
-<!-- Notice / intro banner -->
-<section class="site-notice" role="note" aria-label="Site notice">
-  <div class="site-notice-inner">
-    <div class="site-notice-badge">Info</div>
-    <div class="site-notice-content">
-      <h2 class="site-notice-title">How the site works</h2>
-      <p class="site-notice-text">
-        Post your screenshot(s) as usual on the corresponding thread on Guild Discord with the following message format:<br/>
-        <b>Rank | Region | Name | Number of teams</b> (last one for TS only)<br/>
-        If you want to add any other notes, make sure to do it on the second line. If you want to keep track of multiple accounts, make sure to use a different name for each account.<br/>
-        <b>Enjoy!</b>
-      </p>
-    </div>
-  </div>
-</section>
-
-<!-- Main content -->
-<main class="page">
+<main class="page" id="compFinderPage">
   <header class="page-header">
-    <h1 class="page-title">Latest updates</h1>
+    <h1 class="page-title">Comp Finder</h1>
     <p class="page-subtitle">
-      A live feed of the most recent RGM screenshots across Cursed Realm, Nightmare Corridor, and Treasure Scramble.
+      Browse best-performing comps aggregated across all players.
     </p>
-    <p id="loadStatus" class="page-status"></p>
+    <p class="page-status" id="cfLoadStatus"></p>
   </header>
 
-  <!-- Filters -->
-  <section class="filters" aria-label="Filters">
+  <section class="filters" aria-label="Comp Finder filters">
     <div class="filters-group">
-      <span class="filters-label">Mode</span>
-      <select id="modeFilter" class="filters-select">
-        <option value="">All modes</option>
-        <option value="cr">Cursed Realm</option>
-        <option value="nc">Nightmare Corridor</option>
-        <option value="ts">Treasure Scramble</option>
-      </select>
-
-      <select id="submodeFilter" class="filters-select">
-        <option value="">All sub-modes</option>
-        <!-- Cursed Realm -->
-        <option value="brute" data-mode="cr">Brute</option>
-        <option value="dune" data-mode="cr">Dune</option>
-        <option value="shemira" data-mode="cr">Shemira</option>
-        <option value="nemora" data-mode="cr">Nemora</option>
-        <option value="kane" data-mode="cr">Kane</option>
-        <option value="idre" data-mode="cr">Idre</option>
-        <!-- Nightmare Corridor -->
-        <option value="nc-base" data-mode="nc">Nightmare Corridor</option>
-        <!-- Treasure Scramble -->
-        <option value="fire" data-mode="ts">Fire</option>
-        <option value="fog" data-mode="ts">Fog</option>
-        <option value="fountain" data-mode="ts">Fountain</option>
-        <option value="frost" data-mode="ts">Frost</option>
-        <option value="forest" data-mode="ts">Forest</option>
+      <label class="filters-label" for="cfModeSelect">Mode</label>
+      <select id="cfModeSelect" class="filters-select">
+        
+          <option value="ts-fire" >Fire</option>
+        
+          <option value="ts-fog" >Fog</option>
+        
+          <option value="ts-fountain" >Fountain</option>
+        
+          <option value="ts-frost" >Frost</option>
+        
+          <option value="ts-forest" selected>Forest</option>
+        
       </select>
     </div>
 
-    <div class="filters-group">
-      <span class="filters-label">Player</span>
-      <input
-        id="searchPlayer"
-        class="filters-input"
-        type="search"
-        placeholder="Search by player name..."
-      />
+    <div class="filters-group cf-density-filters" aria-label="Density filters">
+      <span class="filters-label">Show</span>
+
+      <label class="cf-check">
+        <input type="checkbox" id="cfShowRed" checked />
+        <span class="cf-check-pill cf-pill-red">Low</span>
+      </label>
+
+      <label class="cf-check">
+        <input type="checkbox" id="cfShowOrange" checked />
+        <span class="cf-check-pill cf-pill-orange">Medium</span>
+      </label>
+
+      <label class="cf-check">
+        <input type="checkbox" id="cfShowGreen" checked />
+        <span class="cf-check-pill cf-pill-green">High</span>
+      </label>
     </div>
 
     <span class="filters-spacer"></span>
 
     <div class="filters-group">
-      <span id="visibleCount" class="filters-badge">0 entries</span>
+      <span class="filters-label">Legend</span>
+      <span class="filters-badge">Low ≤ 3</span>
+      <span class="filters-badge">Medium 4–8</span>
+      <span class="filters-badge">High ≥ 9</span>
     </div>
   </section>
 
-  <!-- Grid of latest entries (will be filled by JS) -->
-  <section class="grid" id="entriesGrid"></section>
+  <section aria-label="Teams buckets">
+    <div class="cf-tabs" role="tablist" aria-label="Teams buckets">
+      <button class="cf-tab is-active" id="cfTab23" role="tab" aria-selected="true" aria-controls="cfPanel23" data-bucket="2-3">2–3 teams</button>
+      <button class="cf-tab" id="cfTab45" role="tab" aria-selected="false" aria-controls="cfPanel45" data-bucket="4-5">4–5 teams</button>
+      <button class="cf-tab" id="cfTab67" role="tab" aria-selected="false" aria-controls="cfPanel67" data-bucket="6-7">6–7 teams</button>
+    </div>
+
+    <div class="cf-panels">
+      <div class="cf-panel is-active" id="cfPanel23" role="tabpanel" aria-labelledby="cfTab23" data-bucket="2-3">
+        <div class="comps-grid" id="cfGrid23"></div>
+      </div>
+
+      <div class="cf-panel" id="cfPanel45" role="tabpanel" aria-labelledby="cfTab45" data-bucket="4-5">
+        <div class="comps-grid" id="cfGrid45"></div>
+      </div>
+
+      <div class="cf-panel" id="cfPanel67" role="tabpanel" aria-labelledby="cfTab67" data-bucket="6-7">
+        <div class="comps-grid" id="cfGrid67"></div>
+      </div>
+    </div>
+  </section>
 </main>
 
 
