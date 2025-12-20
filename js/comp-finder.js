@@ -45,8 +45,8 @@
   }
 
   function densityKeyFromCount(n) {
-    if (n <= 3) return 'red';
-    if (n <= 8) return 'orange';
+    if (n <= 2) return 'red';
+    if (n <= 6) return 'orange';
     return 'green';
   }
 
