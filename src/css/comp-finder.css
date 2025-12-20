@@ -124,7 +124,7 @@
 
 /* Density tiers -> colored box-shadow (glow) */
 
-.comp-card.density-red {
+.comp-card.cf-glow-red {
   border-color: rgba(255, 80, 80, 0.28);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
@@ -133,7 +133,7 @@
     0 0 18px rgba(255, 80, 80, 0.22);
 }
 
-.comp-card.density-orange {
+.comp-card.cf-glow-orange {
   border-color: rgba(255, 170, 60, 0.28);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
@@ -142,7 +142,7 @@
     0 0 18px rgba(255, 170, 60, 0.22);
 }
 
-.comp-card.density-green {
+.comp-card.cf-glow-green {
   border-color: rgba(70, 220, 140, 0.28);
   box-shadow:
     0 1px 0 rgba(255, 255, 255, 0.06) inset,
