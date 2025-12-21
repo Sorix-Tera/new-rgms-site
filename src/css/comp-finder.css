@@ -74,73 +74,103 @@
    If your wrapper id differs, you can drop the #compFinderPage prefix.
 */
 
-/* ===== Comp Finder: compact filters so everything fits ===== */
-
-/* tighter spacing overall */
 #compFinderPage .filters {
-  gap: 10px 10px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 8px 10px;
 }
 
-/* allow controls to shrink more */
+/* your mode/regions groups (keeps them aligned and prevents squish) */
 #compFinderPage .filters-group {
-  min-width: 150px;
+  min-width: 180px;
 }
 
 #compFinderPage .cf-density-filters {
-  min-width: 220px;
+  min-width: 260px;
 }
 
-/* keep single line earlier, but still allow wrap on smaller screens */
-@media (min-width: 900px) {
+/* spacer used in your markup to push density filters right on wide screens */
+#compFinderPage .filters-spacer {
+  flex: 1 1 auto;
+  min-width: 12px;
+}
+
+/* Prefer a single line on desktop; wrap gracefully on smaller screens */
+@media (min-width: 980px) {
   #compFinderPage .filters {
     flex-wrap: nowrap;
   }
 }
 
-/* labels a bit smaller */
-#compFinderPage .filters-label {
-  font-size: 0.82rem;
-  margin-bottom: 6px;
+/* Multi-select dropdown (button + menu with checkboxes) */
+.cf-multi {
+  position: relative;
 }
 
-/* make selects/buttons slightly smaller */
-#compFinderPage .filters-select,
-#compFinderPage .cf-multi-btn {
-  font-size: 0.90rem;
-  padding: 0.45rem 0.70rem;
-  min-height: 36px;
-}
-
-/* regions button narrower */
 .cf-multi-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
   min-width: 175px;
 }
 
-/* dropdown menu slightly tighter */
+.cf-multi-caret {
+  opacity: 0.8;
+  transform: translateY(-1px);
+}
+
 .cf-multi-menu {
-  padding: 6px;
+  display: none;
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  min-width: 100%;
+  z-index: 50;
+
+  background: rgba(5, 6, 10, 0.95);
+  border: 1px solid rgba(255,255,255,0.10);
   border-radius: 10px;
+  padding: 6px;
+
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.06) inset,
+    0 10px 28px rgba(0,0,0,0.35);
+}
+
+.cf-multi-menu.is-open {
+  display: block;
 }
 
 .cf-multi-item {
-  padding: 7px 8px;
-  border-radius: 9px;
-  font-size: 0.92rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  color: var(--text);
+}
+
+.cf-multi-item:hover {
+  background: rgba(255,255,255,0.05);
+}
+
+.cf-multi-item input {
+  transform: translateY(1px);
 }
 
 .cf-multi-sep {
-  margin: 5px 4px;
+  height: 1px;
+  background: rgba(255,255,255,0.08);
+  margin: 6px 4px;
 }
 
-/* check pills tighter */
-.cf-check-pill {
-  font-size: 0.76rem;
-  padding: 0.18rem 0.48rem;
-}
+/* ===== Density filters ===== */
 
-/* density filter row tighter */
 .cf-density-filters {
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 .cf-check {
