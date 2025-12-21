@@ -95,25 +95,36 @@
 
   <section class="filters" aria-label="Comp Finder filters">
     <div class="cf-filter-grid">
-      <!-- Row 1: text labels -->
-      <div class="cf-filter-head">
+      <!-- Line 1: text row -->
+      <div class="cf-filter-head" aria-hidden="true">
         <div class="cf-filter-h">Mode</div>
         <div class="cf-filter-h">Region</div>
         <div class="cf-filter-h">Show</div>
-        <div class="cf-filter-h">Legend</div>
+        <div class="cf-filter-h">Legend (number of times used)</div>
       </div>
 
-      <!-- Row 2: actual controls -->
-      <div class="cf-filter-body">
-        <!-- Mode -->
-        <div class="cf-filter-cell">
-          <select id="cfMode" class="filters-select">
-            <!-- your existing options -->
+      <!-- Line 2: actual controls + legend -->
+      <div class="filters cf-filter-body">
+        <div class="filters-group">
+          <label class="filters-label cf-sr-only" for="cfModeSelect">Mode</label>
+          <select id="cfModeSelect" class="filters-select">
+            
+              <option value="ts-fire" >Fire</option>
+            
+              <option value="ts-fog" >Fog</option>
+            
+              <option value="ts-fountain" >Fountain</option>
+            
+              <option value="ts-frost" >Frost</option>
+            
+              <option value="ts-forest" selected>Forest</option>
+            
           </select>
         </div>
 
-        <!-- Regions (your existing multi-select button + menu) -->
-        <div class="cf-filter-cell">
+        <div class="filters-group">
+          <label class="filters-label cf-sr-only" for="cfRegionsBtn">Regions</label>
+
           <div class="cf-multi" id="cfRegions">
             <button type="button"
                     id="cfRegionsBtn"
@@ -125,28 +136,61 @@
             </button>
 
             <div class="cf-multi-menu" id="cfRegionsMenu" role="menu" aria-label="Regions">
-              <!-- your existing checkbox items -->
+              <label class="cf-multi-item">
+                <input type="checkbox" data-key="all" id="cfRegionAll" checked />
+                <span>All regions</span>
+              </label>
+
+              <div class="cf-multi-sep" role="separator"></div>
+
+              <label class="cf-multi-item">
+                <input type="checkbox" data-key="r1-20" id="cfRegionR1_20" checked />
+                <span>R1–R20</span>
+              </label>
+
+              <label class="cf-multi-item">
+                <input type="checkbox" data-key="r21-40" id="cfRegionR21_40" checked />
+                <span>R21–R40</span>
+              </label>
+
+              <label class="cf-multi-item">
+                <input type="checkbox" data-key="r41p" id="cfRegionR41P" checked />
+                <span>R41+</span>
+              </label>
             </div>
           </div>
         </div>
 
-        <!-- Show (put your tabs here) -->
-        <div class="cf-filter-cell">
-          <div class="cf-tabs" id="cfTabs">
-            <button class="cf-tab is-active" data-tab="2-3" type="button">2–3 teams</button>
-            <button class="cf-tab" data-tab="4-5" type="button">4–5 teams</button>
-            <button class="cf-tab" data-tab="6-7" type="button">6–7 teams</button>
-          </div>
+        <div class="filters-group cf-density-filters" aria-label="Density filters">
+          <span class="filters-label cf-sr-only">Show</span>
+
+          <label class="cf-check">
+            <input type="checkbox" id="cfShowRed" checked />
+            <span class="cf-check-pill cf-pill-red">Low</span>
+          </label>
+
+          <label class="cf-check">
+            <input type="checkbox" id="cfShowOrange" checked />
+            <span class="cf-check-pill cf-pill-orange">Medium</span>
+          </label>
+
+          <label class="cf-check">
+            <input type="checkbox" id="cfShowGreen" checked />
+            <span class="cf-check-pill cf-pill-green">High</span>
+          </label>
         </div>
 
-        <!-- Legend (your density checkboxes/pills) -->
-        <div class="cf-filter-cell">
-          <div class="cf-density-filters">
-            <!-- your existing 3 checkbox pills -->
-          </div>
+        <span class="filters-spacer" aria-hidden="true"></span>
+
+        <div class="filters-group">
+          <span class="filters-label cf-sr-only">Legend (number of times used)</span>
+          <span class="filters-badge">Low ≤ 2</span>
+          <span class="filters-badge">Medium 3–6</span>
+          <span class="filters-badge">High ≥ 7</span>
         </div>
       </div>
     </div>
+
   </section>
 
   <section aria-label="Teams buckets">
