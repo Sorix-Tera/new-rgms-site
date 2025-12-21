@@ -474,19 +474,32 @@
   }
 
   function setActiveBucket(bucketKey) {
-    // Toggle panels + tabs (if present in your markup).
-    qsa('[data-cf-tab]').forEach(btn => {
-      const k = btn.getAttribute('data-cf-tab');
+    // Tabs
+    qsa('.cf-tab').forEach((btn) => {
+      const k = btn.getAttribute('data-bucket');
       if (!k) return;
-      btn.classList.toggle('is-active', k === bucketKey);
+
+      const isActive = (k === bucketKey);
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+
+      // Optional: manage tabindex for keyboard nav
+      btn.setAttribute('tabindex', isActive ? '0' : '-1');
     });
 
-    qsa('.cf-panel').forEach(panel => {
-      const k = panel.getAttribute('data-cf-panel');
+    // Panels
+    qsa('.cf-panel').forEach((panel) => {
+      const k = panel.getAttribute('data-bucket');
       if (!k) return;
-      panel.classList.toggle('is-active', k === bucketKey);
+
+      const isActive = (k === bucketKey);
+      panel.classList.toggle('is-active', isActive);
+
+      // Optional: hide inactive panels from assistive tech
+      panel.setAttribute('aria-hidden', isActive ? 'false' : 'true');
     });
   }
+
 
   function getInitialModeFromUrlOrDefault() {
     const p = new URLSearchParams(window.location.search);
@@ -516,9 +529,10 @@
     });
 
     // Tabs (if you use them)
-    qsa('[data-cf-tab]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const bucket = btn.getAttribute('data-cf-tab');
+    qsa('.cf-tab').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const bucket = btn.getAttribute('data-bucket');
         if (!bucket) return;
         setActiveBucket(bucket);
       });
