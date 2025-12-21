@@ -71,15 +71,13 @@
 
 /* ---- NEW: Two-line filter layout (text row + controls row) ---- */
 
-.cf-filter-grid {
-  margin: 0 0 1.0rem 0;
-}
-
-#compFinderPage .cf-filter-head {
+#compFinderPage .cf-filter-head ,
+#compFinderPage .filters.cf-filter-body {
   display: grid;
   grid-template-columns: 190px 220px 260px 1fr; /* Mode | Region | Show | Legend */
-  column-gap: 12px;
+  column-gap: 10px;
   align-items: end;
+  border: 1px solid rgb(255, 255, 255, 0);
 }
 
 #compFinderPage .cf-filter-head {
