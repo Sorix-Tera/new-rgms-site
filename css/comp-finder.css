@@ -75,8 +75,7 @@
   margin: 0 0 1.0rem 0;
 }
 
-#compFinderPage .cf-filter-head,
-#compFinderPage .filters.cf-filter-body {
+#compFinderPage .cf-filter-head {
   display: grid;
   grid-template-columns: 190px 220px 260px 1fr; /* Mode | Region | Show | Legend */
   column-gap: 12px;
