@@ -2,7 +2,7 @@
 // Aggregates comps across all players, grouped by teams buckets and averaged winrate.
 
 (function () {
-  const CACHE = new Map(); // mode -> { buckets: { '2-3':[], '4-5':[], '6-7':[] }, truncated: boolean, rowCount: number }
+  const CACHE = new Map(); // mode -> { rows: [], truncated: boolean, rowCount: number, bucketsAll: {..}, statsAll: {...} }
 
   function qs(sel) { return document.querySelector(sel); }
   function qsa(sel) { return Array.from(document.querySelectorAll(sel)); }
@@ -72,7 +72,7 @@
 
       const { data, error } = await supabaseClient
         .from('comps')
-        .select('heroes,pet,winrate,teams')
+        .select('heroes,pet,winrate,teams,region')
         .eq('mode', mode)
         .not('winrate', 'is', null)
         .range(from, to);
@@ -268,15 +268,206 @@
     history.replaceState({}, '', url.toString());
   }
 
+  // ---------- Regions (multi-select) ----------
+
+  const REGION_RANGES = [
+    { key: 'r1-20', label: 'R1–R20', min: 1, max: 20 },
+    { key: 'r21-40', label: 'R21–R40', min: 21, max: 40 },
+    { key: 'r41plus', label: 'R41+', min: 41, max: Infinity },
+  ];
+
+  function parseRegionNumber(value) {
+    if (value == null) return null;
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+    const m = String(value).match(/(\d+)/);
+    if (!m) return null;
+    const n = Number(m[1]);
+    return Number.isFinite(n) ? n : null;
+  }
+
+  function getRegionParamKeysFromUrl() {
+    const p = new URLSearchParams(window.location.search);
+    const raw = (p.get('regions') || '').trim();
+    if (!raw) return null; // null => all regions
+    const parts = raw.split(',').map(s => s.trim()).filter(Boolean);
+    if (parts.length === 0) return null;
+    if (parts.includes('all')) return null;
+    // keep only known keys
+    const known = new Set(REGION_RANGES.map(r => r.key));
+    const keys = parts.filter(k => known.has(k));
+    return keys.length ? keys : null;
+  }
+
+  function updateUrlRegions(keysOrNull) {
+    const url = new URL(window.location.href);
+    if (!keysOrNull || keysOrNull.length === 0) {
+      url.searchParams.delete('regions');
+    } else {
+      url.searchParams.set('regions', keysOrNull.join(','));
+    }
+    history.replaceState({}, '', url.toString());
+  }
+
+  function getRegionEls() {
+    return {
+      dropdown: qs('#cfRegionDropdown'),
+      summary: qs('#cfRegionSummary'),
+      all: qs('#cfRegionAll'),
+      ranges: qsa('.cf-region-range'),
+    };
+  }
+
+  function setRegionUiToAll() {
+    const { all, ranges } = getRegionEls();
+    if (all) all.checked = true;
+    for (const cb of ranges) cb.checked = true;
+    updateRegionSummaryText();
+  }
+
+  function setRegionUiToKeys(keys) {
+    const { all, ranges } = getRegionEls();
+    const set = new Set(keys || []);
+    if (all) all.checked = false;
+    for (const cb of ranges) cb.checked = set.has(cb.value);
+    // If none selected, fall back to all
+    const any = ranges.some(cb => cb.checked);
+    if (!any) {
+      setRegionUiToAll();
+      return;
+    }
+    // If all ranges selected, treat as all
+    const every = ranges.every(cb => cb.checked);
+    if (every) {
+      setRegionUiToAll();
+      return;
+    }
+    updateRegionSummaryText();
+  }
+
+  function getRegionSelection() {
+    const { all, ranges } = getRegionEls();
+    const checkedRanges = ranges.filter(cb => cb.checked).map(cb => cb.value);
+
+    const allSelected = (all && all.checked) || checkedRanges.length === 0 || checkedRanges.length === REGION_RANGES.length;
+    if (allSelected) {
+      return { isAll: true, keys: null, label: 'All regions' };
+    }
+
+    const labels = REGION_RANGES
+      .filter(r => checkedRanges.includes(r.key))
+      .map(r => r.label);
+
+    return { isAll: false, keys: checkedRanges, label: labels.join(', ') };
+  }
+
+  function updateRegionSummaryText() {
+    const { summary } = getRegionEls();
+    if (!summary) return;
+    const sel = getRegionSelection();
+    summary.textContent = sel.label;
+  }
+
+  function normalizeRegionUiAfterChange(changedKey) {
+    const { all, ranges } = getRegionEls();
+    if (!all) return;
+
+    if (changedKey === 'all') {
+      // All toggled => apply to all range checkboxes
+      for (const cb of ranges) cb.checked = all.checked;
+      // Never allow "none" => if unchecked, re-check all
+      const any = ranges.some(cb => cb.checked);
+      if (!any) {
+        all.checked = true;
+        for (const cb of ranges) cb.checked = true;
+      }
+      updateRegionSummaryText();
+      return;
+    }
+
+    // A range changed
+    const every = ranges.every(cb => cb.checked);
+    const any = ranges.some(cb => cb.checked);
+
+    if (!any) {
+      // Don't allow empty selection
+      setRegionUiToAll();
+      return;
+    }
+
+    // If all ranges checked => go back to All
+    if (every) {
+      setRegionUiToAll();
+      return;
+    }
+
+    // Otherwise ensure "All" is unchecked
+    all.checked = false;
+    updateRegionSummaryText();
+  }
+
+  function rowMatchesSelectedRegions(row, regionSel) {
+    if (!regionSel || regionSel.isAll) return true;
+
+    const n = parseRegionNumber(row && row.region);
+    if (n == null) return false;
+
+    for (const key of regionSel.keys || []) {
+      const r = REGION_RANGES.find(x => x.key === key);
+      if (!r) continue;
+      if (n >= r.min && n <= r.max) return true;
+    }
+    return false;
+  }
+
+  function initRegionUi() {
+    const { dropdown, all, ranges } = getRegionEls();
+    if (!dropdown || !all || !ranges.length) return;
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', (e) => {
+      if (!dropdown.open) return;
+      if (!dropdown.contains(e.target)) dropdown.removeAttribute('open');
+    });
+
+    // Apply URL param (if any)
+    const keys = getRegionParamKeysFromUrl();
+    if (!keys) setRegionUiToAll();
+    else setRegionUiToKeys(keys);
+
+    all.addEventListener('change', () => {
+      normalizeRegionUiAfterChange('all');
+      const sel = getRegionSelection();
+      updateUrlRegions(sel.isAll ? null : sel.keys);
+      renderForMode(getSelectedMode());
+    });
+
+    for (const cb of ranges) {
+      cb.addEventListener('change', () => {
+        normalizeRegionUiAfterChange(cb.value);
+        const sel = getRegionSelection();
+        updateUrlRegions(sel.isAll ? null : sel.keys);
+        renderForMode(getSelectedMode());
+      });
+    }
+  }
+
+
   async function ensureDataLoaded(mode, statusEl) {
     if (CACHE.has(mode)) return CACHE.get(mode);
 
     statusEl.textContent = 'Loading comps…';
 
     const { rows, truncated } = await fetchAllCompsRowsForMode(mode);
-    const { buckets } = groupAndAggregate(rows);
+    const { buckets, stats } = groupAndAggregate(rows);
 
-    const payload = { buckets, truncated, rowCount: rows.length };
+    const payload = {
+      rows,
+      truncated,
+      rowCount: rows.length,
+      bucketsAll: buckets,
+      statsAll: stats,
+    };
+
     CACHE.set(mode, payload);
     return payload;
   }
@@ -292,16 +483,31 @@
     try {
       const payload = await ensureDataLoaded(mode, statusEl);
 
-      const densityFlags = getDensityFlags();
-      renderCompsIntoGrid(grid23, payload.buckets['2-3'], densityFlags);
-      renderCompsIntoGrid(grid45, payload.buckets['4-5'], densityFlags);
-      renderCompsIntoGrid(grid67, payload.buckets['6-7'], densityFlags);
+      const regionSel = getRegionSelection();
+      let bucketsToRender = payload.bucketsAll;
+      let rowsUsed = payload.rowCount;
 
-      const msg = payload.truncated
+      // If a region subset is selected, re-aggregate from cached raw rows
+      if (regionSel && !regionSel.isAll) {
+        const filtered = (payload.rows || []).filter(r => rowMatchesSelectedRegions(r, regionSel));
+        rowsUsed = filtered.length;
+        bucketsToRender = groupAndAggregate(filtered).buckets;
+      }
+
+      const densityFlags = getDensityFlags();
+      renderCompsIntoGrid(grid23, bucketsToRender['2-3'], densityFlags);
+      renderCompsIntoGrid(grid45, bucketsToRender['4-5'], densityFlags);
+      renderCompsIntoGrid(grid67, bucketsToRender['6-7'], densityFlags);
+
+      const baseMsg = payload.truncated
         ? `Loaded first ${payload.rowCount} rows (truncated for performance).`
         : `Loaded ${payload.rowCount} rows.`;
 
-      statusEl.textContent = `Showing comps aggregated across all players for ${mode}. ${msg}`;
+      const regionMsg = (regionSel && !regionSel.isAll)
+        ? ` Regions: ${regionSel.label} (using ${rowsUsed} rows).`
+        : ` Regions: All regions.`;
+
+      statusEl.textContent = `Showing comps aggregated across all players for ${mode}. ${baseMsg}${regionMsg}`;
     } catch (err) {
       console.error('Comp Finder error:', err);
       const statusEl2 = qs('#cfLoadStatus');
@@ -319,6 +525,9 @@
     const initialMode = modeFromUrl || getSelectedMode();
     setSelectedMode(initialMode);
     updateUrlMode(initialMode);
+
+    // Regions multi-select (reads URL param if present)
+    initRegionUi();
 
     // Tabs
     qsa('.cf-tab').forEach(btn => {

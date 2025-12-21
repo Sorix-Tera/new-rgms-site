@@ -23,6 +23,39 @@ permalink: "comp-finder.html"
       </select>
     </div>
 
+
+    <div class="filters-group">
+      <label class="filters-label">Regions</label>
+
+      <details class="cf-region" id="cfRegionDropdown">
+        <summary class="filters-select cf-region-summary">
+          <span id="cfRegionSummary">All regions</span>
+        </summary>
+
+        <div class="cf-region-menu" role="listbox" aria-label="Regions">
+          <label class="cf-region-item">
+            <input type="checkbox" id="cfRegionAll" value="all" checked />
+            <span>All regions</span>
+          </label>
+
+          <label class="cf-region-item">
+            <input type="checkbox" class="cf-region-range" value="r1-20" checked />
+            <span>R1–R20</span>
+          </label>
+
+          <label class="cf-region-item">
+            <input type="checkbox" class="cf-region-range" value="r21-40" checked />
+            <span>R21–R40</span>
+          </label>
+
+          <label class="cf-region-item">
+            <input type="checkbox" class="cf-region-range" value="r41plus" checked />
+            <span>R41+</span>
+          </label>
+        </div>
+      </details>
+    </div>
+
     <div class="filters-group cf-density-filters" aria-label="Density filters">
       <span class="filters-label">Show</span>
 
@@ -74,3 +107,49 @@ permalink: "comp-finder.html"
     </div>
   </section>
 </main>
+
+<style>
+  /* Comp Finder: region dropdown (multi-select) */
+  .cf-region { position: relative; }
+  .cf-region summary { list-style: none; }
+  .cf-region summary::-webkit-details-marker { display: none; }
+
+  /* Make the summary look like your selects */
+  .cf-region-summary { cursor: pointer; user-select: none; }
+  .cf-region[open] .cf-region-summary {
+    border-color: rgba(255,255,255,0.18);
+  }
+
+  .cf-region-menu {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    z-index: 40;
+    min-width: 220px;
+    padding: 10px 10px;
+    background: rgba(5, 6, 10, 0.95);
+    border: 1px solid rgba(255,255,255,0.10);
+    border-radius: 12px;
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.06) inset,
+      0 14px 34px rgba(0,0,0,0.35);
+  }
+
+  .cf-region-item {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    padding: 0.35rem 0.35rem;
+    cursor: pointer;
+    color: var(--text);
+  }
+
+  .cf-region-item:hover {
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+  }
+
+  .cf-region-item input {
+    transform: translateY(1px);
+  }
+</style>
