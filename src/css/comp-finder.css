@@ -248,3 +248,76 @@
     0 0 0 1px rgba(70, 220, 140, 0.14),
     0 0 18px rgba(70, 220, 140, 0.22);
 }
+
+/* ===== Comp Finder: 2-line filter grid (labels row + controls row) ===== */
+
+.cf-filter-grid {
+  margin: 0 0 1.0rem 0;
+}
+
+.cf-filter-head,
+.cf-filter-body {
+  display: grid;
+  grid-template-columns: 180px 220px 1fr 320px; /* Mode | Region | Show | Legend */
+  column-gap: 12px;
+  align-items: end;
+}
+
+/* Header labels row */
+.cf-filter-head {
+  margin-bottom: 6px;
+}
+
+.cf-filter-h {
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.2px;
+  color: var(--text-muted);
+}
+
+/* Controls row */
+.cf-filter-cell {
+  min-width: 0; /* prevents overflow in grid */
+}
+
+/* Make the Show tabs fit nicely inside the grid cell */
+.cf-filter-cell .cf-tabs {
+  margin: 0;            /* remove the bottom margin used elsewhere */
+  width: max-content;   /* keeps it compact */
+  max-width: 100%;
+}
+
+/* Keep legend pills aligned and on one line when possible */
+.cf-filter-cell .cf-density-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* Slightly reduce control height so the row looks compact */
+.filters-select,
+.cf-multi-btn {
+  min-height: 38px;
+}
+
+/* Responsive: stack into 2 columns on medium screens */
+@media (max-width: 980px) {
+  .cf-filter-head,
+  .cf-filter-body {
+    grid-template-columns: 1fr 1fr; /* Mode | Region then Show | Legend */
+    row-gap: 10px;
+  }
+}
+
+/* Responsive: stack into 1 column on small screens */
+@media (max-width: 560px) {
+  .cf-filter-head,
+  .cf-filter-body {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-filter-cell .cf-density-filters {
+    justify-content: flex-start;
+  }
+}
