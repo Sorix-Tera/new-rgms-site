@@ -547,6 +547,10 @@ function renderBucketedCompsGrid(gridEl, compsByBucket, opts = {}) {
         empty.textContent = 'No comps.';
         body.appendChild(empty);
       }
+    } else if (col.key == '4-5') {
+      renderCompsGrid(body, comps, 5);
+    } else if (col.key == '6-7') {
+      renderCompsGrid(body, comps, 7);
     } else {
       renderCompsGrid(body, comps);
     }
@@ -580,10 +584,14 @@ function iconUrlForPet(name) {
   return `icons/pets/${n}.jpg`;
 }
 
-function renderCompsGrid(gridEl, comps) {
+function renderCompsGrid(gridEl, comps, key = null) {
   const frag = document.createDocumentFragment();
+  let selected = [];
+  let toSelect = false;
 
   for (const comp of comps) {
+    if (key !== null)
+      console.log(comp);
     const card = document.createElement('div');
     card.className = 'comp-card';
 
