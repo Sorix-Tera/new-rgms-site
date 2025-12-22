@@ -590,10 +590,22 @@ function renderCompsGrid(gridEl, comps, key = null) {
   let toSelect = false;
 
   for (const comp of comps) {
-    if (key !== null)
-      console.log(comp);
+    if (key !== null) {
+      if ((selected.length/5) <= key) {
+        const heroes = comp.hero.split("-").map(s => s.trim());
+        const hasAnySelected = heroes.some(h => selected.includes(h));
+        if (!hasAnySelected) {
+          toSelect = true;
+          selected.push(...comp.hero.split("-").map(s => s.trim()));
+        }
+      }
+    }
+    
     const card = document.createElement('div');
-    card.className = 'comp-card';
+    if (toSelect)
+      card.className = 'comp-card selected';
+    else
+      card.className = 'comp-card';
 
     const row = document.createElement('div');
     row.className = 'comp-row';
@@ -613,7 +625,7 @@ function renderCompsGrid(gridEl, comps, key = null) {
       };
       row.appendChild(img);
     }
-
+    console.log("selected", selected)
     // Pet icon
     const petImg = document.createElement('img');
     petImg.className = 'comp-icon';
