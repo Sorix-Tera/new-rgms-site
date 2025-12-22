@@ -591,14 +591,14 @@ function renderCompsGrid(gridEl, comps, key = null) {
 
   for (const comp of comps) {
     console.log(key, comp)
-    if (key != null) {
+    if (key != null & comp?.heroes != null) {
       console.log("here?");
       if ((selected.length/5) <= key) {
-        const heroes = comp.hero.split("-").map(s => s.trim());
+        const heroes = comp.heroes.split("-").map(s => s.trim());
         const hasAnySelected = heroes.some(h => selected.includes(h));
         if (!hasAnySelected) {
           toSelect = true;
-          selected.push(...comp.hero.split("-").map(s => s.trim()));
+          selected.push(...comp.heroes.split("-").map(s => s.trim()));
         }
       }
     }
