@@ -328,39 +328,189 @@
     return !!comp && (comp.density === 'orange' || comp.density === 'green');
   }
   
-  function computeSelectedCompKeys(compsSorted, maxSelect) {
-    // Select best-performing comps (already sorted by winrate desc),
-    // enforcing unique heroes across selections. Only Medium/High legend comps qualify.
+  function computeSelectedCompKeysGreedy(compsSorted, maxSelect) {
+    // Your current behavior, but also enforcing unique pets (new requirement).
     const selectedKeys = new Set();
     const usedHeroes = new Set();
+    const usedPets = new Set();
     let picked = 0;
   
-    if (!Array.isArray(compsSorted)) return selectedKeys;
-    if (!Number.isFinite(maxSelect) || maxSelect <= 0) return selectedKeys;
+    if (!Array.isArray(compsSorted) || maxSelect <= 0) return selectedKeys;
   
     for (const comp of compsSorted) {
       if (picked >= maxSelect) break;
       if (!isMediumOrHighLegend(comp)) continue;
   
+      // Normalize heroes/pet
       let heroes = parseHeroesList(comp.heroes).map(h => (h || '').trim().toLowerCase());
       heroes = heroes.slice(0, 5);
       while (heroes.length < 5) heroes.push('unknown');
   
-      // Enforce unique heroes across selected cards (ignore "unknown")
-      const overlaps = heroes.some(h => h && h !== 'unknown' && usedHeroes.has(h));
-      if (overlaps) continue;
+      const pet = ((comp.pet || '').trim().toLowerCase()) || 'unknown';
+  
+      // Enforce uniqueness (ignore 'unknown')
+      const heroOverlap = heroes.some(h => h && h !== 'unknown' && usedHeroes.has(h));
+      const petOverlap = (pet !== 'unknown' && usedPets.has(pet));
+      if (heroOverlap || petOverlap) continue;
   
       const compKey = normalizeCompKey(heroes, comp.pet);
       selectedKeys.add(compKey);
   
-      for (const h of heroes) {
-        if (h && h !== 'unknown') usedHeroes.add(h);
-      }
+      for (const h of heroes) if (h && h !== 'unknown') usedHeroes.add(h);
+      if (pet !== 'unknown') usedPets.add(pet);
   
       picked++;
     }
   
     return selectedKeys;
+  }
+  
+  function computeSelectedCompKeys(compsSorted, maxSelect) {
+    // 1) If <= maxSelect eligible, keep current method (greedy).
+    // 2) Else try to find EXACTLY maxSelect disjoint comps (unique heroes + unique pets),
+    //    maximizing total winrate.
+    // 3) If not found, fallback to greedy.
+  
+    if (!Array.isArray(compsSorted) || maxSelect <= 0) return new Set();
+  
+    // Keep only Medium/High legend as required
+    const eligible = compsSorted.filter(isMediumOrHighLegend);
+  
+    // Rule (1): if only maxSelect or fewer, keep existing behavior
+    if (eligible.length <= maxSelect) {
+      return computeSelectedCompKeysGreedy(eligible, maxSelect);
+    }
+  
+    // Optional additional “reason” to preserve responsiveness:
+    // cap candidates so we don’t explode combinatorially on very large datasets.
+    // (Tune these caps based on your dataset size / browser targets.)
+    const CANDIDATE_CAP = (maxSelect === 5) ? 70 : 110;
+  
+    // De-duplicate identical comps by compKey (keep best winrate)
+    const bestByKey = new Map();
+    for (const comp of eligible) {
+      let heroes = parseHeroesList(comp.heroes).map(h => (h || '').trim().toLowerCase());
+      heroes = heroes.slice(0, 5);
+      while (heroes.length < 5) heroes.push('unknown');
+  
+      const key = normalizeCompKey(heroes, comp.pet);
+      const win = Number(comp.winrate) || 0;
+  
+      const prev = bestByKey.get(key);
+      if (!prev || win > prev._win) {
+        bestByKey.set(key, { ...comp, _key: key, _win: win });
+      }
+    }
+  
+    // Sort by winrate desc and keep top N candidates
+    const candidates = Array.from(bestByKey.values())
+      .sort((a, b) => (b._win - a._win))
+      .slice(0, CANDIDATE_CAP)
+      .map(c => {
+        // Precompute sets for faster conflict checks
+        let heroes = parseHeroesList(c.heroes).map(h => (h || '').trim().toLowerCase());
+        heroes = heroes.slice(0, 5);
+        while (heroes.length < 5) heroes.push('unknown');
+  
+        const heroSet = new Set(heroes.filter(h => h && h !== 'unknown'));
+        const pet = ((c.pet || '').trim().toLowerCase()) || 'unknown';
+  
+        return {
+          ...c,
+          _heroSet: heroSet,
+          _petNorm: pet,
+        };
+      });
+  
+    // If we capped too hard and now there aren't enough candidates to even choose k
+    if (candidates.length < maxSelect) {
+      return computeSelectedCompKeysGreedy(eligible, maxSelect);
+    }
+  
+    // Branch-and-bound search for best EXACT set of size maxSelect
+    let bestPick = null;
+    let bestSum = -Infinity;
+  
+    const usedHeroes = new Set();
+    const usedPets = new Set();
+    const picked = [];
+  
+    // Precompute a simple upper-bound prefix to prune faster:
+    // ub(i, remaining) = sum of top `remaining` wins from i onward (ignores conflicts).
+    const wins = candidates.map(c => c._win);
+  
+    function upperBound(fromIndex, remaining) {
+      let s = 0;
+      for (let i = 0; i < remaining; i++) {
+        const idx = fromIndex + i;
+        if (idx >= wins.length) break;
+        s += wins[idx];
+      }
+      return s;
+    }
+  
+    function conflicts(comp) {
+      // pets must be unique as well; ignore unknown pet
+      if (comp._petNorm !== 'unknown' && usedPets.has(comp._petNorm)) return true;
+      for (const h of comp._heroSet) {
+        if (usedHeroes.has(h)) return true;
+      }
+      return false;
+    }
+  
+    function addComp(comp) {
+      picked.push(comp);
+      if (comp._petNorm !== 'unknown') usedPets.add(comp._petNorm);
+      for (const h of comp._heroSet) usedHeroes.add(h);
+    }
+  
+    function removeComp(comp) {
+      picked.pop();
+      if (comp._petNorm !== 'unknown') usedPets.delete(comp._petNorm);
+      for (const h of comp._heroSet) usedHeroes.delete(h);
+    }
+  
+    function dfs(i, sum) {
+      const remainingToPick = maxSelect - picked.length;
+      if (remainingToPick === 0) {
+        if (sum > bestSum) {
+          bestSum = sum;
+          bestPick = picked.slice();
+        }
+        return;
+      }
+      if (i >= candidates.length) return;
+  
+      // Not enough candidates left to reach size k
+      if (picked.length + (candidates.length - i) < maxSelect) return;
+  
+      // Upper-bound pruning (even if we took the next best `remainingToPick`, can we beat bestSum?)
+      const ub = sum + upperBound(i, remainingToPick);
+      if (ub <= bestSum) return;
+  
+      const comp = candidates[i];
+  
+      // Try include branch first (because candidates are sorted by winrate desc)
+      if (!conflicts(comp)) {
+        addComp(comp);
+        dfs(i + 1, sum + comp._win);
+        removeComp(comp);
+      }
+  
+      // Exclude branch
+      dfs(i + 1, sum);
+    }
+  
+    dfs(0, 0);
+  
+    // Rule (2): If we found an exact-size solution, use it
+    if (bestPick && bestPick.length === maxSelect) {
+      const keys = new Set(bestPick.map(c => c._key));
+      return keys;
+    }
+  
+    // Rule (2 fallback): If exact k not found, revert to current greedy behavior
+    return computeSelectedCompKeysGreedy(eligible, maxSelect);
   }
 
   function renderCompsIntoGrid(gridEl, comps, densityFlags, selectMax) {
