@@ -324,11 +324,24 @@
   }
 
   function isMediumOrHighLegend(comp) {
-    // Legend tiers: Low <=2 (red), Medium 3-6 (orange), High >=7 (green)
-    return !!comp && (comp.density === 'orange' || comp.density === 'green');
+      // Legend tiers: Low <=2 (red), Medium 3-6 (orange), High >=7 (green)
+      return !!comp && (comp.density === 'orange' || comp.density === 'green');
+    }
+  
+    function normHeroId(x) {
+    return (x || '').toString().trim().toLowerCase();
   }
   
-  function computeSelectedCompKeysGreedy(compsSorted, maxSelect) {
+  function getExcludedHeroesFromUI() {
+    const set = new Set();
+    document.querySelectorAll('input.hero-exclusion:checked').forEach(cb => {
+      const id = normHeroId(cb.value);
+      if (id) set.add(id);
+    });
+    return set;
+  }
+  
+  function computeSelectedCompKeysGreedy(compsSorted, maxSelect, excludedHeroes = new Set()) {
     // Your current behavior, but also enforcing unique pets (new requirement).
     const selectedKeys = new Set();
     const usedHeroes = new Set();
@@ -344,6 +357,8 @@
       // Normalize heroes/pet
       let heroes = parseHeroesList(comp.heroes).map(h => (h || '').trim().toLowerCase());
       heroes = heroes.slice(0, 5);
+      const heroExcluded = heroes.some(h => h && h !== 'unknown' && excludedHeroes.has(h));
+      if (heroExcluded) continue;
       while (heroes.length < 5) heroes.push('unknown');
   
       const pet = ((comp.pet || '').trim().toLowerCase()) || 'unknown';
@@ -365,7 +380,7 @@
     return selectedKeys;
   }
   
-  function computeSelectedCompKeys(compsSorted, maxSelect) {
+  function computeSelectedCompKeys(compsSorted, maxSelect, excludedHeroes = new Set()) {
     // 1) If <= maxSelect eligible, keep current method (greedy).
     // 2) Else try to find EXACTLY maxSelect disjoint comps (unique heroes + unique pets),
     //    maximizing total winrate.
@@ -424,7 +439,7 @@
   
     // If we capped too hard and now there aren't enough candidates to even choose k
     if (candidates.length < maxSelect) {
-      return computeSelectedCompKeysGreedy(eligible, maxSelect);
+      return computeSelectedCompKeysGreedy(eligible, maxSelect, excludedHeroes);
     }
   
     // Branch-and-bound search for best EXACT set of size maxSelect
@@ -450,14 +465,21 @@
     }
   
     function conflicts(comp) {
-      // pets must be unique as well; ignore unknown pet
+      // Excluded heroes: if candidate contains any excluded hero, it is invalid
+      for (const h of comp._heroSet) {
+        if (excludedHeroes.has(h)) return true;
+      }
+    
+      // pets must be unique; ignore unknown
       if (comp._petNorm !== 'unknown' && usedPets.has(comp._petNorm)) return true;
+    
+      // selected heroes must be unique
       for (const h of comp._heroSet) {
         if (usedHeroes.has(h)) return true;
       }
       return false;
     }
-  
+
     function addComp(comp) {
       picked.push(comp);
       if (comp._petNorm !== 'unknown') usedPets.add(comp._petNorm);
@@ -510,15 +532,15 @@
     }
   
     // Rule (2 fallback): If exact k not found, revert to current greedy behavior
-    return computeSelectedCompKeysGreedy(eligible, maxSelect);
+    return computeSelectedCompKeysGreedy(eligible, maxSelect, excludedHeroes);
   }
 
-  function renderCompsIntoGrid(gridEl, comps, densityFlags, selectMax) {
+  function renderCompsIntoGrid(gridEl, comps, densityFlags, selectMax, excludedHeroes) {
     if (!gridEl) return;
     gridEl.innerHTML = '';
 
     const list = (comps || []).filter(c => shouldShowDensity(c, densityFlags));
-    const selectedKeys = computeSelectedCompKeys(list, selectMax);
+    const selectedKeys = computeSelectedCompKeys(list, selectMax, excludedHeroes);
 
     for (const comp of list) {
       const card = document.createElement('div');
@@ -657,9 +679,10 @@
       const { buckets } = groupAndAggregate(filteredRows);
 
       const densityFlags = getDensityFlags();
-      renderCompsIntoGrid(grid23, buckets['2-3'], densityFlags, 0);
-      renderCompsIntoGrid(grid45, buckets['4-5'], densityFlags, 5);
-      renderCompsIntoGrid(grid67, buckets['6-7'], densityFlags, 7);
+      const excludedHeroes = getExcludedHeroesFromUI();
+      renderCompsIntoGrid(grid23, buckets['2-3'], densityFlags, 0, excludedHeroes);
+      renderCompsIntoGrid(grid45, buckets['4-5'], densityFlags, 5, excludedHeroes);
+      renderCompsIntoGrid(grid67, buckets['6-7'], densityFlags, 7, excludedHeroes);
 
       const msg = payload.truncated
         ? `Loaded first ${payload.rowCount} rows (truncated for performance).`
@@ -756,6 +779,12 @@
       });
     }
 
+    qsa('input.hero-exclusion').forEach(cb => {
+      cb.addEventListener('change', () => {
+        const mode = getSelectedMode();      // whatever you currently use
+        renderForMode(mode);
+      });
+    });
     // Default active tab
     setActiveBucket('2-3');
 
