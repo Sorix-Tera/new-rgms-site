@@ -594,6 +594,7 @@ function renderCompsGrid(gridEl, comps, key = null) {
       if ((selected.length/5) <= key) {
         const heroes = comp.hero.split("-").map(s => s.trim());
         const hasAnySelected = heroes.some(h => selected.includes(h));
+        console.log(heroes, hasAnySelected)
         if (!hasAnySelected) {
           toSelect = true;
           selected.push(...comp.hero.split("-").map(s => s.trim()));
@@ -625,7 +626,7 @@ function renderCompsGrid(gridEl, comps, key = null) {
       };
       row.appendChild(img);
     }
-    console.log("selected", selected)
+    //console.log("selected", selected)
     // Pet icon
     const petImg = document.createElement('img');
     petImg.className = 'comp-icon';
