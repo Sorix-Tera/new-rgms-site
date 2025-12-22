@@ -338,6 +338,7 @@
       const id = normHeroId(cb.value);
       if (id) set.add(id);
     });
+    console.log("EXCLUDED", set);
     return set;
   }
   
@@ -385,7 +386,7 @@
     // 2) Else try to find EXACTLY maxSelect disjoint comps (unique heroes + unique pets),
     //    maximizing total winrate.
     // 3) If not found, fallback to greedy.
-  
+    console.log("compute here?");
     if (!Array.isArray(compsSorted) || maxSelect <= 0) return new Set();
   
     // Keep only Medium/High legend as required
@@ -393,7 +394,7 @@
   
     // Rule (1): if only maxSelect or fewer, keep existing behavior
     if (eligible.length <= maxSelect) {
-      return computeSelectedCompKeysGreedy(eligible, maxSelect);
+      return computeSelectedCompKeysGreedy(eligible, maxSelect, excludedHeroes);
     }
   
     // Optional additional “reason” to preserve responsiveness:
