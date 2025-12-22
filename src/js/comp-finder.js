@@ -323,15 +323,65 @@
     return true;
   }
 
-  function renderCompsIntoGrid(gridEl, comps, densityFlags) {
+  function isMediumOrHighLegend(comp) {
+    // Legend tiers: Low <=2 (red), Medium 3-6 (orange), High >=7 (green)
+    return !!comp && (comp.density === 'orange' || comp.density === 'green');
+  }
+  
+  function computeSelectedCompKeys(compsSorted, maxSelect) {
+    // Select best-performing comps (already sorted by winrate desc),
+    // enforcing unique heroes across selections. Only Medium/High legend comps qualify.
+    const selectedKeys = new Set();
+    const usedHeroes = new Set();
+    let picked = 0;
+  
+    if (!Array.isArray(compsSorted)) return selectedKeys;
+    if (!Number.isFinite(maxSelect) || maxSelect <= 0) return selectedKeys;
+  
+    for (const comp of compsSorted) {
+      if (picked >= maxSelect) break;
+      if (!isMediumOrHighLegend(comp)) continue;
+  
+      let heroes = parseHeroesList(comp.heroes).map(h => (h || '').trim().toLowerCase());
+      heroes = heroes.slice(0, 5);
+      while (heroes.length < 5) heroes.push('unknown');
+  
+      // Enforce unique heroes across selected cards (ignore "unknown")
+      const overlaps = heroes.some(h => h && h !== 'unknown' && usedHeroes.has(h));
+      if (overlaps) continue;
+  
+      const compKey = normalizeCompKey(heroes, comp.pet);
+      selectedKeys.add(compKey);
+  
+      for (const h of heroes) {
+        if (h && h !== 'unknown') usedHeroes.add(h);
+      }
+  
+      picked++;
+    }
+  
+    return selectedKeys;
+  }
+
+  function renderCompsIntoGrid(gridEl, comps, densityFlags, selectMax) {
     if (!gridEl) return;
     gridEl.innerHTML = '';
 
     const list = (comps || []).filter(c => shouldShowDensity(c, densityFlags));
+    const selectedKeys = computeSelectedCompKeys(list, selectMax);
 
     for (const comp of list) {
       const card = document.createElement('div');
       card.className = 'comp-card';
+
+      // Selected highlight (top comps, unique heroes, medium/high legend)
+      const compKey = (() => {
+        let h = parseHeroesList(comp.heroes).map(x => (x || '').trim().toLowerCase());
+        h = h.slice(0, 5);
+        while (h.length < 5) h.push('unknown');
+        return normalizeCompKey(h, comp.pet);
+      })();
+      if (selectedKeys.has(compKey)) card.classList.add('selected');
 
       // density glow class
       if (comp.density === 'red') card.classList.add('cf-glow-red');
@@ -457,9 +507,9 @@
       const { buckets } = groupAndAggregate(filteredRows);
 
       const densityFlags = getDensityFlags();
-      renderCompsIntoGrid(grid23, buckets['2-3'], densityFlags);
-      renderCompsIntoGrid(grid45, buckets['4-5'], densityFlags);
-      renderCompsIntoGrid(grid67, buckets['6-7'], densityFlags);
+      renderCompsIntoGrid(grid23, buckets['2-3'], densityFlags, 0);
+      renderCompsIntoGrid(grid45, buckets['4-5'], densityFlags, 5);
+      renderCompsIntoGrid(grid67, buckets['6-7'], densityFlags, 7);
 
       const msg = payload.truncated
         ? `Loaded first ${payload.rowCount} rows (truncated for performance).`
