@@ -296,3 +296,79 @@
     0 0 0 1px rgba(70, 220, 140, 0.14),
     0 0 18px rgba(70, 220, 140, 0.22);
 }
+
+/* ===== Hero exclusions (Comp Finder) ===== */
+#hero-exclusions {
+  display: block;
+  padding: 0.75rem 0.9rem;
+  margin: 0 0 1.25rem 0;
+
+  background: rgba(5, 6, 10, 0.85);
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Your <h3> is a bit too large for a filter label; style it like other filter headings */
+#hero-exclusions h3 {
+  margin: 0 0 0.55rem 0;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+/* Checkbox list layout */
+#hero-exclusions .hero-exclusion-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+/* Make each label look like a pill control, consistent with the rest of your UI */
+#hero-exclusions .hero-exclusion-list label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  cursor: pointer;
+  user-select: none;
+
+  padding: 0.22rem 0.65rem;
+  border-radius: 999px;
+
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: var(--bg-elevated-soft);
+  color: var(--text-muted);
+
+  font-size: 0.82rem;
+  line-height: 1.1;
+  transition: background 120ms ease, border-color 120ms ease, color 120ms ease;
+}
+
+#hero-exclusions .hero-exclusion-list label:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+/* Checkbox look/feel */
+#hero-exclusions input.hero-exclusion {
+  transform: translateY(1px);
+  accent-color: var(--accent);
+}
+
+/* Selected (checked) state — uses :has when available */
+#hero-exclusions .hero-exclusion-list label:has(input.hero-exclusion:checked) {
+  background: rgba(242, 193, 79, 0.12);
+  border-color: rgba(242, 193, 79, 0.40);
+  color: var(--text);
+  box-shadow: 0 0 0 1px rgba(242, 193, 79, 0.18);
+}
+
+/* Keyboard accessibility */
+#hero-exclusions input.hero-exclusion:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(242, 193, 79, 0.35);
+  border-radius: 4px;
+}
