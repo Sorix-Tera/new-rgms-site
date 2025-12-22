@@ -1,5 +1,4 @@
 // details.js (updated: TS comps summary is now split into 3 columns by teams bucket)
-// Source base: your current file :contentReference[oaicite:0]{index=0}
 
 async function initDetailPage() {
   const titleEl = document.getElementById('detailTitle');
