@@ -591,7 +591,7 @@ function renderCompsGrid(gridEl, comps, key = null) {
 
   for (const comp of comps) {
     console.log(key, comp)
-    if (key != null && comp?.hero != null) {
+    if (key != null) {
       console.log("here?");
       if ((selected.length/5) <= key) {
         const heroes = comp.hero.split("-").map(s => s.trim());
