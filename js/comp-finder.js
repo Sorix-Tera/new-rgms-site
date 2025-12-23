@@ -12,8 +12,8 @@
   // We intentionally do NOT store regions in the URL; only mode stays in URL (optional).
 
   const REGION_PRESETS = [
-    { key: 'r1-20', label: 'R1–R20', min: 1, max: 20 },
-    { key: 'r21-40', label: 'R21–R40', min: 21, max: 40 },
+    { key: 'r1-22', label: 'R1–R22', min: 1, max: 22 },
+    { key: 'r23-40', label: 'R23–R40', min: 23, max: 40 },
     { key: 'r41p', label: 'R41+', min: 41, max: Infinity },
   ];
 
