@@ -30,8 +30,8 @@
 
   function getSelectedRegionKeys() {
     const allEl = qs('#cfRegionAll');
-    const r1 = qs('#cfRegionR1_20');
-    const r2 = qs('#cfRegionR21_40');
+    const r1 = qs('#cfRegionR1_22');
+    const r2 = qs('#cfRegionR23_40');
     const r3 = qs('#cfRegionR41P');
 
     // If UI isn't present, default to all regions
@@ -40,8 +40,8 @@
     if (allEl.checked) return new Set(['all']);
 
     const keys = new Set();
-    if (r1.checked) keys.add('r1-20');
-    if (r2.checked) keys.add('r21-40');
+    if (r1.checked) keys.add('r1-22');
+    if (r2.checked) keys.add('r23-40');
     if (r3.checked) keys.add('r41p');
 
     // Empty selection behaves as "All"
@@ -55,8 +55,8 @@
 
   function setRegionSelection(keysSet) {
     const allEl = qs('#cfRegionAll');
-    const r1 = qs('#cfRegionR1_20');
-    const r2 = qs('#cfRegionR21_40');
+    const r1 = qs('#cfRegionR1_22');
+    const r2 = qs('#cfRegionR23_40');
     const r3 = qs('#cfRegionR41P');
     const labelEl = qs('#cfRegionsLabel');
 
@@ -65,8 +65,8 @@
     const isAll = !keysSet || keysSet.size === 0 || keysSet.has('all');
     allEl.checked = isAll;
 
-    r1.checked = isAll || keysSet.has('r1-20');
-    r2.checked = isAll || keysSet.has('r21-40');
+    r1.checked = isAll || keysSet.has('r1-22');
+    r2.checked = isAll || keysSet.has('r23-40');
     r3.checked = isAll || keysSet.has('r41p');
 
     if (labelEl) {
@@ -131,8 +131,8 @@
     });
 
     const allEl = qs('#cfRegionAll');
-    const r1 = qs('#cfRegionR1_20');
-    const r2 = qs('#cfRegionR21_40');
+    const r1 = qs('#cfRegionR1_22');
+    const r2 = qs('#cfRegionR23_40');
     const r3 = qs('#cfRegionR41P');
 
     function emit() {
@@ -147,7 +147,7 @@
           setRegionSelection(new Set(['all']));
         } else {
           // If user unchecks All, default to all three ranges selected.
-          setRegionSelection(new Set(['r1-20', 'r21-40', 'r41p']));
+          setRegionSelection(new Set(['r1-22', 'r23-40', 'r41p']));
         }
         emit();
       });
