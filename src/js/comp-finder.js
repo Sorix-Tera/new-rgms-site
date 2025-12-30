@@ -563,10 +563,9 @@
     if (!client) {
       throw new Error('Supabase client not initialized (core.js).');
     }
-    const { data, error } = await client
 
     // Pull only what we need for comp finder
-    const { data, error } = await window.supabaseClient
+    const { data, error } = await client
       .from(SUPABASE_TABLE)
       .select('mode,created_at,region,teams,heroes,pet,winrate')
       .eq('mode', modeKey)
