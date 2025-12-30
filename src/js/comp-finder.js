@@ -24,6 +24,17 @@
     { id: 'cr', label: 'Cursed Realm', key: 'cr' },
   ];
 
+  function getSupabaseClient() {
+    // core.js defines: const supabaseClient = createClient(...)
+    // That is a global binding (accessible by identifier) but not on window.
+    if (typeof supabaseClient !== 'undefined') return supabaseClient;
+  
+    // fallback if you ever expose it on window
+    if (typeof window !== 'undefined' && window.supabaseClient) return window.supabaseClient;
+  
+    return null;
+  }
+
   // ---------- parsing / normalization ----------
   function parseHeroesList(heroesStr) {
     // Heroes are stored as "A - B - C - D - E"
@@ -548,9 +559,11 @@
   }
 
   async function fetchRowsForMode(modeKey) {
-    if (!window.supabaseClient) {
+    const client = getSupabaseClient();
+    if (!client) {
       throw new Error('Supabase client not initialized (core.js).');
     }
+    const { data, error } = await client
 
     // Pull only what we need for comp finder
     const { data, error } = await window.supabaseClient
