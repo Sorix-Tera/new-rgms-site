@@ -1,0 +1,65 @@
+/* nc-comps.css
+   Page-specific UI: top tabs for the nc-comps page.
+   (Content below tabs is intentionally empty for now.)
+*/
+
+#ncCompsPage .nc-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  margin-top: 0.6rem;
+
+  background: rgba(5, 6, 10, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+}
+
+#ncCompsPage .nc-tab {
+  display: inline-flex;
+  align-items: center;
+
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+
+  cursor: pointer;
+  color: var(--text-muted);
+
+  /* remove native button look */
+  background: transparent;
+  border: 1px solid transparent;
+  margin: 0;
+  font: inherit;
+  line-height: 1;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  -webkit-tap-highlight-color: transparent;
+
+  transition: background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+}
+
+#ncCompsPage .nc-tab:hover {
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+}
+
+#ncCompsPage .nc-tab:focus-visible {
+  outline: 2px solid rgba(242, 193, 79, 0.35);
+  outline-offset: 2px;
+}
+
+#ncCompsPage .nc-tab.is-active {
+  color: var(--text);
+  background: rgba(242, 193, 79, 0.12);
+  box-shadow: 0 0 0 1px rgba(242, 193, 79, 0.35) inset;
+}
+
+/* Panels are empty for now, but we wire the show/hide behavior already. */
+#ncCompsPage .nc-panel {
+  display: none;
+}
+
+#ncCompsPage .nc-panel.is-active {
+  display: block;
+}
