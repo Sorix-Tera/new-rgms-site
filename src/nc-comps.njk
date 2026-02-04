@@ -72,11 +72,13 @@ permalink: "nc-comps.html"
             <div class="nc-force-row">
               <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero {{ i }}"/>
               <select class="nc-select" aria-label="Force hero {{ i }} SI">
+                <option value="" selected></option>
                 <option value="40">40</option>
                 <option value="30">30</option>
                 <option value="<30">&lt;30</option>
               </select>
               <select class="nc-select" aria-label="Force hero {{ i }} Furniture">
+                <option value="" selected></option>
                 <option value="0">0</option>
                 <option value="3">3</option>
                 <option value="9">9</option>
@@ -100,7 +102,7 @@ permalink: "nc-comps.html"
       <!-- Intentionally nothing else below filters for now -->
     </section>
 
-    <!-- LEADERBOARD VIEW (must remain blank) -->
+    <!-- LEADERBOARD VIEW -->
     <section
       class="nc-panel"
       id="ncPanelLeaderboard"
@@ -108,6 +110,45 @@ permalink: "nc-comps.html"
       aria-labelledby="ncTabLeaderboard"
       data-view="leaderboard"
       aria-hidden="true"
-    ></section>
+    >
+      <section class="filters nc-leaderboard-filters" aria-label="NC leaderboard filters">
+        <div class="nc-leaderboard-header" aria-hidden="true">
+          <div class="nc-lh">Hero</div>
+          <div class="nc-lh">SI</div>
+          <div class="nc-lh">Furn.</div>
+          <div class="nc-lh">Round</div>
+        </div>
+
+        <div class="nc-leaderboard-rows">
+          {% for i in [1,2,3,4,5] %}
+          <div class="nc-leaderboard-row">
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero {{ i }}"/>
+            <select class="nc-select" aria-label="Leaderboard hero {{ i }} SI">
+              <option value="" selected></option>
+              <option value="40">40</option>
+              <option value="30">30</option>
+              <option value="<30">&lt;30</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero {{ i }} Furniture">
+              <option value="" selected></option>
+              <option value="0">0</option>
+              <option value="3">3</option>
+              <option value="9">9</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero {{ i }} Round">
+              <option value="R1">R1</option>
+              <option value="R2">R2</option>
+              <option value="R3">R3</option>
+              <option value="R4">R4</option>
+              <option value="R5">R5</option>
+              <option value="R6">R6</option>
+            </select>
+          </div>
+          {% endfor %}
+        </div>
+      </section>
+
+      <!-- Intentionally nothing else below filters for now -->
+    </section>
   </div>
 </main>
