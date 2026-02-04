@@ -37,16 +37,70 @@ permalink: "nc-comps.html"
     </div>
   </header>
 
-  <!-- Intentionally empty for now; we will populate these views later -->
   <div class="nc-panels">
+    <!-- COMPS VIEW -->
     <section
       class="nc-panel is-active"
       id="ncPanelComps"
       role="tabpanel"
       aria-labelledby="ncTabComps"
       data-view="comps"
-    ></section>
+    >
+      <!-- Round tabs -->
+      <div class="nc-rounds" role="tablist" aria-label="Nightmare Corridor rounds">
+        <button class="nc-round-tab is-active" type="button" role="tab" aria-selected="true" data-round="1">R1</button>
+        <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="2">R2</button>
+        <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="3">R3</button>
+        <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="4">R4</button>
+        <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="5">R5</button>
+        <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="6">R6</button>
+      </div>
 
+      <!-- Filters section (Comp Finder style container) -->
+      <section class="filters nc-comps-filters" aria-label="NC comps filters">
+        <div class="nc-filter-col nc-filter-col-force">
+          <div class="nc-filter-title">Force Hero</div>
+
+          <div class="nc-force-header" aria-hidden="true">
+            <div class="nc-force-h">Hero</div>
+            <div class="nc-force-h">SI</div>
+            <div class="nc-force-h">Furn.</div>
+          </div>
+
+          <div class="nc-force-rows">
+            {% for i in [1,2,3,4,5] %}
+            <div class="nc-force-row">
+              <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero {{ i }}"/>
+              <select class="nc-select" aria-label="Force hero {{ i }} SI">
+                <option value="40">40</option>
+                <option value="30">30</option>
+                <option value="<30">&lt;30</option>
+              </select>
+              <select class="nc-select" aria-label="Force hero {{ i }} Furniture">
+                <option value="0">0</option>
+                <option value="3">3</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+            {% endfor %}
+          </div>
+        </div>
+
+        <div class="nc-filter-col nc-filter-col-blacklist">
+          <div class="nc-filter-title">Blacklist Hero</div>
+
+          <div class="nc-blacklist-rows">
+            {% for i in [1,2,3,4,5] %}
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Blacklist hero {{ i }}"/>
+            {% endfor %}
+          </div>
+        </div>
+      </section>
+
+      <!-- Intentionally nothing else below filters for now -->
+    </section>
+
+    <!-- LEADERBOARD VIEW (must remain blank) -->
     <section
       class="nc-panel"
       id="ncPanelLeaderboard"
