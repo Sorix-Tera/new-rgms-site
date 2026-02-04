@@ -61,15 +61,15 @@ permalink: "nc-comps.html"
         <div class="nc-filter-col nc-filter-col-force">
           <div class="nc-filter-title">Force Hero</div>
 
-          <div class="nc-force-header" aria-hidden="true">
-            <div class="nc-force-h">Hero</div>
-            <div class="nc-force-h">SI</div>
-            <div class="nc-force-h">Furn.</div>
+          <div class="nc-filter-header" aria-hidden="true">
+            <div class="nc-filter-h">Hero</div>
+            <div class="nc-filter-h">SI</div>
+            <div class="nc-filter-h">Furn.</div>
           </div>
 
           <div class="nc-force-rows">
             {% for i in [1,2,3,4,5] %}
-            <div class="nc-force-row">
+            <div class="nc-filter-row">
               <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero {{ i }}"/>
               <select class="nc-select" aria-label="Force hero {{ i }} SI">
                 <option value="" selected></option>
@@ -112,16 +112,16 @@ permalink: "nc-comps.html"
       aria-hidden="true"
     >
       <section class="filters nc-leaderboard-filters" aria-label="NC leaderboard filters">
-        <div class="nc-leaderboard-header" aria-hidden="true">
-          <div class="nc-lh">Hero</div>
-          <div class="nc-lh">SI</div>
-          <div class="nc-lh">Furn.</div>
-          <div class="nc-lh">Round</div>
+        <div class="nc-filter-header" aria-hidden="true">
+          <div class="nc-filter-h">Hero</div>
+          <div class="nc-filter-h">SI</div>
+          <div class="nc-filter-h">Furn.</div>
+          <div class="nc-filter-h">Round</div>
         </div>
 
         <div class="nc-leaderboard-rows">
           {% for i in [1,2,3,4,5] %}
-          <div class="nc-leaderboard-row">
+          <div class="nc-filter-row">
             <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero {{ i }}"/>
             <select class="nc-select" aria-label="Leaderboard hero {{ i }} SI">
               <option value="" selected></option>
