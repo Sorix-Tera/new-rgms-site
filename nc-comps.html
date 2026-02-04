@@ -158,11 +158,13 @@
             <div class="nc-force-row">
               <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero 1"/>
               <select class="nc-select" aria-label="Force hero 1 SI">
+                <option value="" selected></option>
                 <option value="40">40</option>
                 <option value="30">30</option>
                 <option value="<30">&lt;30</option>
               </select>
               <select class="nc-select" aria-label="Force hero 1 Furniture">
+                <option value="" selected></option>
                 <option value="0">0</option>
                 <option value="3">3</option>
                 <option value="9">9</option>
@@ -172,11 +174,13 @@
             <div class="nc-force-row">
               <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero 2"/>
               <select class="nc-select" aria-label="Force hero 2 SI">
+                <option value="" selected></option>
                 <option value="40">40</option>
                 <option value="30">30</option>
                 <option value="<30">&lt;30</option>
               </select>
               <select class="nc-select" aria-label="Force hero 2 Furniture">
+                <option value="" selected></option>
                 <option value="0">0</option>
                 <option value="3">3</option>
                 <option value="9">9</option>
@@ -186,11 +190,13 @@
             <div class="nc-force-row">
               <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero 3"/>
               <select class="nc-select" aria-label="Force hero 3 SI">
+                <option value="" selected></option>
                 <option value="40">40</option>
                 <option value="30">30</option>
                 <option value="<30">&lt;30</option>
               </select>
               <select class="nc-select" aria-label="Force hero 3 Furniture">
+                <option value="" selected></option>
                 <option value="0">0</option>
                 <option value="3">3</option>
                 <option value="9">9</option>
@@ -200,11 +206,13 @@
             <div class="nc-force-row">
               <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero 4"/>
               <select class="nc-select" aria-label="Force hero 4 SI">
+                <option value="" selected></option>
                 <option value="40">40</option>
                 <option value="30">30</option>
                 <option value="<30">&lt;30</option>
               </select>
               <select class="nc-select" aria-label="Force hero 4 Furniture">
+                <option value="" selected></option>
                 <option value="0">0</option>
                 <option value="3">3</option>
                 <option value="9">9</option>
@@ -214,11 +222,13 @@
             <div class="nc-force-row">
               <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero 5"/>
               <select class="nc-select" aria-label="Force hero 5 SI">
+                <option value="" selected></option>
                 <option value="40">40</option>
                 <option value="30">30</option>
                 <option value="<30">&lt;30</option>
               </select>
               <select class="nc-select" aria-label="Force hero 5 Furniture">
+                <option value="" selected></option>
                 <option value="0">0</option>
                 <option value="3">3</option>
                 <option value="9">9</option>
@@ -250,7 +260,7 @@
       <!-- Intentionally nothing else below filters for now -->
     </section>
 
-    <!-- LEADERBOARD VIEW (must remain blank) -->
+    <!-- LEADERBOARD VIEW -->
     <section
       class="nc-panel"
       id="ncPanelLeaderboard"
@@ -258,7 +268,142 @@
       aria-labelledby="ncTabLeaderboard"
       data-view="leaderboard"
       aria-hidden="true"
-    ></section>
+    >
+      <section class="filters nc-leaderboard-filters" aria-label="NC leaderboard filters">
+        <div class="nc-leaderboard-header" aria-hidden="true">
+          <div class="nc-lh">Hero</div>
+          <div class="nc-lh">SI</div>
+          <div class="nc-lh">Furn.</div>
+          <div class="nc-lh">Round</div>
+        </div>
+
+        <div class="nc-leaderboard-rows">
+          
+          <div class="nc-leaderboard-row">
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero 1"/>
+            <select class="nc-select" aria-label="Leaderboard hero 1 SI">
+              <option value="" selected></option>
+              <option value="40">40</option>
+              <option value="30">30</option>
+              <option value="<30">&lt;30</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 1 Furniture">
+              <option value="" selected></option>
+              <option value="0">0</option>
+              <option value="3">3</option>
+              <option value="9">9</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 1 Round">
+              <option value="R1">R1</option>
+              <option value="R2">R2</option>
+              <option value="R3">R3</option>
+              <option value="R4">R4</option>
+              <option value="R5">R5</option>
+              <option value="R6">R6</option>
+            </select>
+          </div>
+          
+          <div class="nc-leaderboard-row">
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero 2"/>
+            <select class="nc-select" aria-label="Leaderboard hero 2 SI">
+              <option value="" selected></option>
+              <option value="40">40</option>
+              <option value="30">30</option>
+              <option value="<30">&lt;30</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 2 Furniture">
+              <option value="" selected></option>
+              <option value="0">0</option>
+              <option value="3">3</option>
+              <option value="9">9</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 2 Round">
+              <option value="R1">R1</option>
+              <option value="R2">R2</option>
+              <option value="R3">R3</option>
+              <option value="R4">R4</option>
+              <option value="R5">R5</option>
+              <option value="R6">R6</option>
+            </select>
+          </div>
+          
+          <div class="nc-leaderboard-row">
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero 3"/>
+            <select class="nc-select" aria-label="Leaderboard hero 3 SI">
+              <option value="" selected></option>
+              <option value="40">40</option>
+              <option value="30">30</option>
+              <option value="<30">&lt;30</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 3 Furniture">
+              <option value="" selected></option>
+              <option value="0">0</option>
+              <option value="3">3</option>
+              <option value="9">9</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 3 Round">
+              <option value="R1">R1</option>
+              <option value="R2">R2</option>
+              <option value="R3">R3</option>
+              <option value="R4">R4</option>
+              <option value="R5">R5</option>
+              <option value="R6">R6</option>
+            </select>
+          </div>
+          
+          <div class="nc-leaderboard-row">
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero 4"/>
+            <select class="nc-select" aria-label="Leaderboard hero 4 SI">
+              <option value="" selected></option>
+              <option value="40">40</option>
+              <option value="30">30</option>
+              <option value="<30">&lt;30</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 4 Furniture">
+              <option value="" selected></option>
+              <option value="0">0</option>
+              <option value="3">3</option>
+              <option value="9">9</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 4 Round">
+              <option value="R1">R1</option>
+              <option value="R2">R2</option>
+              <option value="R3">R3</option>
+              <option value="R4">R4</option>
+              <option value="R5">R5</option>
+              <option value="R6">R6</option>
+            </select>
+          </div>
+          
+          <div class="nc-leaderboard-row">
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero 5"/>
+            <select class="nc-select" aria-label="Leaderboard hero 5 SI">
+              <option value="" selected></option>
+              <option value="40">40</option>
+              <option value="30">30</option>
+              <option value="<30">&lt;30</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 5 Furniture">
+              <option value="" selected></option>
+              <option value="0">0</option>
+              <option value="3">3</option>
+              <option value="9">9</option>
+            </select>
+            <select class="nc-select" aria-label="Leaderboard hero 5 Round">
+              <option value="R1">R1</option>
+              <option value="R2">R2</option>
+              <option value="R3">R3</option>
+              <option value="R4">R4</option>
+              <option value="R5">R5</option>
+              <option value="R6">R6</option>
+            </select>
+          </div>
+          
+        </div>
+      </section>
+
+      <!-- Intentionally nothing else below filters for now -->
+    </section>
   </div>
 </main>
 
