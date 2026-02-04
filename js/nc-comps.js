@@ -1,5 +1,6 @@
 // nc-comps.js
-// Only handles the top tabs for nc-comps. Panels are intentionally empty for now.
+// Handles: top view tabs (Comps/Leaderboard) + round tabs (R1..R6) in Comps view.
+// No data, no rendering below filters yet.
 
 (function () {
   function qs(sel, root = document) {
@@ -11,7 +12,7 @@
   }
 
   function setActiveView(root, view) {
-    // Tabs
+    // Top tabs
     const tabs = qsa('.nc-tab', root);
     tabs.forEach((btn) => {
       const isActive = btn.getAttribute('data-view') === view;
@@ -20,7 +21,7 @@
       btn.tabIndex = isActive ? 0 : -1;
     });
 
-    // Panels (empty for now)
+    // Panels
     qsa('.nc-panel', root).forEach((panel) => {
       const isActive = panel.getAttribute('data-view') === view;
       panel.classList.toggle('is-active', isActive);
@@ -28,14 +29,28 @@
     });
   }
 
+  function setActiveRound(root, round) {
+    const roundTabs = qsa('.nc-round-tab', root);
+    if (roundTabs.length === 0) return;
+
+    roundTabs.forEach((btn) => {
+      const isActive = btn.getAttribute('data-round') === String(round);
+      btn.classList.toggle('is-active', isActive);
+      btn.setAttribute('aria-selected', isActive ? 'true' : 'false');
+      btn.tabIndex = isActive ? 0 : -1;
+    });
+
+    // For now we do nothing else (no content to swap yet).
+    // Later, we'll use `round` to decide which comps to show.
+  }
+
   document.addEventListener('DOMContentLoaded', () => {
     const root = qs('#ncCompsPage');
     if (!root) return;
 
-    const tabs = qsa('.nc-tab', root);
-    if (tabs.length === 0) return;
-
-    tabs.forEach((btn) => {
+    // Top view tabs
+    const viewTabs = qsa('.nc-tab', root);
+    viewTabs.forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.preventDefault();
         const view = btn.getAttribute('data-view');
@@ -44,22 +59,19 @@
       });
     });
 
-    // Optional keyboard support: left/right arrows cycle tabs
-    root.addEventListener('keydown', (e) => {
-      if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
-
-      const activeIndex = tabs.findIndex((t) => t.classList.contains('is-active'));
-      if (activeIndex === -1) return;
-
-      const dir = e.key === 'ArrowRight' ? 1 : -1;
-      const nextIndex = (activeIndex + dir + tabs.length) % tabs.length;
-      const nextTab = tabs[nextIndex];
-      if (!nextTab) return;
-
-      nextTab.focus();
-      const view = nextTab.getAttribute('data-view');
-      if (!view) return;
-      setActiveView(root, view);
+    // Round tabs (Comps view only)
+    const roundTabs = qsa('.nc-round-tab', root);
+    roundTabs.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        const round = btn.getAttribute('data-round');
+        if (!round) return;
+        setActiveRound(root, round);
+      });
     });
+
+    // Defaults
+    setActiveView(root, 'comps');
+    setActiveRound(root, '1');
   });
 })();
