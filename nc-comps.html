@@ -96,10 +96,54 @@
     <p class="page-subtitle">
       Browse best-performing comps aggregated across all players.
     </p>
-    <p class="page-status" id="cfLoadStatus"></p>
+
+    <div class="nc-tabs" role="tablist" aria-label="NC Comps views">
+      <button
+        class="nc-tab is-active"
+        id="ncTabComps"
+        type="button"
+        role="tab"
+        aria-selected="true"
+        aria-controls="ncPanelComps"
+        data-view="comps"
+      >
+        Comps
+      </button>
+      <button
+        class="nc-tab"
+        id="ncTabLeaderboard"
+        type="button"
+        role="tab"
+        aria-selected="false"
+        aria-controls="ncPanelLeaderboard"
+        data-view="leaderboard"
+      >
+        Leaderboard
+      </button>
+    </div>
   </header>
 
+  <!-- Intentionally empty for now; we will populate these views later -->
+  <div class="nc-panels">
+    <section
+      class="nc-panel is-active"
+      id="ncPanelComps"
+      role="tabpanel"
+      aria-labelledby="ncTabComps"
+      data-view="comps"
+    ></section>
+
+    <section
+      class="nc-panel"
+      id="ncPanelLeaderboard"
+      role="tabpanel"
+      aria-labelledby="ncTabLeaderboard"
+      data-view="leaderboard"
+      aria-hidden="true"
+    ></section>
+  </div>
 </main>
+
 
   <footer>
   TangledSpore&#39;s RGMs! · AFK Arena community project · © Sorix
