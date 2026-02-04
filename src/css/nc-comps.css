@@ -1,6 +1,5 @@
 /* nc-comps.css
-   Page-specific UI: top tabs for the nc-comps page.
-   (Content below tabs is intentionally empty for now.)
+   Page-specific UI: view tabs + comps view scaffold (round tabs + filters).
 */
 
 #ncCompsPage .nc-tabs {
@@ -32,12 +31,10 @@
   color: var(--text-muted);
   font-weight: 800;
 
-  /* give "button" definition even at rest */
   background: rgba(255, 255, 255, 0.02);
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
 
-  /* remove native button look */
   margin: 0;
   font: inherit;
   line-height: 1;
@@ -78,11 +75,169 @@
     0 0 0 1px rgba(242, 193, 79, 0.22) inset;
 }
 
-/* Panels are empty for now, but we wire the show/hide behavior already. */
-#ncCompsPage .nc-panel {
-  display: none;
+/* Panels */
+#ncCompsPage .nc-panel { display: none; }
+#ncCompsPage .nc-panel.is-active { display: block; }
+
+/* ------------------------------------------------------------------ */
+/* Comps view: R1..R6 tabs (bigger + spread across width)              */
+/* ------------------------------------------------------------------ */
+
+#ncCompsPage .nc-rounds {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  margin-bottom: 0.9rem;
+  width: 100%;
 }
 
-#ncCompsPage .nc-panel.is-active {
-  display: block;
+#ncCompsPage .nc-round-tab {
+  flex: 1 1 0;
+  min-width: 0;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.6rem 0.2rem; /* bigger than top tabs */
+  border-radius: 999px;
+
+  cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 900;
+  letter-spacing: 0.2px;
+
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+
+  margin: 0;
+  font: inherit;
+  line-height: 1;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.08s ease;
+}
+
+#ncCompsPage .nc-round-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+#ncCompsPage .nc-round-tab:active {
+  transform: translateY(1px);
+}
+
+#ncCompsPage .nc-round-tab.is-active {
+  color: var(--text);
+  background: rgba(242, 193, 79, 0.12);
+  border-color: rgba(242, 193, 79, 0.35);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 0 0 1px rgba(242, 193, 79, 0.22) inset;
+}
+
+/* ------------------------------------------------------------------ */
+/* Filters layout (inside existing .filters container)                 */
+/* ------------------------------------------------------------------ */
+
+#ncCompsPage .nc-comps-filters {
+  display: grid;
+  grid-template-columns: 1.9fr 1.1fr; /* ~63/37 */
+  gap: 1rem;
+  align-items: start;
+}
+
+#ncCompsPage .nc-filter-title {
+  font-weight: 900;
+  color: var(--text);
+  text-align: center;
+  margin-bottom: 0.6rem;
+}
+
+/* Force hero table-like header + rows */
+#ncCompsPage .nc-force-header,
+#ncCompsPage .nc-force-row {
+  display: grid;
+  grid-template-columns: 1fr 110px 110px;
+  gap: 0.6rem;
+}
+
+#ncCompsPage .nc-force-header {
+  margin-bottom: 0.45rem;
+}
+
+#ncCompsPage .nc-force-h {
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  color: var(--text-muted);
+  text-align: left;
+}
+
+#ncCompsPage .nc-force-h:nth-child(2),
+#ncCompsPage .nc-force-h:nth-child(3) {
+  text-align: center;
+}
+
+#ncCompsPage .nc-force-rows {
+  display: grid;
+  gap: 0.5rem;
+}
+
+#ncCompsPage .nc-blacklist-rows {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Inputs/selects – “site-consistent”, but scoped to this page */
+#ncCompsPage .nc-input,
+#ncCompsPage .nc-select {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border-radius: 0.75rem;
+
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  color: var(--text);
+
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+  outline: none;
+}
+
+#ncCompsPage .nc-input::placeholder {
+  color: rgba(255, 255, 255, 0.35);
+}
+
+#ncCompsPage .nc-input:focus,
+#ncCompsPage .nc-select:focus {
+  border-color: rgba(242, 193, 79, 0.35);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.06) inset,
+    0 0 0 2px rgba(242, 193, 79, 0.18);
+}
+
+#ncCompsPage .nc-select {
+  text-align: center;
+  cursor: pointer;
+}
+
+/* Responsive: stack columns */
+@media (max-width: 900px) {
+  #ncCompsPage .nc-comps-filters {
+    grid-template-columns: 1fr;
+  }
+
+  #ncCompsPage .nc-force-header,
+  #ncCompsPage .nc-force-row {
+    grid-template-columns: 1fr 90px 90px;
+  }
 }
