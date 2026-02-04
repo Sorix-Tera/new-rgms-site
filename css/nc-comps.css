@@ -258,8 +258,7 @@
 
 /* Fix: dropdown options should be readable even without hover */
 #ncCompsPage .nc-select option {
-  color: var(--text);
-  background: rgba(10, 12, 18, 1);
+  color: black;
 }
 
 /* Responsive: stack columns */
