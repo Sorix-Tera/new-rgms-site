@@ -151,9 +151,23 @@
 
 #ncCompsPage .nc-comps-filters {
   display: grid;
-  grid-template-columns: 1.9fr 1.1fr; /* ~63/37 */
-  gap: 1rem;
+
+  /* a bit more breathing room between the two sides */
+  grid-template-columns: 1.85fr 1.05fr;
+  gap: 1.6rem;
+
   align-items: start;
+}
+
+/* Add a subtle separator + spacing on the right column */
+#ncCompsPage .nc-filter-col-blacklist {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding-left: 1.15rem;
+}
+
+/* Optional: slightly reduce how “wide” the left side feels */
+#ncCompsPage .nc-filter-col-force {
+  padding-right: 0.35rem;
 }
 
 #ncCompsPage .nc-filter-title {
@@ -167,12 +181,16 @@
 #ncCompsPage .nc-force-header,
 #ncCompsPage .nc-force-row {
   display: grid;
-  grid-template-columns: 1fr 110px 110px;
+
+  /* Narrow the Hero input a bit, keep SI/Furn fixed */
+  grid-template-columns: minmax(210px, 0.9fr) 110px 110px;
   gap: 0.6rem;
 }
 
 #ncCompsPage .nc-force-header {
   margin-bottom: 0.45rem;
+  /* ensure consistent “header height” to align blacklist rows */
+  min-height: 1.15rem;
 }
 
 #ncCompsPage .nc-force-h {
@@ -180,9 +198,10 @@
   font-weight: 900;
   letter-spacing: 0.2px;
   color: var(--text-muted);
-  text-align: left;
 }
 
+/* Center the header labels above their inputs */
+#ncCompsPage .nc-force-h:nth-child(1),
 #ncCompsPage .nc-force-h:nth-child(2),
 #ncCompsPage .nc-force-h:nth-child(3) {
   text-align: center;
@@ -193,12 +212,16 @@
   gap: 0.5rem;
 }
 
+/* Align blacklist inputs with force rows (skip the Force header row height) */
 #ncCompsPage .nc-blacklist-rows {
   display: grid;
   gap: 0.5rem;
+
+  /* matches the visual space taken by the Force header row */
+  padding-top: calc(1.15rem + 0.45rem);
 }
 
-/* Inputs/selects – “site-consistent”, but scoped to this page */
+/* Inputs/selects – scoped to this page */
 #ncCompsPage .nc-input,
 #ncCompsPage .nc-select {
   width: 100%;
@@ -228,16 +251,37 @@
 #ncCompsPage .nc-select {
   text-align: center;
   cursor: pointer;
+
+  /* helps browsers render the native dropdown with dark-friendly contrast */
+  color-scheme: dark;
+}
+
+/* Fix: dropdown options should be readable even without hover */
+#ncCompsPage .nc-select option {
+  color: var(--text);
+  background: rgba(10, 12, 18, 1);
 }
 
 /* Responsive: stack columns */
 @media (max-width: 900px) {
   #ncCompsPage .nc-comps-filters {
     grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  #ncCompsPage .nc-filter-col-blacklist {
+    border-left: none;
+    padding-left: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 1rem;
   }
 
   #ncCompsPage .nc-force-header,
   #ncCompsPage .nc-force-row {
-    grid-template-columns: 1fr 90px 90px;
+    grid-template-columns: minmax(180px, 1fr) 90px 90px;
+  }
+
+  #ncCompsPage .nc-blacklist-rows {
+    padding-top: 0; /* on mobile it reads fine without forced alignment */
   }
 }
