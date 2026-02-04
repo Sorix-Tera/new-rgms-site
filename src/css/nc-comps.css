@@ -168,6 +168,18 @@
 /* Optional: slightly reduce how “wide” the left side feels */
 #ncCompsPage .nc-filter-col-force {
   padding-right: 0.35rem;
+
+  /* default (desktop): 3 columns (Hero, SI, Furn) */
+  --nc-cols: minmax(210px, 0.9fr) 110px 110px;
+}
+
+/* Leaderboard: 4 columns (Hero, SI, Furn, Round) */
+#ncCompsPage .nc-leaderboard-filters {
+  --nc-cols: minmax(210px, 0.9fr) 110px 110px 110px;
+
+  /* keep it compact, not full-width */
+  width: fit-content;
+  max-width: 100%;
 }
 
 #ncCompsPage .nc-filter-title {
@@ -177,33 +189,25 @@
   margin-bottom: 0.6rem;
 }
 
-/* Force hero table-like header + rows */
-#ncCompsPage .nc-force-header,
-#ncCompsPage .nc-force-row {
+/* Shared grid for filter header/rows */
+#ncCompsPage .nc-filter-header,
+#ncCompsPage .nc-filter-row {
   display: grid;
-
-  /* Narrow the Hero input a bit, keep SI/Furn fixed */
-  grid-template-columns: minmax(210px, 0.9fr) 110px 110px;
+  grid-template-columns: var(--nc-cols);
   gap: 0.6rem;
 }
 
-#ncCompsPage .nc-force-header {
+#ncCompsPage .nc-filter-header {
   margin-bottom: 0.45rem;
   /* ensure consistent “header height” to align blacklist rows */
   min-height: 1.15rem;
 }
 
-#ncCompsPage .nc-force-h {
+#ncCompsPage .nc-filter-h {
   font-size: 0.85rem;
   font-weight: 900;
   letter-spacing: 0.2px;
   color: var(--text-muted);
-}
-
-/* Center the header labels above their inputs */
-#ncCompsPage .nc-force-h:nth-child(1),
-#ncCompsPage .nc-force-h:nth-child(2),
-#ncCompsPage .nc-force-h:nth-child(3) {
   text-align: center;
 }
 
@@ -212,12 +216,17 @@
   gap: 0.5rem;
 }
 
-/* Align blacklist inputs with force rows (skip the Force header row height) */
+#ncCompsPage .nc-leaderboard-rows {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Align blacklist inputs with force rows (skip the header row height) */
 #ncCompsPage .nc-blacklist-rows {
   display: grid;
   gap: 0.5rem;
 
-  /* matches the visual space taken by the Force header row */
+  /* matches the visual space taken by the header row */
   padding-top: calc(1.15rem + 0.45rem);
 }
 
@@ -258,7 +267,8 @@
 
 /* Fix: dropdown options should be readable even without hover */
 #ncCompsPage .nc-select option {
-  color: black;
+  color: var(--text);
+  background: rgba(10, 12, 18, 1);
 }
 
 /* Responsive: stack columns */
@@ -275,9 +285,14 @@
     padding-top: 1rem;
   }
 
-  #ncCompsPage .nc-force-header,
-  #ncCompsPage .nc-force-row {
-    grid-template-columns: minmax(180px, 1fr) 90px 90px;
+  /* Force (3 cols) */
+  #ncCompsPage .nc-filter-col-force {
+    --nc-cols: minmax(180px, 1fr) 90px 90px;
+  }
+
+  /* Leaderboard (4 cols) */
+  #ncCompsPage .nc-leaderboard-filters {
+    --nc-cols: minmax(180px, 1fr) 90px 90px 90px;
   }
 
   #ncCompsPage .nc-blacklist-rows {
