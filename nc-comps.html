@@ -282,6 +282,7 @@
       <section class="filters nc-leaderboard-filters" aria-label="NC leaderboard filters">
         <div class="nc-lb-topbar">
           <div class="nc-lb-title">Filter heroes</div>
+
           <div class="nc-lb-round">
             <div class="nc-lb-round-label">Round</div>
             <select class="nc-select" id="ncLbRound" aria-label="Leaderboard round">
@@ -295,94 +296,96 @@
           </div>
         </div>
 
-        <div class="nc-filter-header" aria-hidden="true">
-          <div class="nc-filter-h">Hero</div>
-          <div class="nc-filter-h">SI</div>
-          <div class="nc-filter-h">Furn.</div>
-        </div>
+        <div class="nc-lb-grid">
+          <div class="nc-lb-header" aria-hidden="true">
+            <div class="nc-lb-h">Hero</div>
+            <div class="nc-lb-h">SI</div>
+            <div class="nc-lb-h">Furn.</div>
+          </div>
 
-        <div class="nc-leaderboard-rows">
-          
-          <div class="nc-filter-row">
-            <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 1" list="ncHeroList"/>
-            <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 1 SI">
-              <option value="" selected></option>
-              <option value="40">40</option>
-              <option value="30">30</option>
-              <option value="<30">&lt;30</option>
-            </select>
-            <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 1 Furniture">
-              <option value="" selected></option>
-              <option value="0">0</option>
-              <option value="3">3</option>
-              <option value="9">9</option>
-            </select>
+          <div class="nc-lb-rows">
+            
+            <div class="nc-lb-row">
+              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 1" list="ncHeroList"/>
+              <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 1 SI">
+                <option value="" selected></option>
+                <option value="40">40</option>
+                <option value="30">30</option>
+                <option value="<30">&lt;30</option>
+              </select>
+              <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 1 Furniture">
+                <option value="" selected></option>
+                <option value="0">0</option>
+                <option value="3">3</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+            
+            <div class="nc-lb-row">
+              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 2" list="ncHeroList"/>
+              <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 2 SI">
+                <option value="" selected></option>
+                <option value="40">40</option>
+                <option value="30">30</option>
+                <option value="<30">&lt;30</option>
+              </select>
+              <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 2 Furniture">
+                <option value="" selected></option>
+                <option value="0">0</option>
+                <option value="3">3</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+            
+            <div class="nc-lb-row">
+              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 3" list="ncHeroList"/>
+              <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 3 SI">
+                <option value="" selected></option>
+                <option value="40">40</option>
+                <option value="30">30</option>
+                <option value="<30">&lt;30</option>
+              </select>
+              <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 3 Furniture">
+                <option value="" selected></option>
+                <option value="0">0</option>
+                <option value="3">3</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+            
+            <div class="nc-lb-row">
+              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 4" list="ncHeroList"/>
+              <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 4 SI">
+                <option value="" selected></option>
+                <option value="40">40</option>
+                <option value="30">30</option>
+                <option value="<30">&lt;30</option>
+              </select>
+              <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 4 Furniture">
+                <option value="" selected></option>
+                <option value="0">0</option>
+                <option value="3">3</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+            
+            <div class="nc-lb-row">
+              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 5" list="ncHeroList"/>
+              <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 5 SI">
+                <option value="" selected></option>
+                <option value="40">40</option>
+                <option value="30">30</option>
+                <option value="<30">&lt;30</option>
+              </select>
+              <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 5 Furniture">
+                <option value="" selected></option>
+                <option value="0">0</option>
+                <option value="3">3</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+            
           </div>
-          
-          <div class="nc-filter-row">
-            <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 2" list="ncHeroList"/>
-            <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 2 SI">
-              <option value="" selected></option>
-              <option value="40">40</option>
-              <option value="30">30</option>
-              <option value="<30">&lt;30</option>
-            </select>
-            <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 2 Furniture">
-              <option value="" selected></option>
-              <option value="0">0</option>
-              <option value="3">3</option>
-              <option value="9">9</option>
-            </select>
-          </div>
-          
-          <div class="nc-filter-row">
-            <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 3" list="ncHeroList"/>
-            <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 3 SI">
-              <option value="" selected></option>
-              <option value="40">40</option>
-              <option value="30">30</option>
-              <option value="<30">&lt;30</option>
-            </select>
-            <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 3 Furniture">
-              <option value="" selected></option>
-              <option value="0">0</option>
-              <option value="3">3</option>
-              <option value="9">9</option>
-            </select>
-          </div>
-          
-          <div class="nc-filter-row">
-            <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 4" list="ncHeroList"/>
-            <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 4 SI">
-              <option value="" selected></option>
-              <option value="40">40</option>
-              <option value="30">30</option>
-              <option value="<30">&lt;30</option>
-            </select>
-            <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 4 Furniture">
-              <option value="" selected></option>
-              <option value="0">0</option>
-              <option value="3">3</option>
-              <option value="9">9</option>
-            </select>
-          </div>
-          
-          <div class="nc-filter-row">
-            <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 5" list="ncHeroList"/>
-            <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 5 SI">
-              <option value="" selected></option>
-              <option value="40">40</option>
-              <option value="30">30</option>
-              <option value="<30">&lt;30</option>
-            </select>
-            <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero 5 Furniture">
-              <option value="" selected></option>
-              <option value="0">0</option>
-              <option value="3">3</option>
-              <option value="9">9</option>
-            </select>
-          </div>
-          
         </div>
       </section>
 
