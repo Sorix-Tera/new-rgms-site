@@ -237,8 +237,7 @@
 }
 
 #ncCompsPage .nc-select option {
-  color: var(--text);
-  background: rgba(10, 12, 18, 1);
+  color: black;
 }
 
 /* ------------------------------------------------------------------ */
