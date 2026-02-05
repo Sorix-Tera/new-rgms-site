@@ -2,6 +2,7 @@
 // - Comps view uses RPC: nc_comps_agg(p_round, p_force, p_blacklist)
 // - Leaderboard view uses RPC: nc_leaderboard_rows(p_round, p_force)
 // - Hero icons fallback: unknown.png when .jpg missing
+// - Leaderboard "Comp" column renders hero icons (not text)
 
 (function () {
   const RPC_COMPS = "nc_comps_agg";
@@ -162,6 +163,35 @@
     if (el) el.textContent = msg || "";
   }
 
+  function makeHeroImg(heroName, sizePx) {
+    const slug = heroToIconSlug(heroName);
+
+    const img = document.createElement("img");
+    img.src = `icons/heroes2/${slug}.jpg`;
+    img.alt = heroName;
+    img.title = heroName;
+    img.loading = "lazy";
+    img.style.width = `${sizePx}px`;
+    img.style.height = `${sizePx}px`;
+    img.style.borderRadius = "10px";
+    img.style.objectFit = "cover";
+    img.style.border = "1px solid rgba(255,255,255,0.10)";
+    img.style.background = "rgba(255,255,255,0.02)";
+
+    img.addEventListener("error", () => {
+      if (img.dataset.fallback === "1") {
+        img.style.display = "none";
+        return;
+      }
+      img.dataset.fallback = "1";
+      img.src = "icons/heroes2/unknown.png";
+      img.alt = "Unknown";
+      img.title = "Unknown";
+    });
+
+    return img;
+  }
+
   function renderComps(root, compRows) {
     const results = qs("#ncCompsResults", root);
     if (!results) return;
@@ -212,32 +242,7 @@
       heroRow.style.flexWrap = "nowrap";
 
       for (const h of heroes) {
-        const slug = heroToIconSlug(h);
-
-        const img = document.createElement("img");
-        img.src = `icons/heroes2/${slug}.jpg`;
-        img.alt = h;
-        img.title = h;
-        img.loading = "lazy";
-        img.style.width = "42px";
-        img.style.height = "42px";
-        img.style.borderRadius = "12px";
-        img.style.objectFit = "cover";
-        img.style.border = "1px solid rgba(255,255,255,0.10)";
-        img.style.background = "rgba(255,255,255,0.02)";
-
-        img.addEventListener("error", () => {
-          if (img.dataset.fallback === "1") {
-            img.style.display = "none";
-            return;
-          }
-          img.dataset.fallback = "1";
-          img.src = "icons/heroes2/unknown.png";
-          img.alt = "Unknown";
-          img.title = "Unknown";
-        });
-
-        heroRow.appendChild(img);
+        heroRow.appendChild(makeHeroImg(h, 42));
       }
 
       card.appendChild(top);
@@ -273,8 +278,19 @@
       const tdName = document.createElement("td");
       tdName.textContent = r.name ?? "—";
 
+      // ✅ Comp as icons (not text)
       const tdComp = document.createElement("td");
-      tdComp.textContent = r.comp ?? "—";
+      const heroes = parseCompHeroes(r.comp);
+      const wrap = document.createElement("div");
+      wrap.style.display = "flex";
+      wrap.style.gap = "0.35rem";
+      wrap.style.alignItems = "center";
+      wrap.style.flexWrap = "nowrap";
+
+      for (const h of heroes) {
+        wrap.appendChild(makeHeroImg(h, 28));
+      }
+      tdComp.appendChild(wrap);
 
       const tdTime = document.createElement("td");
       tdTime.textContent = formatAvgTime(r.time_boss);
