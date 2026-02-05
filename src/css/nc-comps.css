@@ -151,24 +151,33 @@
 
 #ncCompsPage .nc-comps-filters {
   display: grid;
+
+  /* a bit more breathing room between the two sides */
   grid-template-columns: 1.85fr 1.05fr;
   gap: 1.6rem;
+
   align-items: start;
 }
 
+/* Add a subtle separator + spacing on the right column */
 #ncCompsPage .nc-filter-col-blacklist {
   border-left: 1px solid rgba(255, 255, 255, 0.08);
   padding-left: 1.15rem;
 }
 
+/* Optional: slightly reduce how “wide” the left side feels */
 #ncCompsPage .nc-filter-col-force {
   padding-right: 0.35rem;
-  --nc-cols: minmax(210px, 0.9fr) 110px 110px; /* 3 cols */
+
+  /* default (desktop): 3 columns (Hero, SI, Furn) */
+  --nc-cols: minmax(210px, 0.9fr) 110px 110px;
 }
 
-/* IMPORTANT FIX: Leaderboard is now also 3 cols (Hero, SI, Furn.) */
+/* ✅ LEADERBOARD FIX: also 3 columns (Hero, SI, Furn) */
 #ncCompsPage .nc-leaderboard-filters {
-  --nc-cols: minmax(210px, 0.9fr) 110px 110px; /* 3 cols */
+  --nc-cols: minmax(210px, 0.9fr) 110px 110px;
+
+  /* keep it compact, not full-width */
   width: fit-content;
   max-width: 100%;
 }
@@ -180,6 +189,7 @@
   margin-bottom: 0.6rem;
 }
 
+/* Shared grid for filter header/rows */
 #ncCompsPage .nc-filter-header,
 #ncCompsPage .nc-filter-row {
   display: grid;
@@ -210,9 +220,12 @@
   gap: 0.5rem;
 }
 
+/* Align blacklist inputs with force rows (skip the header row height) */
 #ncCompsPage .nc-blacklist-rows {
   display: grid;
   gap: 0.5rem;
+
+  /* matches the visual space taken by the header row */
   padding-top: calc(1.15rem + 0.45rem);
 }
 
@@ -249,12 +262,13 @@
   color-scheme: dark;
 }
 
+/* Fix: dropdown options should be readable even without hover */
 #ncCompsPage .nc-select option {
   color: var(--text);
   background: rgba(10, 12, 18, 1);
 }
 
-/* Leaderboard topbar */
+/* Leaderboard top bar (keeps Round out of the grid header) */
 #ncCompsPage .nc-lb-topbar {
   display: flex;
   align-items: flex-end;
@@ -293,10 +307,12 @@
     padding-top: 1rem;
   }
 
+  /* Force (3 cols) */
   #ncCompsPage .nc-filter-col-force {
     --nc-cols: minmax(180px, 1fr) 90px 90px;
   }
 
+  /* Leaderboard (3 cols) */
   #ncCompsPage .nc-leaderboard-filters {
     --nc-cols: minmax(180px, 1fr) 90px 90px;
   }
