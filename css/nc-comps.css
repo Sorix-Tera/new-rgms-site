@@ -80,7 +80,7 @@
 #ncCompsPage .nc-panel.is-active { display: block; }
 
 /* ------------------------------------------------------------------ */
-/* Comps view: R1..R6 tabs (bigger + spread across width)              */
+/* Comps view: R1..R6 tabs                                              */
 /* ------------------------------------------------------------------ */
 
 #ncCompsPage .nc-rounds {
@@ -99,7 +99,7 @@
   align-items: center;
   justify-content: center;
 
-  padding: 0.6rem 0.2rem; /* bigger than top tabs */
+  padding: 0.6rem 0.2rem;
   border-radius: 999px;
 
   cursor: pointer;
@@ -146,40 +146,23 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Filters layout (inside existing .filters container)                 */
+/* Comps filters (existing)                                            */
 /* ------------------------------------------------------------------ */
 
 #ncCompsPage .nc-comps-filters {
   display: grid;
-
-  /* a bit more breathing room between the two sides */
   grid-template-columns: 1.85fr 1.05fr;
   gap: 1.6rem;
-
   align-items: start;
 }
 
-/* Add a subtle separator + spacing on the right column */
 #ncCompsPage .nc-filter-col-blacklist {
   border-left: 1px solid rgba(255, 255, 255, 0.08);
   padding-left: 1.15rem;
 }
 
-/* Optional: slightly reduce how “wide” the left side feels */
 #ncCompsPage .nc-filter-col-force {
   padding-right: 0.35rem;
-
-  /* default (desktop): 3 columns (Hero, SI, Furn) */
-  --nc-cols: minmax(210px, 0.9fr) 110px 110px;
-}
-
-/* ✅ LEADERBOARD FIX: also 3 columns (Hero, SI, Furn) */
-#ncCompsPage .nc-leaderboard-filters {
-  --nc-cols: minmax(210px, 0.9fr) 110px 110px;
-
-  /* keep it compact, not full-width */
-  width: fit-content;
-  max-width: 100%;
 }
 
 #ncCompsPage .nc-filter-title {
@@ -189,11 +172,10 @@
   margin-bottom: 0.6rem;
 }
 
-/* Shared grid for filter header/rows */
 #ncCompsPage .nc-filter-header,
 #ncCompsPage .nc-filter-row {
   display: grid;
-  grid-template-columns: var(--nc-cols);
+  grid-template-columns: minmax(210px, 0.9fr) 110px 110px;
   gap: 0.6rem;
 }
 
@@ -215,21 +197,13 @@
   gap: 0.5rem;
 }
 
-#ncCompsPage .nc-leaderboard-rows {
-  display: grid;
-  gap: 0.5rem;
-}
-
-/* Align blacklist inputs with force rows (skip the header row height) */
 #ncCompsPage .nc-blacklist-rows {
   display: grid;
   gap: 0.5rem;
-
-  /* matches the visual space taken by the header row */
   padding-top: calc(1.15rem + 0.45rem);
 }
 
-/* Inputs/selects – scoped to this page */
+/* Inputs/selects */
 #ncCompsPage .nc-input,
 #ncCompsPage .nc-select {
   width: 100%;
@@ -262,19 +236,21 @@
   color-scheme: dark;
 }
 
-/* Fix: dropdown options should be readable even without hover */
 #ncCompsPage .nc-select option {
   color: var(--text);
   background: rgba(10, 12, 18, 1);
 }
 
-/* Leaderboard top bar (keeps Round out of the grid header) */
+/* ------------------------------------------------------------------ */
+/* ✅ Leaderboard filters: clean, self-contained grid                  */
+/* ------------------------------------------------------------------ */
+
 #ncCompsPage .nc-lb-topbar {
   display: flex;
   align-items: flex-end;
-  justify-content: space-between;
-  gap: 1rem;
-  margin-bottom: 0.6rem;
+  justify-content: flex-start;
+  gap: 1.2rem;
+  margin-bottom: 0.65rem;
 }
 
 #ncCompsPage .nc-lb-title {
@@ -293,7 +269,38 @@
   color: var(--text);
 }
 
-/* Responsive: stack columns */
+/* The ONLY grid that controls header/rows alignment for leaderboard */
+#ncCompsPage .nc-lb-grid {
+  display: grid;
+  gap: 0.5rem;
+}
+
+#ncCompsPage .nc-lb-header,
+#ncCompsPage .nc-lb-row {
+  display: grid;
+  grid-template-columns: minmax(210px, 0.9fr) 110px 110px;
+  gap: 0.6rem;
+}
+
+#ncCompsPage .nc-lb-header {
+  margin-bottom: 0.1rem;
+  min-height: 1.15rem;
+}
+
+#ncCompsPage .nc-lb-h {
+  font-size: 0.85rem;
+  font-weight: 900;
+  letter-spacing: 0.2px;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+#ncCompsPage .nc-lb-rows {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Responsive */
 @media (max-width: 900px) {
   #ncCompsPage .nc-comps-filters {
     grid-template-columns: 1fr;
@@ -307,14 +314,9 @@
     padding-top: 1rem;
   }
 
-  /* Force (3 cols) */
-  #ncCompsPage .nc-filter-col-force {
-    --nc-cols: minmax(180px, 1fr) 90px 90px;
-  }
-
-  /* Leaderboard (3 cols) */
-  #ncCompsPage .nc-leaderboard-filters {
-    --nc-cols: minmax(180px, 1fr) 90px 90px;
+  #ncCompsPage .nc-filter-header,
+  #ncCompsPage .nc-filter-row {
+    grid-template-columns: minmax(180px, 1fr) 90px 90px;
   }
 
   #ncCompsPage .nc-blacklist-rows {
@@ -324,5 +326,10 @@
   #ncCompsPage .nc-lb-topbar {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  #ncCompsPage .nc-lb-header,
+  #ncCompsPage .nc-lb-row {
+    grid-template-columns: minmax(180px, 1fr) 90px 90px;
   }
 }
