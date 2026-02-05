@@ -240,15 +240,8 @@
         heroRow.appendChild(img);
       }
 
-      const compText = document.createElement("div");
-      compText.style.marginTop = "0.55rem";
-      compText.style.color = "var(--text-muted)";
-      compText.style.fontSize = "0.85rem";
-      compText.textContent = item.comp;
-
       card.appendChild(top);
       card.appendChild(heroRow);
-      card.appendChild(compText);
 
       results.appendChild(card);
     }
@@ -428,7 +421,6 @@
         if (!view) return;
         setActiveView(root, view);
 
-        // Lazy load leaderboard when switching to it
         if (view === "leaderboard") {
           loadLeaderboard(root);
         }
