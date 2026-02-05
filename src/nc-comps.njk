@@ -124,6 +124,7 @@ permalink: "nc-comps.html"
       <section class="filters nc-leaderboard-filters" aria-label="NC leaderboard filters">
         <div class="nc-lb-topbar">
           <div class="nc-lb-title">Filter heroes</div>
+
           <div class="nc-lb-round">
             <div class="nc-lb-round-label">Round</div>
             <select class="nc-select" id="ncLbRound" aria-label="Leaderboard round">
@@ -137,30 +138,32 @@ permalink: "nc-comps.html"
           </div>
         </div>
 
-        <div class="nc-filter-header" aria-hidden="true">
-          <div class="nc-filter-h">Hero</div>
-          <div class="nc-filter-h">SI</div>
-          <div class="nc-filter-h">Furn.</div>
-        </div>
-
-        <div class="nc-leaderboard-rows">
-          {% for i in [1,2,3,4,5] %}
-          <div class="nc-filter-row">
-            <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero {{ i }}" list="ncHeroList"/>
-            <select class="nc-select nc-lb-si" aria-label="Leaderboard hero {{ i }} SI">
-              <option value="" selected></option>
-              <option value="40">40</option>
-              <option value="30">30</option>
-              <option value="<30">&lt;30</option>
-            </select>
-            <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero {{ i }} Furniture">
-              <option value="" selected></option>
-              <option value="0">0</option>
-              <option value="3">3</option>
-              <option value="9">9</option>
-            </select>
+        <div class="nc-lb-grid">
+          <div class="nc-lb-header" aria-hidden="true">
+            <div class="nc-lb-h">Hero</div>
+            <div class="nc-lb-h">SI</div>
+            <div class="nc-lb-h">Furn.</div>
           </div>
-          {% endfor %}
+
+          <div class="nc-lb-rows">
+            {% for i in [1,2,3,4,5] %}
+            <div class="nc-lb-row">
+              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero {{ i }}" list="ncHeroList"/>
+              <select class="nc-select nc-lb-si" aria-label="Leaderboard hero {{ i }} SI">
+                <option value="" selected></option>
+                <option value="40">40</option>
+                <option value="30">30</option>
+                <option value="<30">&lt;30</option>
+              </select>
+              <select class="nc-select nc-lb-furn" aria-label="Leaderboard hero {{ i }} Furniture">
+                <option value="" selected></option>
+                <option value="0">0</option>
+                <option value="3">3</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+            {% endfor %}
+          </div>
         </div>
       </section>
 
