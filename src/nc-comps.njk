@@ -56,7 +56,7 @@ permalink: "nc-comps.html"
         <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="6">R6</button>
       </div>
 
-      <!-- Filters section (Comp Finder style container) -->
+      <!-- Filters section -->
       <section class="filters nc-comps-filters" aria-label="NC comps filters">
         <div class="nc-filter-col nc-filter-col-force">
           <div class="nc-filter-title">Force Hero</div>
@@ -70,14 +70,14 @@ permalink: "nc-comps.html"
           <div class="nc-force-rows">
             {% for i in [1,2,3,4,5] %}
             <div class="nc-filter-row">
-              <input class="nc-input" type="text" placeholder="Hero" aria-label="Force hero {{ i }}"/>
-              <select class="nc-select" aria-label="Force hero {{ i }} SI">
+              <input class="nc-input nc-force-hero" type="text" placeholder="Hero" aria-label="Force hero {{ i }}" list="ncHeroList"/>
+              <select class="nc-select nc-force-si" aria-label="Force hero {{ i }} SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
                 <option value="30">30</option>
                 <option value="<30">&lt;30</option>
               </select>
-              <select class="nc-select" aria-label="Force hero {{ i }} Furniture">
+              <select class="nc-select nc-force-furn" aria-label="Force hero {{ i }} Furniture">
                 <option value="" selected></option>
                 <option value="0">0</option>
                 <option value="3">3</option>
@@ -93,13 +93,23 @@ permalink: "nc-comps.html"
 
           <div class="nc-blacklist-rows">
             {% for i in [1,2,3,4,5] %}
-            <input class="nc-input" type="text" placeholder="Hero" aria-label="Blacklist hero {{ i }}"/>
+            <input class="nc-input nc-blacklist-hero" type="text" placeholder="Hero" aria-label="Blacklist hero {{ i }}" list="ncHeroList"/>
             {% endfor %}
           </div>
         </div>
       </section>
 
-      <!-- Intentionally nothing else below filters for now -->
+      <!-- Hero suggestions -->
+      <datalist id="ncHeroList">
+        <!-- filled by JS -->
+      </datalist>
+
+      <!-- Results -->
+      <p class="page-status" id="ncCompsStatus"></p>
+
+      <section id="ncCompsResults" class="nc-comps-results" aria-label="NC comps results">
+        <!-- filled by JS -->
+      </section>
     </section>
 
     <!-- LEADERBOARD VIEW -->
@@ -122,7 +132,7 @@ permalink: "nc-comps.html"
         <div class="nc-leaderboard-rows">
           {% for i in [1,2,3,4,5] %}
           <div class="nc-filter-row">
-            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero {{ i }}"/>
+            <input class="nc-input" type="text" placeholder="Hero" aria-label="Leaderboard hero {{ i }}" list="ncHeroList"/>
             <select class="nc-select" aria-label="Leaderboard hero {{ i }} SI">
               <option value="" selected></option>
               <option value="40">40</option>
