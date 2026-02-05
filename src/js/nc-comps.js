@@ -2,17 +2,13 @@
 // Implements:
 // - Top tabs (Comps / Leaderboard)
 // - Round tabs (R1..R6)
-// - Comps view data display from Supabase:
-//     nc_round filtered by round and optional force/blacklist filters (via nc_heroes),
-//     then group by comp and avg(time_boss), order asc,
-//     render 2-column layout (row-wise left->right).
+// - Comps view data display from Supabase via RPC:
+//     public.nc_comps_agg(p_round, p_force, p_blacklist)
+// - Hero icon rendering from /icons/heroes2 (lowercased/sanitized) with fallback unknown.png
 
 (function () {
-  const TABLE_ROUND = "nc_round";
+  const RPC_COMPS = "nc_comps_agg";
   const TABLE_HEROES = "nc_heroes";
-
-  // Supabase .in() has practical limits; keep chunks reasonable.
-  const IN_CHUNK = 900;
 
   function qs(sel, root = document) {
     return root.querySelector(sel);
@@ -26,8 +22,7 @@
     return (name || "").trim();
   }
 
-  // Icons in /src/icons/heroes2 look like: albedo.jpg, aathalia.jpg, etc.
-  // We'll lower + strip to [a-z0-9] to match that convention.
+  // Icons in /icons/heroes2 use a "lowercase + stripped" convention.
   function heroToIconSlug(name) {
     return normalizeHeroName(name)
       .toLowerCase()
@@ -43,7 +38,6 @@
 
   function formatAvgTime(val) {
     if (val == null || Number.isNaN(val)) return "—";
-    // Keep simple for now; we can change to mm:ss later if you prefer.
     return `${Number(val).toFixed(2)}s`;
   }
 
@@ -89,7 +83,6 @@
       const furn = (qs(".nc-force-furn", row)?.value || "").trim();
 
       if (!hero) continue;
-
       out.push({ hero, si, furn });
     }
     return out;
@@ -101,7 +94,6 @@
       .map((i) => normalizeHeroName(i.value))
       .filter(Boolean);
 
-    // distinct, case-insensitive distinct
     const seen = new Set();
     const out = [];
     for (const n of names) {
@@ -114,56 +106,17 @@
     return out;
   }
 
-  function buildSiPredicate(siChoice) {
-    // User confirmed:
-    // SI 40 => >=40
-    // SI 30 => >=30
-    // SI <30 => <30
-    const v = (siChoice || "").trim();
-    if (!v) return null;
-    if (v === "40") return (x) => x != null && Number(x) >= 40;
-    if (v === "30") return (x) => x != null && Number(x) >= 30;
-    if (v === "<30") return (x) => x != null && Number(x) < 30;
-    return null;
-  }
-
-  function buildFurnPredicate(furnChoice) {
-    // Furn 9 => >=9 ; 3 => >=3 ; 0 => ==0 (as discussed earlier)
-    const v = (furnChoice || "").trim();
-    if (!v) return null;
-    if (v === "9") return (x) => x != null && Number(x) >= 9;
-    if (v === "3") return (x) => x != null && Number(x) >= 3;
-    if (v === "0") return (x) => x != null && Number(x) === 0;
-    return null;
-  }
-
-  function chunkArray(arr, size) {
-    const out = [];
-    for (let i = 0; i < arr.length; i += size) out.push(arr.slice(i, i + size));
-    return out;
-  }
-
-  function intersectSets(a, b) {
-    // Returns new Set of intersection
-    if (!a) return new Set(b);
-    const out = new Set();
-    for (const v of a) if (b.has(v)) out.add(v);
-    return out;
-  }
-
   async function fetchDistinctHeroes() {
-    // Supabase doesn't always do DISTINCT nicely in JS client across all setups.
-    // We'll fetch names (paged) and dedupe in JS.
     const seen = new Set();
     const names = [];
 
-    // Try a single large fetch first; if your table is huge, we can revisit.
     const { data, error } = await supabaseClient
       .from(TABLE_HEROES)
       .select("name")
       .limit(5000);
 
     if (error) throw error;
+
     for (const row of data || []) {
       const n = normalizeHeroName(row.name);
       if (!n) continue;
@@ -173,7 +126,6 @@
       names.push(n);
     }
 
-    // Sort alpha for datalist usability
     names.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
     return names;
   }
@@ -189,138 +141,24 @@
     }
   }
 
-  async function fetchNcIdsForForceConstraint(round, constraint) {
-    // constraint: { hero, si, furn }
-    // We filter on nc_heroes rows for that round and that hero name.
-    // Then apply SI/Furn predicates in JS because it’s easy and avoids tricky query branching.
-    // (If performance ever matters, we can push it into SQL.)
-    const hero = constraint.hero;
-
-    const { data, error } = await supabaseClient
-      .from(TABLE_HEROES)
-      .select("nc_id, si, furn, name")
-      .eq("round", round)
-      .ilike("name", hero);
-
-    if (error) throw error;
-
-    const siPred = buildSiPredicate(constraint.si);
-    const furnPred = buildFurnPredicate(constraint.furn);
-
-    const ids = new Set();
-    for (const row of data || []) {
-      if (siPred && !siPred(row.si)) continue;
-      if (furnPred && !furnPred(row.furn)) continue;
-      ids.add(row.nc_id);
-    }
-    return ids;
+  function setStatus(root, msg) {
+    const el = qs("#ncCompsStatus", root);
+    if (el) el.textContent = msg || "";
   }
 
-  async function fetchNcIdsToExcludeForBlacklist(round, blacklistNames) {
-    if (!blacklistNames || blacklistNames.length === 0) return new Set();
-
-    // Query rows matching any blacklisted hero in that round, collect nc_id
-    // Supabase doesn't have ilike-any built in; we'll do OR chaining.
-    // Example: or=(name.ilike.Albedo,name.ilike.Ainz)
-    const orParts = blacklistNames.map((n) => `name.ilike.${escapeOrValue(n)}`);
-    const orExpr = orParts.join(",");
-
-    const { data, error } = await supabaseClient
-      .from(TABLE_HEROES)
-      .select("nc_id,name")
-      .eq("round", round)
-      .or(orExpr);
-
-    if (error) throw error;
-
-    const ids = new Set();
-    for (const row of data || []) ids.add(row.nc_id);
-    return ids;
-  }
-
-  function escapeOrValue(val) {
-    // Supabase OR syntax is touchy; keep it simple by escaping commas and parentheses.
-    // Also, ilike patterns: if user types % it becomes wildcard; that's probably fine.
-    return String(val).replace(/,/g, "\\,").replace(/\)/g, "\\)").replace(/\(/g, "\\(");
-  }
-
-  async function fetchNcRoundRows(round, allowedNcIds /* Set or null */) {
-    // Returns rows: { comp, time_boss }
-    // If allowedNcIds is null => fetch all rows for that round
-    if (!allowedNcIds) {
-      const { data, error } = await supabaseClient
-        .from(TABLE_ROUND)
-        .select("comp, time_boss")
-        .eq("round", round);
-
-      if (error) throw error;
-      return data || [];
-    }
-
-    const ids = Array.from(allowedNcIds);
-    if (ids.length === 0) return [];
-
-    const chunks = chunkArray(ids, IN_CHUNK);
-    const all = [];
-
-    for (const chunk of chunks) {
-      const { data, error } = await supabaseClient
-        .from(TABLE_ROUND)
-        .select("comp, time_boss, nc_id")
-        .eq("round", round)
-        .in("nc_id", chunk);
-
-      if (error) throw error;
-      all.push(...(data || []));
-    }
-    return all;
-  }
-
-  function computeAvgByComp(rows) {
-    // rows: { comp, time_boss }
-    const agg = new Map(); // comp -> {sum, count}
-    for (const r of rows) {
-      const comp = (r.comp || "").trim();
-      if (!comp) continue;
-      const t = r.time_boss;
-      if (t == null || Number.isNaN(t)) continue;
-
-      const cur = agg.get(comp) || { sum: 0, count: 0 };
-      cur.sum += Number(t);
-      cur.count += 1;
-      agg.set(comp, cur);
-    }
-
-    const out = [];
-    for (const [comp, v] of agg.entries()) {
-      out.push({
-        comp,
-        avg: v.count ? v.sum / v.count : null,
-        count: v.count,
-      });
-    }
-
-    out.sort((a, b) => (a.avg ?? Infinity) - (b.avg ?? Infinity));
-    return out;
-  }
-
-  function renderComps(root, compAverages) {
+  function renderComps(root, compRows) {
     const results = qs("#ncCompsResults", root);
     if (!results) return;
 
-    // Basic 2-column responsive grid using inline styles to avoid touching CSS right now.
     results.innerHTML = "";
     results.style.display = "grid";
     results.style.gridTemplateColumns = "repeat(2, minmax(0, 1fr))";
     results.style.gap = "0.9rem";
     results.style.marginTop = "0.9rem";
 
-    if (!compAverages || compAverages.length === 0) {
-      // Keep area empty but provide no-results feedback via status; nothing to render.
-      return;
-    }
+    if (!compRows || compRows.length === 0) return;
 
-    for (const item of compAverages) {
+    for (const item of compRows) {
       const heroes = parseCompHeroes(item.comp);
 
       const card = document.createElement("article");
@@ -340,13 +178,13 @@
       const time = document.createElement("div");
       time.style.fontWeight = "900";
       time.style.whiteSpace = "nowrap";
-      time.textContent = formatAvgTime(item.avg);
+      time.textContent = formatAvgTime(item.avg_time);
 
       const sample = document.createElement("div");
       sample.style.color = "var(--text-muted)";
       sample.style.fontSize = "0.85rem";
       sample.style.whiteSpace = "nowrap";
-      sample.textContent = `${item.count} runs`;
+      sample.textContent = `${item.run_count ?? 0} runs`;
 
       top.appendChild(time);
       top.appendChild(sample);
@@ -359,6 +197,7 @@
 
       for (const h of heroes) {
         const slug = heroToIconSlug(h);
+
         const img = document.createElement("img");
         img.src = `icons/heroes2/${slug}.jpg`;
         img.alt = h;
@@ -371,15 +210,22 @@
         img.style.border = "1px solid rgba(255,255,255,0.10)";
         img.style.background = "rgba(255,255,255,0.02)";
 
-        // If the icon doesn't exist, avoid broken-image ugliness:
+        // If missing .jpg, fallback to unknown.png (requested)
         img.addEventListener("error", () => {
-          img.style.display = "none";
+          if (img.dataset.fallback === "1") {
+            // unknown.png also missing? hide it.
+            img.style.display = "none";
+            return;
+          }
+          img.dataset.fallback = "1";
+          img.src = "icons/heroes2/unknown.png";
+          img.alt = "Unknown";
+          img.title = "Unknown";
         });
 
         heroRow.appendChild(img);
       }
 
-      // Optional: show the raw comp string (useful for debugging icon mismatches)
       const compText = document.createElement("div");
       compText.style.marginTop = "0.55rem";
       compText.style.color = "var(--text-muted)";
@@ -402,9 +248,12 @@
     mq.addEventListener?.("change", applyMq);
   }
 
-  function setStatus(root, msg) {
-    const el = qs("#ncCompsStatus", root);
-    if (el) el.textContent = msg || "";
+  function debounce(fn, waitMs) {
+    let t = null;
+    return function (...args) {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => fn.apply(this, args), waitMs);
+    };
   }
 
   let heroNamesLoaded = false;
@@ -422,16 +271,16 @@
     const force = readForceConstraints(root);
     const blacklist = readBlacklist(root);
 
-    // Ensure hero datalist loaded once
+    // Load hero datalist once
     if (!heroNamesLoaded) {
       try {
+        setStatus(root, "Loading hero list...");
         const names = await fetchDistinctHeroes();
         if (token !== lastLoadToken) return;
         fillHeroDatalist(root, names);
-        heroNamesLoaded = true;
       } catch (e) {
         console.error("Failed loading distinct heroes:", e);
-        // Not fatal for comps rendering
+      } finally {
         heroNamesLoaded = true;
       }
     }
@@ -441,88 +290,34 @@
     if (results) results.innerHTML = "";
 
     try {
-      // Compute allowed nc_ids from force constraints (AND = intersection)
-      let allowedSet = null;
-
-      for (const c of force) {
-        const ids = await fetchNcIdsForForceConstraint(round, c);
-        if (token !== lastLoadToken) return;
-        allowedSet = intersectSets(allowedSet, ids);
-        if (allowedSet.size === 0) break;
-      }
-
-      // Exclude any nc_ids containing blacklisted heroes for that round
-      if (blacklist.length > 0) {
-        const exclude = await fetchNcIdsToExcludeForBlacklist(round, blacklist);
-        if (token !== lastLoadToken) return;
-
-        if (allowedSet == null) {
-          // If no force constraints, we can't “subtract from all” without knowing universe of ids.
-          // We'll handle blacklist by filtering comps after fetching all nc_round rows for the round.
-          // (This is correct because you said blacklist excludes comps where hero appears in the comp.)
-        } else {
-          for (const id of exclude) allowedSet.delete(id);
-        }
-      }
-
-      let rows;
-
-      if (allowedSet == null) {
-        // No force constraints:
-        // Fetch all comps for the round
-        rows = await fetchNcRoundRows(round, null);
-        if (token !== lastLoadToken) return;
-
-        // Apply blacklist at comp-string level (your requirement)
-        if (blacklist.length > 0) {
-          const bl = new Set(blacklist.map((x) => x.toLowerCase()));
-          rows = (rows || []).filter((r) => {
-            const heroes = parseCompHeroes(r.comp).map((h) => h.toLowerCase());
-            for (const h of heroes) if (bl.has(h)) return false;
-            return true;
-          });
-        }
-      } else {
-        // Force constraints present: allowedSet is explicit (possibly empty)
-        rows = await fetchNcRoundRows(round, allowedSet);
-        if (token !== lastLoadToken) return;
-
-        // (Optional) also enforce blacklist at comp-string level (extra safety)
-        if (blacklist.length > 0) {
-          const bl = new Set(blacklist.map((x) => x.toLowerCase()));
-          rows = (rows || []).filter((r) => {
-            const heroes = parseCompHeroes(r.comp).map((h) => h.toLowerCase());
-            for (const h of heroes) if (bl.has(h)) return false;
-            return true;
-          });
-        }
-      }
-
-      // Group and compute averages
-      const avgByComp = computeAvgByComp(rows);
+      // RPC does filtering + grouping + avg(time_boss) server-side
+      const { data, error } = await supabaseClient.rpc(RPC_COMPS, {
+        p_round: round,
+        p_force: force,          // json array [{hero, si, furn}, ...]
+        p_blacklist: blacklist,  // text[]
+      });
 
       if (token !== lastLoadToken) return;
 
-      if (!avgByComp || avgByComp.length === 0) {
+      if (error) {
+        console.error("RPC error:", error);
+        setStatus(root, "Error loading comps from Supabase (RPC).");
+        return;
+      }
+
+      const rows = data || [];
+      if (rows.length === 0) {
         setStatus(root, "No comps match these filters.");
         renderComps(root, []);
         return;
       }
 
       setStatus(root, "");
-      renderComps(root, avgByComp);
+      renderComps(root, rows);
     } catch (err) {
       console.error("Error loading comps:", err);
       setStatus(root, "Error loading comps from Supabase.");
     }
-  }
-
-  function debounce(fn, waitMs) {
-    let t = null;
-    return function (...args) {
-      window.clearTimeout(t);
-      t = window.setTimeout(() => fn.apply(this, args), waitMs);
-    };
   }
 
   document.addEventListener("DOMContentLoaded", () => {
@@ -552,14 +347,12 @@
       });
     });
 
-    // Filter changes
+    // Filter changes (Comps view)
     const debouncedLoad = debounce(() => loadComps(root), 250);
 
-    // Force side inputs/selects
     qsa("#ncPanelComps .nc-filter-col-force input, #ncPanelComps .nc-filter-col-force select", root)
       .forEach((el) => el.addEventListener("input", debouncedLoad));
 
-    // Blacklist side inputs
     qsa("#ncPanelComps .nc-filter-col-blacklist input", root)
       .forEach((el) => el.addEventListener("input", debouncedLoad));
 
