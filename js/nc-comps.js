@@ -1,13 +1,11 @@
 // nc-comps.js
-// Implements:
-// - Top tabs (Comps / Leaderboard)
-// - Round tabs (R1..R6)
-// - Comps view data display from Supabase via RPC:
-//     public.nc_comps_agg(p_round, p_force, p_blacklist)
-// - Hero icon rendering from /icons/heroes2 (lowercased/sanitized) with fallback unknown.png
+// - Comps view uses RPC: nc_comps_agg(p_round, p_force, p_blacklist)
+// - Leaderboard view uses RPC: nc_leaderboard_rows(p_round, p_force)
+// - Hero icons fallback: unknown.png when .jpg missing
 
 (function () {
   const RPC_COMPS = "nc_comps_agg";
+  const RPC_LB = "nc_leaderboard_rows";
   const TABLE_HEROES = "nc_heroes";
 
   function qs(sel, root = document) {
@@ -22,7 +20,6 @@
     return (name || "").trim();
   }
 
-  // Icons in /icons/heroes2 use a "lowercase + stripped" convention.
   function heroToIconSlug(name) {
     return normalizeHeroName(name)
       .toLowerCase()
@@ -30,7 +27,6 @@
   }
 
   function parseCompHeroes(compStr) {
-    // Example: "Liberta - Lucilla - Orthos - Palmer - Marcille"
     const raw = (compStr || "").trim();
     if (!raw) return [];
     return raw.split(" - ").map((s) => s.trim()).filter(Boolean);
@@ -73,15 +69,12 @@
   }
 
   function readForceConstraints(root) {
-    // 5 rows of (hero, si, furn); only rows with hero filled count.
     const rows = qsa("#ncPanelComps .nc-filter-col-force .nc-filter-row", root);
     const out = [];
-
     for (const row of rows) {
       const hero = normalizeHeroName(qs(".nc-force-hero", row)?.value || "");
       const si = (qs(".nc-force-si", row)?.value || "").trim();
       const furn = (qs(".nc-force-furn", row)?.value || "").trim();
-
       if (!hero) continue;
       out.push({ hero, si, furn });
     }
@@ -90,9 +83,7 @@
 
   function readBlacklist(root) {
     const inputs = qsa("#ncPanelComps .nc-blacklist-hero", root);
-    const names = inputs
-      .map((i) => normalizeHeroName(i.value))
-      .filter(Boolean);
+    const names = inputs.map((i) => normalizeHeroName(i.value)).filter(Boolean);
 
     const seen = new Set();
     const out = [];
@@ -104,6 +95,26 @@
       }
     }
     return out;
+  }
+
+  function readLeaderboardForce(root) {
+    const rows = qsa("#ncPanelLeaderboard .nc-filter-row", root);
+    const out = [];
+    for (const row of rows) {
+      const hero = normalizeHeroName(qs(".nc-lb-hero", row)?.value || "");
+      const si = (qs(".nc-lb-si", row)?.value || "").trim();
+      const furn = (qs(".nc-lb-furn", row)?.value || "").trim();
+      if (!hero) continue;
+      out.push({ hero, si, furn });
+    }
+    return out;
+  }
+
+  function getLeaderboardRound(root) {
+    const sel = qs("#ncLbRound", root);
+    const v = (sel?.value || "1").trim();
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 1;
   }
 
   async function fetchDistinctHeroes() {
@@ -143,6 +154,11 @@
 
   function setStatus(root, msg) {
     const el = qs("#ncCompsStatus", root);
+    if (el) el.textContent = msg || "";
+  }
+
+  function setLbStatus(root, msg) {
+    const el = qs("#ncLbStatus", root);
     if (el) el.textContent = msg || "";
   }
 
@@ -210,10 +226,8 @@
         img.style.border = "1px solid rgba(255,255,255,0.10)";
         img.style.background = "rgba(255,255,255,0.02)";
 
-        // If missing .jpg, fallback to unknown.png (requested)
         img.addEventListener("error", () => {
           if (img.dataset.fallback === "1") {
-            // unknown.png also missing? hide it.
             img.style.display = "none";
             return;
           }
@@ -239,13 +253,47 @@
       results.appendChild(card);
     }
 
-    // Responsive: collapse to one column on small screens
     const mq = window.matchMedia("(max-width: 900px)");
     const applyMq = () => {
       results.style.gridTemplateColumns = mq.matches ? "1fr" : "repeat(2, minmax(0, 1fr))";
     };
     applyMq();
     mq.addEventListener?.("change", applyMq);
+  }
+
+  function renderLeaderboard(root, rows) {
+    const table = qs("#ncLbTable", root);
+    const tbody = table?.querySelector("tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    for (const r of rows || []) {
+      const tr = document.createElement("tr");
+
+      const tdRank = document.createElement("td");
+      tdRank.textContent = r.rank ?? "—";
+
+      const tdRegion = document.createElement("td");
+      tdRegion.textContent = r.region ?? "—";
+
+      const tdName = document.createElement("td");
+      tdName.textContent = r.name ?? "—";
+
+      const tdComp = document.createElement("td");
+      tdComp.textContent = r.comp ?? "—";
+
+      const tdTime = document.createElement("td");
+      tdTime.textContent = formatAvgTime(r.time_boss);
+
+      tr.appendChild(tdRank);
+      tr.appendChild(tdRegion);
+      tr.appendChild(tdName);
+      tr.appendChild(tdComp);
+      tr.appendChild(tdTime);
+
+      tbody.appendChild(tr);
+    }
   }
 
   function debounce(fn, waitMs) {
@@ -257,50 +305,51 @@
   }
 
   let heroNamesLoaded = false;
-  let lastLoadToken = 0;
+  let lastCompsToken = 0;
+  let lastLbToken = 0;
+
+  async function ensureHeroList(root) {
+    if (heroNamesLoaded) return;
+    try {
+      const names = await fetchDistinctHeroes();
+      fillHeroDatalist(root, names);
+    } catch (e) {
+      console.error("Failed loading distinct heroes:", e);
+    } finally {
+      heroNamesLoaded = true;
+    }
+  }
 
   async function loadComps(root) {
-    const token = ++lastLoadToken;
+    const token = ++lastCompsToken;
 
     if (typeof supabaseClient === "undefined") {
       setStatus(root, "Supabase client is not available on this page.");
       return;
     }
 
+    await ensureHeroList(root);
+    if (token !== lastCompsToken) return;
+
     const round = getSelectedRound(root);
     const force = readForceConstraints(root);
     const blacklist = readBlacklist(root);
-
-    // Load hero datalist once
-    if (!heroNamesLoaded) {
-      try {
-        setStatus(root, "Loading hero list...");
-        const names = await fetchDistinctHeroes();
-        if (token !== lastLoadToken) return;
-        fillHeroDatalist(root, names);
-      } catch (e) {
-        console.error("Failed loading distinct heroes:", e);
-      } finally {
-        heroNamesLoaded = true;
-      }
-    }
 
     setStatus(root, "Loading comps...");
     const results = qs("#ncCompsResults", root);
     if (results) results.innerHTML = "";
 
     try {
-      // RPC does filtering + grouping + avg(time_boss) server-side
       const { data, error } = await supabaseClient.rpc(RPC_COMPS, {
         p_round: round,
-        p_force: force,          // json array [{hero, si, furn}, ...]
-        p_blacklist: blacklist,  // text[]
+        p_force: force,
+        p_blacklist: blacklist,
       });
 
-      if (token !== lastLoadToken) return;
+      if (token !== lastCompsToken) return;
 
       if (error) {
-        console.error("RPC error:", error);
+        console.error("Comps RPC error:", error);
         setStatus(root, "Error loading comps from Supabase (RPC).");
         return;
       }
@@ -320,6 +369,52 @@
     }
   }
 
+  async function loadLeaderboard(root) {
+    const token = ++lastLbToken;
+
+    if (typeof supabaseClient === "undefined") {
+      setLbStatus(root, "Supabase client is not available on this page.");
+      return;
+    }
+
+    await ensureHeroList(root);
+    if (token !== lastLbToken) return;
+
+    const round = getLeaderboardRound(root);
+    const force = readLeaderboardForce(root);
+
+    setLbStatus(root, "Loading leaderboard...");
+    renderLeaderboard(root, []);
+
+    try {
+      const { data, error } = await supabaseClient.rpc(RPC_LB, {
+        p_round: round,
+        p_force: force,
+      });
+
+      if (token !== lastLbToken) return;
+
+      if (error) {
+        console.error("Leaderboard RPC error:", error);
+        setLbStatus(root, "Error loading leaderboard from Supabase (RPC).");
+        return;
+      }
+
+      const rows = data || [];
+      if (rows.length === 0) {
+        setLbStatus(root, "No results match these filters.");
+        renderLeaderboard(root, []);
+        return;
+      }
+
+      setLbStatus(root, "");
+      renderLeaderboard(root, rows);
+    } catch (err) {
+      console.error("Error loading leaderboard:", err);
+      setLbStatus(root, "Error loading leaderboard from Supabase.");
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const root = qs("#ncCompsPage");
     if (!root) return;
@@ -327,15 +422,20 @@
     // Top view tabs
     const viewTabs = qsa(".nc-tab", root);
     viewTabs.forEach((btn) => {
-      btn.addEventListener("click", (e) => {
+      btn.addEventListener("click", async (e) => {
         e.preventDefault();
         const view = btn.getAttribute("data-view");
         if (!view) return;
         setActiveView(root, view);
+
+        // Lazy load leaderboard when switching to it
+        if (view === "leaderboard") {
+          loadLeaderboard(root);
+        }
       });
     });
 
-    // Round tabs
+    // Round tabs (Comps only)
     const roundTabs = qsa(".nc-round-tab", root);
     roundTabs.forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -347,14 +447,19 @@
       });
     });
 
-    // Filter changes (Comps view)
-    const debouncedLoad = debounce(() => loadComps(root), 250);
-
+    // Comps filters
+    const debouncedComps = debounce(() => loadComps(root), 250);
     qsa("#ncPanelComps .nc-filter-col-force input, #ncPanelComps .nc-filter-col-force select", root)
-      .forEach((el) => el.addEventListener("input", debouncedLoad));
-
+      .forEach((el) => el.addEventListener("input", debouncedComps));
     qsa("#ncPanelComps .nc-filter-col-blacklist input", root)
-      .forEach((el) => el.addEventListener("input", debouncedLoad));
+      .forEach((el) => el.addEventListener("input", debouncedComps));
+
+    // Leaderboard filters
+    const debouncedLb = debounce(() => loadLeaderboard(root), 250);
+    qsa("#ncPanelLeaderboard .nc-leaderboard-rows input, #ncPanelLeaderboard .nc-leaderboard-rows select", root)
+      .forEach((el) => el.addEventListener("input", debouncedLb));
+    const lbRound = qs("#ncLbRound", root);
+    if (lbRound) lbRound.addEventListener("change", debouncedLb);
 
     // Defaults
     setActiveView(root, "comps");
