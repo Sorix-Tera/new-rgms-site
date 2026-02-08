@@ -3,10 +3,12 @@
 // - Leaderboard view uses RPC: nc_leaderboard_rows(p_round, p_force)
 // - Hero icons fallback: unknown.png when .jpg missing
 // - Leaderboard "Comp" column renders hero icons (not text)
+// - Hero input autocomplete via <datalist id="ncHeroList"> populated from RPC nc_distinct_heroes
 
 (function () {
   const RPC_COMPS = "nc_comps_agg";
   const RPC_LB = "nc_leaderboard_rows";
+  const RPC_HEROES = "nc_distinct_heroes";
 
   function qs(sel, root = document) {
     return root.querySelector(sel);
@@ -81,10 +83,50 @@
     return Number.isFinite(n) ? n : 1;
   }
 
+  // -------------------------
+  // Hero datalist autocomplete
+  // -------------------------
+
+  async function fetchDistinctHeroes() {
+    if (typeof supabaseClient === "undefined") {
+      throw new Error("supabaseClient is not available");
+    }
+    const { data, error } = await supabaseClient.rpc(RPC_HEROES);
+    if (error) throw error;
+    return (data || []).map((r) => normalizeHeroName(r.name)).filter(Boolean);
+  }
+
+  function fillHeroDatalist(root, heroNames) {
+    const dl = qs("#ncHeroList", root);
+    if (!dl) return;
+    dl.innerHTML = "";
+    for (const name of heroNames) {
+      const opt = document.createElement("option");
+      opt.value = name;
+      dl.appendChild(opt);
+    }
+  }
+
+  let heroNamesLoaded = false;
+
+  async function ensureHeroList(root) {
+    if (heroNamesLoaded) return;
+    try {
+      const names = await fetchDistinctHeroes();
+      fillHeroDatalist(root, names);
+    } catch (e) {
+      // Keep the page functional even if autocomplete fails
+      console.error("Failed loading distinct heroes:", e);
+    } finally {
+      heroNamesLoaded = true;
+    }
+  }
+
+  // -------------------------
+  // Filter readers
+  // -------------------------
+
   function readCompsForce(root) {
-    // Supports both markup styles:
-    // - rows: .nc-filter-row
-    // - inputs: .nc-force-hero, selects: .nc-force-si / .nc-force-furn
     const panel = qs("#ncPanelComps", root);
     if (!panel) return [];
 
@@ -122,16 +164,12 @@
   }
 
   function readLeaderboardForce(root) {
-    // Supports both markup styles:
-    // - rows: .nc-lb-row (new) OR .nc-filter-row (older)
-    // - inputs: .nc-lb-hero, selects: .nc-lb-si / .nc-lb-furn
     const panel = qs("#ncPanelLeaderboard", root);
     if (!panel) return [];
 
     const rows = qsa(".nc-lb-row, .nc-filter-row", panel);
     const out = [];
 
-    // If markup changes and rows list is empty, fall back to “parallel arrays”
     if (rows.length === 0) {
       const heroes = qsa(".nc-lb-hero", panel);
       const sis = qsa(".nc-lb-si", panel);
@@ -159,6 +197,10 @@
     return out;
   }
 
+  // -------------------------
+  // Status helpers
+  // -------------------------
+
   function setStatus(root, msg) {
     const el = qs("#ncCompsStatus", root);
     if (el) el.textContent = msg || "";
@@ -168,6 +210,10 @@
     const el = qs("#ncLbStatus", root);
     if (el) el.textContent = msg || "";
   }
+
+  // -------------------------
+  // Rendering helpers
+  // -------------------------
 
   function makeHeroImg(heroName, sizePx) {
     const slug = heroToIconSlug(heroName);
@@ -309,6 +355,10 @@
     }
   }
 
+  // -------------------------
+  // Data loading
+  // -------------------------
+
   let lastCompsToken = 0;
   let lastLbToken = 0;
 
@@ -323,8 +373,6 @@
     const round = getSelectedRound(root);
     const force = readCompsForce(root);
     const blacklist = readCompsBlacklist(root);
-
-    console.debug("[NC] loadComps", { round, force, blacklist });
 
     setStatus(root, "Loading comps...");
     const results = qs("#ncCompsResults", root);
@@ -371,8 +419,6 @@
     const round = getLeaderboardRound(root);
     const force = readLeaderboardForce(root);
 
-    console.debug("[NC] loadLeaderboard", { round, force });
-
     setLbStatus(root, "Loading leaderboard...");
     renderLeaderboard(root, []);
 
@@ -406,8 +452,6 @@
   }
 
   function bindPanelFilters(panel, handler) {
-    // Bind to all inputs/selects inside the panel’s filters section.
-    // (Avoid relying on container class names that keep changing.)
     const filterInputs = qsa("input, select", panel);
     for (const el of filterInputs) {
       el.addEventListener("input", handler);
@@ -415,9 +459,12 @@
     }
   }
 
-  document.addEventListener("DOMContentLoaded", () => {
+  document.addEventListener("DOMContentLoaded", async () => {
     const root = qs("#ncCompsPage");
     if (!root) return;
+
+    // Restore hero autocomplete
+    await ensureHeroList(root);
 
     const debouncedComps = debounce(() => loadComps(root), 250);
     const debouncedLb = debounce(() => loadLeaderboard(root), 250);
@@ -444,11 +491,10 @@
       });
     });
 
-    // Bind Comps panel filters
+    // Bind filters
     const compsPanel = qs("#ncPanelComps", root);
     if (compsPanel) bindPanelFilters(compsPanel, debouncedComps);
 
-    // Bind Leaderboard panel filters
     const lbPanel = qs("#ncPanelLeaderboard", root);
     if (lbPanel) bindPanelFilters(lbPanel, debouncedLb);
 
