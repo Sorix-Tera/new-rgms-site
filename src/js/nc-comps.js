@@ -7,7 +7,6 @@
 (function () {
   const RPC_COMPS = "nc_comps_agg";
   const RPC_LB = "nc_leaderboard_rows";
-  const TABLE_HEROES = "nc_heroes";
 
   function qs(sel, root = document) {
     return root.querySelector(sel);
@@ -33,14 +32,21 @@
     return raw.split(" - ").map((s) => s.trim()).filter(Boolean);
   }
 
-  function formatAvgTime(val) {
+  function formatTime(val) {
     if (val == null || Number.isNaN(val)) return "—";
     return `${Number(val).toFixed(2)}s`;
   }
 
+  function debounce(fn, waitMs) {
+    let t = null;
+    return function (...args) {
+      window.clearTimeout(t);
+      t = window.setTimeout(() => fn.apply(this, args), waitMs);
+    };
+  }
+
   function setActiveView(root, view) {
-    const tabs = qsa(".nc-tab", root);
-    tabs.forEach((btn) => {
+    qsa(".nc-tab", root).forEach((btn) => {
       const isActive = btn.getAttribute("data-view") === view;
       btn.classList.toggle("is-active", isActive);
       btn.setAttribute("aria-selected", isActive ? "true" : "false");
@@ -55,8 +61,7 @@
   }
 
   function setActiveRound(root, round) {
-    const roundTabs = qsa(".nc-round-tab", root);
-    roundTabs.forEach((btn) => {
+    qsa(".nc-round-tab", root).forEach((btn) => {
       const isActive = btn.getAttribute("data-round") === String(round);
       btn.classList.toggle("is-active", isActive);
       btn.setAttribute("aria-selected", isActive ? "true" : "false");
@@ -69,9 +74,23 @@
     return active ? Number(active.getAttribute("data-round")) : 1;
   }
 
-  function readForceConstraints(root) {
-    const rows = qsa("#ncPanelComps .nc-filter-col-force .nc-filter-row", root);
+  function getLeaderboardRound(root) {
+    const sel = qs("#ncLbRound", root);
+    const v = (sel?.value || "1").trim();
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 1;
+  }
+
+  function readCompsForce(root) {
+    // Supports both markup styles:
+    // - rows: .nc-filter-row
+    // - inputs: .nc-force-hero, selects: .nc-force-si / .nc-force-furn
+    const panel = qs("#ncPanelComps", root);
+    if (!panel) return [];
+
+    const rows = qsa(".nc-filter-col-force .nc-filter-row, .nc-filter-col-force .nc-force-row", panel);
     const out = [];
+
     for (const row of rows) {
       const hero = normalizeHeroName(qs(".nc-force-hero", row)?.value || "");
       const si = (qs(".nc-force-si", row)?.value || "").trim();
@@ -79,11 +98,15 @@
       if (!hero) continue;
       out.push({ hero, si, furn });
     }
+
     return out;
   }
 
-  function readBlacklist(root) {
-    const inputs = qsa("#ncPanelComps .nc-blacklist-hero", root);
+  function readCompsBlacklist(root) {
+    const panel = qs("#ncPanelComps", root);
+    if (!panel) return [];
+
+    const inputs = qsa(".nc-blacklist-hero", panel);
     const names = inputs.map((i) => normalizeHeroName(i.value)).filter(Boolean);
 
     const seen = new Set();
@@ -99,8 +122,32 @@
   }
 
   function readLeaderboardForce(root) {
-    const rows = qsa("#ncPanelLeaderboard .nc-filter-row", root);
+    // Supports both markup styles:
+    // - rows: .nc-lb-row (new) OR .nc-filter-row (older)
+    // - inputs: .nc-lb-hero, selects: .nc-lb-si / .nc-lb-furn
+    const panel = qs("#ncPanelLeaderboard", root);
+    if (!panel) return [];
+
+    const rows = qsa(".nc-lb-row, .nc-filter-row", panel);
     const out = [];
+
+    // If markup changes and rows list is empty, fall back to “parallel arrays”
+    if (rows.length === 0) {
+      const heroes = qsa(".nc-lb-hero", panel);
+      const sis = qsa(".nc-lb-si", panel);
+      const furns = qsa(".nc-lb-furn", panel);
+      const n = Math.max(heroes.length, sis.length, furns.length);
+
+      for (let i = 0; i < n; i++) {
+        const hero = normalizeHeroName(heroes[i]?.value || "");
+        const si = (sis[i]?.value || "").trim();
+        const furn = (furns[i]?.value || "").trim();
+        if (!hero) continue;
+        out.push({ hero, si, furn });
+      }
+      return out;
+    }
+
     for (const row of rows) {
       const hero = normalizeHeroName(qs(".nc-lb-hero", row)?.value || "");
       const si = (qs(".nc-lb-si", row)?.value || "").trim();
@@ -108,34 +155,8 @@
       if (!hero) continue;
       out.push({ hero, si, furn });
     }
+
     return out;
-  }
-
-  function getLeaderboardRound(root) {
-    const sel = qs("#ncLbRound", root);
-    const v = (sel?.value || "1").trim();
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 1;
-  }
-
-  async function fetchDistinctHeroes() {
-    const seen = new Set();
-    const names = [];
-
-    const { data, error } = await supabaseClient.rpc("nc_distinct_heroes");
-    if (error) throw error;
-    return (data || []).map(r => normalizeHeroName(r.name)).filter(Boolean);
-  }
-
-  function fillHeroDatalist(root, heroNames) {
-    const dl = qs("#ncHeroList", root);
-    if (!dl) return;
-    dl.innerHTML = "";
-    for (const name of heroNames) {
-      const opt = document.createElement("option");
-      opt.value = name;
-      dl.appendChild(opt);
-    }
   }
 
   function setStatus(root, msg) {
@@ -209,7 +230,7 @@
       const time = document.createElement("div");
       time.style.fontWeight = "900";
       time.style.whiteSpace = "nowrap";
-      time.textContent = formatAvgTime(item.avg_time);
+      time.textContent = formatTime(item.avg_time);
 
       const sample = document.createElement("div");
       sample.style.color = "var(--text-muted)";
@@ -263,7 +284,6 @@
       const tdName = document.createElement("td");
       tdName.textContent = r.name ?? "—";
 
-      // ✅ Comp as icons (not text)
       const tdComp = document.createElement("td");
       const heroes = parseCompHeroes(r.comp);
       const wrap = document.createElement("div");
@@ -271,14 +291,13 @@
       wrap.style.gap = "0.35rem";
       wrap.style.alignItems = "center";
       wrap.style.flexWrap = "nowrap";
-
       for (const h of heroes) {
         wrap.appendChild(makeHeroImg(h, 28));
       }
       tdComp.appendChild(wrap);
 
       const tdTime = document.createElement("td");
-      tdTime.textContent = formatAvgTime(r.time_boss);
+      tdTime.textContent = formatTime(r.time_boss);
 
       tr.appendChild(tdRank);
       tr.appendChild(tdRegion);
@@ -290,29 +309,8 @@
     }
   }
 
-  function debounce(fn, waitMs) {
-    let t = null;
-    return function (...args) {
-      window.clearTimeout(t);
-      t = window.setTimeout(() => fn.apply(this, args), waitMs);
-    };
-  }
-
-  let heroNamesLoaded = false;
   let lastCompsToken = 0;
   let lastLbToken = 0;
-
-  async function ensureHeroList(root) {
-    if (heroNamesLoaded) return;
-    try {
-      const names = await fetchDistinctHeroes();
-      fillHeroDatalist(root, names);
-    } catch (e) {
-      console.error("Failed loading distinct heroes:", e);
-    } finally {
-      heroNamesLoaded = true;
-    }
-  }
 
   async function loadComps(root) {
     const token = ++lastCompsToken;
@@ -322,12 +320,11 @@
       return;
     }
 
-    await ensureHeroList(root);
-    if (token !== lastCompsToken) return;
-
     const round = getSelectedRound(root);
-    const force = readForceConstraints(root);
-    const blacklist = readBlacklist(root);
+    const force = readCompsForce(root);
+    const blacklist = readCompsBlacklist(root);
+
+    console.debug("[NC] loadComps", { round, force, blacklist });
 
     setStatus(root, "Loading comps...");
     const results = qs("#ncCompsResults", root);
@@ -371,11 +368,10 @@
       return;
     }
 
-    await ensureHeroList(root);
-    if (token !== lastLbToken) return;
-
     const round = getLeaderboardRound(root);
     const force = readLeaderboardForce(root);
+
+    console.debug("[NC] loadLeaderboard", { round, force });
 
     setLbStatus(root, "Loading leaderboard...");
     renderLeaderboard(root, []);
@@ -409,28 +405,36 @@
     }
   }
 
+  function bindPanelFilters(panel, handler) {
+    // Bind to all inputs/selects inside the panel’s filters section.
+    // (Avoid relying on container class names that keep changing.)
+    const filterInputs = qsa("input, select", panel);
+    for (const el of filterInputs) {
+      el.addEventListener("input", handler);
+      el.addEventListener("change", handler);
+    }
+  }
+
   document.addEventListener("DOMContentLoaded", () => {
     const root = qs("#ncCompsPage");
     if (!root) return;
 
-    // Top view tabs
-    const viewTabs = qsa(".nc-tab", root);
-    viewTabs.forEach((btn) => {
-      btn.addEventListener("click", async (e) => {
+    const debouncedComps = debounce(() => loadComps(root), 250);
+    const debouncedLb = debounce(() => loadLeaderboard(root), 250);
+
+    // View tabs
+    qsa(".nc-tab", root).forEach((btn) => {
+      btn.addEventListener("click", (e) => {
         e.preventDefault();
         const view = btn.getAttribute("data-view");
         if (!view) return;
         setActiveView(root, view);
-
-        if (view === "leaderboard") {
-          loadLeaderboard(root);
-        }
+        if (view === "leaderboard") loadLeaderboard(root);
       });
     });
 
-    // Round tabs (Comps only)
-    const roundTabs = qsa(".nc-round-tab", root);
-    roundTabs.forEach((btn) => {
+    // Comps round tabs
+    qsa(".nc-round-tab", root).forEach((btn) => {
       btn.addEventListener("click", (e) => {
         e.preventDefault();
         const round = btn.getAttribute("data-round");
@@ -440,19 +444,13 @@
       });
     });
 
-    // Comps filters
-    const debouncedComps = debounce(() => loadComps(root), 250);
-    qsa("#ncPanelComps .nc-filter-col-force input, #ncPanelComps .nc-filter-col-force select", root)
-      .forEach((el) => el.addEventListener("input", debouncedComps));
-    qsa("#ncPanelComps .nc-filter-col-blacklist input", root)
-      .forEach((el) => el.addEventListener("input", debouncedComps));
+    // Bind Comps panel filters
+    const compsPanel = qs("#ncPanelComps", root);
+    if (compsPanel) bindPanelFilters(compsPanel, debouncedComps);
 
-    // Leaderboard filters
-    const debouncedLb = debounce(() => loadLeaderboard(root), 250);
-    qsa("#ncPanelLeaderboard .nc-leaderboard-rows input, #ncPanelLeaderboard .nc-leaderboard-rows select", root)
-      .forEach((el) => el.addEventListener("input", debouncedLb));
-    const lbRound = qs("#ncLbRound", root);
-    if (lbRound) lbRound.addEventListener("change", debouncedLb);
+    // Bind Leaderboard panel filters
+    const lbPanel = qs("#ncPanelLeaderboard", root);
+    if (lbPanel) bindPanelFilters(lbPanel, debouncedLb);
 
     // Defaults
     setActiveView(root, "comps");
