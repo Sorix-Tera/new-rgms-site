@@ -122,24 +122,9 @@
     const seen = new Set();
     const names = [];
 
-    const { data, error } = await supabaseClient
-      .from(TABLE_HEROES)
-      .select("name")
-      .limit(5000);
-
+    const { data, error } = await supabaseClient.rpc("nc_distinct_heroes");
     if (error) throw error;
-
-    for (const row of data || []) {
-      const n = normalizeHeroName(row.name);
-      if (!n) continue;
-      const key = n.toLowerCase();
-      if (seen.has(key)) continue;
-      seen.add(key);
-      names.push(n);
-    }
-
-    names.sort((a, b) => a.localeCompare(b, undefined, { sensitivity: "base" }));
-    return names;
+    return (data || []).map(r => normalizeHeroName(r.name)).filter(Boolean);
   }
 
   function fillHeroDatalist(root, heroNames) {
