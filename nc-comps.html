@@ -142,21 +142,21 @@
         <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="6">R6</button>
       </div>
 
-      <!-- Filters section -->
+      <!-- Filters section (Comp Finder style container) -->
       <section class="filters nc-comps-filters" aria-label="NC comps filters">
         <div class="nc-filter-col nc-filter-col-force">
           <div class="nc-filter-title">Force Hero</div>
 
-          <div class="nc-filter-header" aria-hidden="true">
-            <div class="nc-filter-h">Hero</div>
-            <div class="nc-filter-h">SI</div>
-            <div class="nc-filter-h">Furn.</div>
+          <div class="nc-force-header" aria-hidden="true">
+            <div class="nc-force-h">Hero</div>
+            <div class="nc-force-h">SI</div>
+            <div class="nc-force-h">Furn.</div>
           </div>
 
           <div class="nc-force-rows">
             
-            <div class="nc-filter-row">
-              <input class="nc-input nc-force-hero" type="text" placeholder="Hero" aria-label="Force hero 1" list="ncHeroList"/>
+            <div class="nc-force-row">
+              <input class="nc-input nc-force-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Force hero 1"/>
               <select class="nc-select nc-force-si" aria-label="Force hero 1 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -171,8 +171,8 @@
               </select>
             </div>
             
-            <div class="nc-filter-row">
-              <input class="nc-input nc-force-hero" type="text" placeholder="Hero" aria-label="Force hero 2" list="ncHeroList"/>
+            <div class="nc-force-row">
+              <input class="nc-input nc-force-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Force hero 2"/>
               <select class="nc-select nc-force-si" aria-label="Force hero 2 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -187,8 +187,8 @@
               </select>
             </div>
             
-            <div class="nc-filter-row">
-              <input class="nc-input nc-force-hero" type="text" placeholder="Hero" aria-label="Force hero 3" list="ncHeroList"/>
+            <div class="nc-force-row">
+              <input class="nc-input nc-force-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Force hero 3"/>
               <select class="nc-select nc-force-si" aria-label="Force hero 3 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -203,8 +203,8 @@
               </select>
             </div>
             
-            <div class="nc-filter-row">
-              <input class="nc-input nc-force-hero" type="text" placeholder="Hero" aria-label="Force hero 4" list="ncHeroList"/>
+            <div class="nc-force-row">
+              <input class="nc-input nc-force-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Force hero 4"/>
               <select class="nc-select nc-force-si" aria-label="Force hero 4 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -219,8 +219,8 @@
               </select>
             </div>
             
-            <div class="nc-filter-row">
-              <input class="nc-input nc-force-hero" type="text" placeholder="Hero" aria-label="Force hero 5" list="ncHeroList"/>
+            <div class="nc-force-row">
+              <input class="nc-input nc-force-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Force hero 5"/>
               <select class="nc-select nc-force-si" aria-label="Force hero 5 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -243,31 +243,24 @@
 
           <div class="nc-blacklist-rows">
             
-            <input class="nc-input nc-blacklist-hero" type="text" placeholder="Hero" aria-label="Blacklist hero 1" list="ncHeroList"/>
+            <input class="nc-input nc-blacklist-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Blacklist hero 1"/>
             
-            <input class="nc-input nc-blacklist-hero" type="text" placeholder="Hero" aria-label="Blacklist hero 2" list="ncHeroList"/>
+            <input class="nc-input nc-blacklist-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Blacklist hero 2"/>
             
-            <input class="nc-input nc-blacklist-hero" type="text" placeholder="Hero" aria-label="Blacklist hero 3" list="ncHeroList"/>
+            <input class="nc-input nc-blacklist-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Blacklist hero 3"/>
             
-            <input class="nc-input nc-blacklist-hero" type="text" placeholder="Hero" aria-label="Blacklist hero 4" list="ncHeroList"/>
+            <input class="nc-input nc-blacklist-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Blacklist hero 4"/>
             
-            <input class="nc-input nc-blacklist-hero" type="text" placeholder="Hero" aria-label="Blacklist hero 5" list="ncHeroList"/>
+            <input class="nc-input nc-blacklist-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Blacklist hero 5"/>
             
           </div>
         </div>
       </section>
 
-      <!-- Hero suggestions -->
-      <datalist id="ncHeroList">
-        <!-- filled by JS -->
-      </datalist>
+      <datalist id="ncHeroList"></datalist>
 
-      <!-- Results -->
-      <p class="page-status" id="ncCompsStatus"></p>
-
-      <section id="ncCompsResults" class="nc-comps-results" aria-label="NC comps results">
-        <!-- filled by JS -->
-      </section>
+      <div id="ncCompsStatus" class="nc-status" aria-live="polite"></div>
+      <div id="ncCompsResults"></div>
     </section>
 
     <!-- LEADERBOARD VIEW -->
@@ -279,34 +272,19 @@
       data-view="leaderboard"
       aria-hidden="true"
     >
+      <!-- Split filters: left (hero/SI/Furn) + right (Round buttons) -->
       <section class="filters nc-leaderboard-filters" aria-label="NC leaderboard filters">
-        <div class="nc-lb-topbar">
-          <div class="nc-lb-title">Filter heroes</div>
-
-          <div class="nc-lb-round">
-            <div class="nc-lb-round-label">Round</div>
-            <select class="nc-select" id="ncLbRound" aria-label="Leaderboard round">
-              <option value="1" selected>R1</option>
-              <option value="2">R2</option>
-              <option value="3">R3</option>
-              <option value="4">R4</option>
-              <option value="5">R5</option>
-              <option value="6">R6</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="nc-lb-grid">
-          <div class="nc-lb-header" aria-hidden="true">
-            <div class="nc-lb-h">Hero</div>
-            <div class="nc-lb-h">SI</div>
-            <div class="nc-lb-h">Furn.</div>
+        <div class="nc-filter-col nc-filter-col-lb-left">
+          <div class="nc-leaderboard-header" aria-hidden="true">
+            <div class="nc-lh">Hero</div>
+            <div class="nc-lh">SI</div>
+            <div class="nc-lh">Furn.</div>
           </div>
 
-          <div class="nc-lb-rows">
+          <div class="nc-leaderboard-rows">
             
-            <div class="nc-lb-row">
-              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 1" list="ncHeroList"/>
+            <div class="nc-leaderboard-row">
+              <input class="nc-input nc-lb-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Leaderboard hero 1"/>
               <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 1 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -321,8 +299,8 @@
               </select>
             </div>
             
-            <div class="nc-lb-row">
-              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 2" list="ncHeroList"/>
+            <div class="nc-leaderboard-row">
+              <input class="nc-input nc-lb-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Leaderboard hero 2"/>
               <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 2 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -337,8 +315,8 @@
               </select>
             </div>
             
-            <div class="nc-lb-row">
-              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 3" list="ncHeroList"/>
+            <div class="nc-leaderboard-row">
+              <input class="nc-input nc-lb-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Leaderboard hero 3"/>
               <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 3 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -353,8 +331,8 @@
               </select>
             </div>
             
-            <div class="nc-lb-row">
-              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 4" list="ncHeroList"/>
+            <div class="nc-leaderboard-row">
+              <input class="nc-input nc-lb-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Leaderboard hero 4"/>
               <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 4 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -369,8 +347,8 @@
               </select>
             </div>
             
-            <div class="nc-lb-row">
-              <input class="nc-input nc-lb-hero" type="text" placeholder="Hero" aria-label="Leaderboard hero 5" list="ncHeroList"/>
+            <div class="nc-leaderboard-row">
+              <input class="nc-input nc-lb-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Leaderboard hero 5"/>
               <select class="nc-select nc-lb-si" aria-label="Leaderboard hero 5 SI">
                 <option value="" selected></option>
                 <option value="40">40</option>
@@ -387,12 +365,24 @@
             
           </div>
         </div>
+
+        <div class="nc-filter-col nc-filter-col-lb-right">
+          <div class="nc-filter-title">Round</div>
+          <div class="nc-lb-rounds" role="tablist" aria-label="Leaderboard round">
+            <button class="nc-lb-round-btn is-active" type="button" role="tab" aria-selected="true" data-round="1">R1</button>
+            <button class="nc-lb-round-btn" type="button" role="tab" aria-selected="false" data-round="2">R2</button>
+            <button class="nc-lb-round-btn" type="button" role="tab" aria-selected="false" data-round="3">R3</button>
+            <button class="nc-lb-round-btn" type="button" role="tab" aria-selected="false" data-round="4">R4</button>
+            <button class="nc-lb-round-btn" type="button" role="tab" aria-selected="false" data-round="5">R5</button>
+            <button class="nc-lb-round-btn" type="button" role="tab" aria-selected="false" data-round="6">R6</button>
+          </div>
+        </div>
       </section>
 
-      <p class="page-status" id="ncLbStatus"></p>
+      <div id="ncLbStatus" class="nc-status" aria-live="polite"></div>
 
-      <section style="margin-top: 0.9rem;">
-        <table class="cr-table" id="ncLbTable">
+      <div class="cr-table">
+        <table id="ncLbTable">
           <thead>
             <tr>
               <th>Rank</th>
@@ -402,15 +392,12 @@
               <th>Time</th>
             </tr>
           </thead>
-          <tbody>
-            <!-- filled by JS -->
-          </tbody>
+          <tbody></tbody>
         </table>
-      </section>
+      </div>
     </section>
   </div>
 </main>
-
 
   <footer>
   TangledSpore&#39;s RGMs! · AFK Arena community project · © Sorix

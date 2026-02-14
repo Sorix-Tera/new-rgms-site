@@ -1,9 +1,9 @@
 // nc-comps.js
 // - Comps view uses RPC: nc_comps_agg(p_round, p_force, p_blacklist)
 // - Leaderboard view uses RPC: nc_leaderboard_rows(p_round, p_force)
-// - Hero icons fallback: unknown.png when .jpg missing
-// - Leaderboard "Comp" column renders hero icons (not text)
 // - Hero input autocomplete via <datalist id="ncHeroList"> populated from RPC nc_distinct_heroes
+// - Icons: heroes from icons/heroes2, pets from icons/pets (pet assumed last in comp string)
+// - Comps cards show: Avg: XXs Best: XXs and are ordered by Best (done in SQL)
 
 (function () {
   const RPC_COMPS = "nc_comps_agg";
@@ -22,13 +22,13 @@
     return (name || "").trim();
   }
 
-  function heroToIconSlug(name) {
+  function toIconSlug(name) {
     return normalizeHeroName(name)
       .toLowerCase()
       .replace(/[^a-z0-9]/g, "");
   }
 
-  function parseCompHeroes(compStr) {
+  function parseCompUnits(compStr) {
     const raw = (compStr || "").trim();
     if (!raw) return [];
     return raw.split(" - ").map((s) => s.trim()).filter(Boolean);
@@ -76,11 +76,19 @@
     return active ? Number(active.getAttribute("data-round")) : 1;
   }
 
+  // Leaderboard: round buttons (single selection)
+  function setActiveLbRound(root, round) {
+    qsa(".nc-lb-round-btn", root).forEach((btn) => {
+      const isActive = btn.getAttribute("data-round") === String(round);
+      btn.classList.toggle("is-active", isActive);
+      btn.setAttribute("aria-selected", isActive ? "true" : "false");
+      btn.tabIndex = isActive ? 0 : -1;
+    });
+  }
+
   function getLeaderboardRound(root) {
-    const sel = qs("#ncLbRound", root);
-    const v = (sel?.value || "1").trim();
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 1;
+    const active = qs(".nc-lb-round-btn.is-active", root);
+    return active ? Number(active.getAttribute("data-round")) : 1;
   }
 
   // -------------------------
@@ -115,7 +123,6 @@
       const names = await fetchDistinctHeroes();
       fillHeroDatalist(root, names);
     } catch (e) {
-      // Keep the page functional even if autocomplete fails
       console.error("Failed loading distinct heroes:", e);
     } finally {
       heroNamesLoaded = true;
@@ -167,24 +174,10 @@
     const panel = qs("#ncPanelLeaderboard", root);
     if (!panel) return [];
 
-    const rows = qsa(".nc-lb-row, .nc-filter-row", panel);
+    const rows = qsa(".nc-lb-row, .nc-filter-row, .nc-leaderboard-row", panel);
     const out = [];
 
-    if (rows.length === 0) {
-      const heroes = qsa(".nc-lb-hero", panel);
-      const sis = qsa(".nc-lb-si", panel);
-      const furns = qsa(".nc-lb-furn", panel);
-      const n = Math.max(heroes.length, sis.length, furns.length);
-
-      for (let i = 0; i < n; i++) {
-        const hero = normalizeHeroName(heroes[i]?.value || "");
-        const si = (sis[i]?.value || "").trim();
-        const furn = (furns[i]?.value || "").trim();
-        if (!hero) continue;
-        out.push({ hero, si, furn });
-      }
-      return out;
-    }
+    if (rows.length === 0) return out;
 
     for (const row of rows) {
       const hero = normalizeHeroName(qs(".nc-lb-hero", row)?.value || "");
@@ -215,13 +208,15 @@
   // Rendering helpers
   // -------------------------
 
-  function makeHeroImg(heroName, sizePx) {
-    const slug = heroToIconSlug(heroName);
+  function makeIconImg({ name, kind, sizePx }) {
+    const slug = toIconSlug(name);
 
     const img = document.createElement("img");
-    img.src = `icons/heroes2/${slug}.jpg`;
-    img.alt = heroName;
-    img.title = heroName;
+    const base = kind === "pet" ? "icons/pets" : "icons/heroes2";
+    img.src = `${base}/${slug}.jpg`;
+
+    img.alt = name;
+    img.title = name;
     img.loading = "lazy";
     img.style.width = `${sizePx}px`;
     img.style.height = `${sizePx}px`;
@@ -231,14 +226,21 @@
     img.style.background = "rgba(255,255,255,0.02)";
 
     img.addEventListener("error", () => {
-      if (img.dataset.fallback === "1") {
-        img.style.display = "none";
+      if (img.dataset.tryPng !== "1") {
+        img.dataset.tryPng = "1";
+        img.src = `${base}/${slug}.png`;
         return;
       }
-      img.dataset.fallback = "1";
-      img.src = "icons/heroes2/unknown.png";
-      img.alt = "Unknown";
-      img.title = "Unknown";
+
+      if (img.dataset.fallback !== "1") {
+        img.dataset.fallback = "1";
+        img.src = "icons/heroes2/unknown.png";
+        img.alt = "Unknown";
+        img.title = "Unknown";
+        return;
+      }
+
+      img.style.display = "none";
     });
 
     return img;
@@ -257,7 +259,9 @@
     if (!compRows || compRows.length === 0) return;
 
     for (const item of compRows) {
-      const heroes = parseCompHeroes(item.comp);
+      const units = parseCompUnits(item.comp);
+      const heroUnits = units.slice(0, Math.max(0, units.length - 1));
+      const petUnit = units.length >= 1 ? units[units.length - 1] : null;
 
       const card = document.createElement("article");
       card.style.background = "rgba(5, 6, 10, 0.85)";
@@ -276,7 +280,7 @@
       const time = document.createElement("div");
       time.style.fontWeight = "900";
       time.style.whiteSpace = "nowrap";
-      time.textContent = formatTime(item.avg_time);
+      time.textContent = `Avg: ${formatTime(item.avg_time)} Best: ${formatTime(item.best_time)}`;
 
       const sample = document.createElement("div");
       sample.style.color = "var(--text-muted)";
@@ -287,19 +291,17 @@
       top.appendChild(time);
       top.appendChild(sample);
 
-      const heroRow = document.createElement("div");
-      heroRow.style.display = "flex";
-      heroRow.style.gap = "0.45rem";
-      heroRow.style.alignItems = "center";
-      heroRow.style.flexWrap = "nowrap";
+      const row = document.createElement("div");
+      row.style.display = "flex";
+      row.style.gap = "0.45rem";
+      row.style.alignItems = "center";
+      row.style.flexWrap = "nowrap";
 
-      for (const h of heroes) {
-        heroRow.appendChild(makeHeroImg(h, 42));
-      }
+      for (const h of heroUnits) row.appendChild(makeIconImg({ name: h, kind: "hero", sizePx: 42 }));
+      if (petUnit) row.appendChild(makeIconImg({ name: petUnit, kind: "pet", sizePx: 42 }));
 
       card.appendChild(top);
-      card.appendChild(heroRow);
-
+      card.appendChild(row);
       results.appendChild(card);
     }
 
@@ -331,15 +333,19 @@
       tdName.textContent = r.name ?? "—";
 
       const tdComp = document.createElement("td");
-      const heroes = parseCompHeroes(r.comp);
+      const units = parseCompUnits(r.comp);
+      const heroUnits = units.slice(0, Math.max(0, units.length - 1));
+      const petUnit = units.length >= 1 ? units[units.length - 1] : null;
+
       const wrap = document.createElement("div");
       wrap.style.display = "flex";
       wrap.style.gap = "0.35rem";
       wrap.style.alignItems = "center";
       wrap.style.flexWrap = "nowrap";
-      for (const h of heroes) {
-        wrap.appendChild(makeHeroImg(h, 28));
-      }
+
+      for (const h of heroUnits) wrap.appendChild(makeIconImg({ name: h, kind: "hero", sizePx: 28 }));
+      if (petUnit) wrap.appendChild(makeIconImg({ name: petUnit, kind: "pet", sizePx: 28 }));
+
       tdComp.appendChild(wrap);
 
       const tdTime = document.createElement("td");
@@ -439,7 +445,7 @@
       const rows = data || [];
       if (rows.length === 0) {
         setLbStatus(root, "No results match these filters.");
-        renderLeaderboard(root, []);
+        renderLeaderboard(root, rows);
         return;
       }
 
@@ -452,8 +458,8 @@
   }
 
   function bindPanelFilters(panel, handler) {
-    const filterInputs = qsa("input, select", panel);
-    for (const el of filterInputs) {
+    const inputs = qsa("input, select", panel);
+    for (const el of inputs) {
       el.addEventListener("input", handler);
       el.addEventListener("change", handler);
     }
@@ -463,7 +469,6 @@
     const root = qs("#ncCompsPage");
     if (!root) return;
 
-    // Restore hero autocomplete
     await ensureHeroList(root);
 
     const debouncedComps = debounce(() => loadComps(root), 250);
@@ -491,6 +496,17 @@
       });
     });
 
+    // Leaderboard round buttons
+    qsa(".nc-lb-round-btn", root).forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const round = btn.getAttribute("data-round");
+        if (!round) return;
+        setActiveLbRound(root, round);
+        loadLeaderboard(root);
+      });
+    });
+
     // Bind filters
     const compsPanel = qs("#ncPanelComps", root);
     if (compsPanel) bindPanelFilters(compsPanel, debouncedComps);
@@ -501,6 +517,7 @@
     // Defaults
     setActiveView(root, "comps");
     setActiveRound(root, "1");
+    setActiveLbRound(root, "1");
 
     // Initial load
     loadComps(root);
