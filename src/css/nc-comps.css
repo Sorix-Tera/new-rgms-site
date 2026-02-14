@@ -80,7 +80,7 @@
 #ncCompsPage .nc-panel.is-active { display: block; }
 
 /* ------------------------------------------------------------------ */
-/* Comps view: R1..R6 tabs                                              */
+/* Comps view: R1..R6 tabs (bigger + spread across width)              */
 /* ------------------------------------------------------------------ */
 
 #ncCompsPage .nc-rounds {
@@ -146,7 +146,7 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* Comps filters (existing)                                            */
+/* Filters layout (Comps)                                              */
 /* ------------------------------------------------------------------ */
 
 #ncCompsPage .nc-comps-filters {
@@ -172,19 +172,20 @@
   margin-bottom: 0.6rem;
 }
 
-#ncCompsPage .nc-filter-header,
-#ncCompsPage .nc-filter-row {
+/* Force hero table-like header + rows */
+#ncCompsPage .nc-force-header,
+#ncCompsPage .nc-force-row {
   display: grid;
   grid-template-columns: minmax(210px, 0.9fr) 110px 110px;
   gap: 0.6rem;
 }
 
-#ncCompsPage .nc-filter-header {
+#ncCompsPage .nc-force-header {
   margin-bottom: 0.45rem;
   min-height: 1.15rem;
 }
 
-#ncCompsPage .nc-filter-h {
+#ncCompsPage .nc-force-h {
   font-size: 0.85rem;
   font-weight: 900;
   letter-spacing: 0.2px;
@@ -241,52 +242,38 @@
 }
 
 /* ------------------------------------------------------------------ */
-/* ✅ Leaderboard filters: clean, self-contained grid                  */
+/* Leaderboard filters: split layout + round buttons                   */
 /* ------------------------------------------------------------------ */
-
-#ncCompsPage .nc-lb-topbar {
-  display: flex;
-  align-items: flex-end;
-  justify-content: flex-start;
-  gap: 1.2rem;
-  margin-bottom: 0.65rem;
+#ncCompsPage #ncLbTable {
+  width: 100%;
+  table-layout: fixed;
 }
 
-#ncCompsPage .nc-lb-title {
-  font-weight: 900;
-  color: var(--text);
-}
-
-#ncCompsPage .nc-lb-round {
-  display: flex;
-  align-items: center;
-  gap: 0.6rem;
-}
-
-#ncCompsPage .nc-lb-round-label {
-  font-weight: 900;
-  color: var(--text);
-}
-
-/* The ONLY grid that controls header/rows alignment for leaderboard */
-#ncCompsPage .nc-lb-grid {
+#ncCompsPage .nc-leaderboard-filters {
   display: grid;
-  gap: 0.5rem;
+  grid-template-columns: 1.9fr 0.85fr;
+  gap: 1.6rem;
+  align-items: start;
 }
 
-#ncCompsPage .nc-lb-header,
-#ncCompsPage .nc-lb-row {
+#ncCompsPage .nc-filter-col-lb-right {
+  border-left: 1px solid rgba(255, 255, 255, 0.08);
+  padding-left: 1.15rem;
+}
+
+#ncCompsPage .nc-leaderboard-header,
+#ncCompsPage .nc-leaderboard-row {
   display: grid;
   grid-template-columns: minmax(210px, 0.9fr) 110px 110px;
   gap: 0.6rem;
 }
 
-#ncCompsPage .nc-lb-header {
-  margin-bottom: 0.1rem;
+#ncCompsPage .nc-leaderboard-header {
+  margin-bottom: 0.45rem;
   min-height: 1.15rem;
 }
 
-#ncCompsPage .nc-lb-h {
+#ncCompsPage .nc-lh {
   font-size: 0.85rem;
   font-weight: 900;
   letter-spacing: 0.2px;
@@ -294,27 +281,90 @@
   text-align: center;
 }
 
-#ncCompsPage .nc-lb-rows {
+#ncCompsPage .nc-leaderboard-rows {
   display: grid;
   gap: 0.5rem;
 }
 
+/* Round buttons (Leaderboard right column) */
+#ncCompsPage .nc-lb-rounds {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+  margin-top: 0.35rem;
+}
+
+#ncCompsPage .nc-lb-round-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 0.6rem 0.2rem;
+  border-radius: 14px; /* rounded square */
+
+  cursor: pointer;
+  color: var(--text-muted);
+  font-weight: 900;
+  letter-spacing: 0.2px;
+
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05) inset;
+
+  margin: 0;
+  font: inherit;
+  line-height: 1;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+
+  transition:
+    background 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease,
+    border-color 0.15s ease,
+    transform 0.08s ease;
+}
+
+#ncCompsPage .nc-lb-round-btn:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.14);
+  color: var(--text);
+}
+
+#ncCompsPage .nc-lb-round-btn:active {
+  transform: translateY(1px);
+}
+
+#ncCompsPage .nc-lb-round-btn.is-active {
+  color: var(--text);
+  background: rgba(242, 193, 79, 0.12);
+  border-color: rgba(242, 193, 79, 0.35);
+  box-shadow:
+    0 1px 0 rgba(255, 255, 255, 0.08) inset,
+    0 0 0 1px rgba(242, 193, 79, 0.22) inset;
+}
+
 /* Responsive */
 @media (max-width: 900px) {
-  #ncCompsPage .nc-comps-filters {
+  #ncCompsPage .nc-comps-filters,
+  #ncCompsPage .nc-leaderboard-filters {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
 
-  #ncCompsPage .nc-filter-col-blacklist {
+  #ncCompsPage .nc-filter-col-blacklist,
+  #ncCompsPage .nc-filter-col-lb-right {
     border-left: none;
     padding-left: 0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
     padding-top: 1rem;
   }
 
-  #ncCompsPage .nc-filter-header,
-  #ncCompsPage .nc-filter-row {
+  #ncCompsPage .nc-force-header,
+  #ncCompsPage .nc-force-row,
+  #ncCompsPage .nc-leaderboard-header,
+  #ncCompsPage .nc-leaderboard-row {
     grid-template-columns: minmax(180px, 1fr) 90px 90px;
   }
 
@@ -322,13 +372,7 @@
     padding-top: 0;
   }
 
-  #ncCompsPage .nc-lb-topbar {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  #ncCompsPage .nc-lb-header,
-  #ncCompsPage .nc-lb-row {
-    grid-template-columns: minmax(180px, 1fr) 90px 90px;
+  #ncCompsPage .nc-lb-rounds {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
