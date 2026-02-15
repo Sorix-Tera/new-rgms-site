@@ -17,5 +17,6 @@ module.exports = {
   ],
   compFinder: [
     { label: "Treasure Scramble", href: "comp-finder.html" },
+    { label: "Nightmare Corridor", href: "nc-comps.html "}
   ],
 };
