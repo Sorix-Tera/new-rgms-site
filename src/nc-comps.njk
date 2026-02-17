@@ -46,7 +46,6 @@ permalink: "nc-comps.html"
       aria-labelledby="ncTabComps"
       data-view="comps"
     >
-      <!-- Round tabs -->
       <div class="nc-rounds" role="tablist" aria-label="Nightmare Corridor rounds">
         <button class="nc-round-tab is-active" type="button" role="tab" aria-selected="true" data-round="1">R1</button>
         <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="2">R2</button>
@@ -56,7 +55,6 @@ permalink: "nc-comps.html"
         <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="6">R6</button>
       </div>
 
-      <!-- Filters section (Comp Finder style container) -->
       <section class="filters nc-comps-filters" aria-label="NC comps filters">
         <div class="nc-filter-col nc-filter-col-force">
           <div class="nc-filter-title">Force Hero</div>
@@ -85,6 +83,7 @@ permalink: "nc-comps.html"
               </select>
             </div>
             {% endfor %}
+            <input class="nc-input nc-pet-input" list="ncPetList" type="text" placeholder="Pet" aria-label="Force pet"/>
           </div>
         </div>
 
@@ -95,11 +94,13 @@ permalink: "nc-comps.html"
             {% for i in [1,2,3,4,5] %}
             <input class="nc-input nc-blacklist-hero" list="ncHeroList" type="text" placeholder="Hero" aria-label="Blacklist hero {{ i }}"/>
             {% endfor %}
+            <input class="nc-input nc-blacklist-pet" list="ncPetList" type="text" placeholder="Pet" aria-label="Blacklist pet"/>
           </div>
         </div>
       </section>
 
       <datalist id="ncHeroList"></datalist>
+      <datalist id="ncPetList"></datalist>
 
       <div id="ncCompsStatus" class="nc-status" aria-live="polite"></div>
       <div id="ncCompsResults"></div>
@@ -114,7 +115,6 @@ permalink: "nc-comps.html"
       data-view="leaderboard"
       aria-hidden="true"
     >
-      <!-- Split filters: left (hero/SI/Furn) + right (Round buttons) -->
       <section class="filters nc-leaderboard-filters" aria-label="NC leaderboard filters">
         <div class="nc-filter-col nc-filter-col-lb-left">
           <div class="nc-leaderboard-header" aria-hidden="true">
@@ -141,6 +141,7 @@ permalink: "nc-comps.html"
               </select>
             </div>
             {% endfor %}
+            <input class="nc-input nc-lb-pet" list="ncPetList" type="text" placeholder="Pet" aria-label="Leaderboard pet"/>
           </div>
         </div>
 

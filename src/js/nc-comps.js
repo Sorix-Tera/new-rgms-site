@@ -1,14 +1,14 @@
 // nc-comps.js
-// - Comps view uses RPC: nc_comps_agg(p_round, p_force, p_blacklist)
-// - Leaderboard view uses RPC: nc_leaderboard_rows(p_round, p_force)
-// - Hero input autocomplete via <datalist id="ncHeroList"> populated from RPC nc_distinct_heroes
-// - Icons: heroes from icons/heroes2, pets from icons/pets (pet assumed last in comp string)
-// - Comps cards show: Avg: XXs Best: XXs and are ordered by Best (done in SQL)
+// - Comps view uses RPC: nc_comps_agg(p_round, p_force, p_blacklist, p_pet, p_blacklist_pet)
+// - Leaderboard view uses RPC: nc_leaderboard_rows(p_round, p_force, p_pet)
+// - Hero input autocomplete via <datalist id="ncHeroList"> populated from RPC nc_distinct_heroes (type=hero)
+// - Pet input autocomplete via <datalist id="ncPetList"> populated from RPC nc_distinct_pets (type=pet)
 
 (function () {
   const RPC_COMPS = "nc_comps_agg";
   const RPC_LB = "nc_leaderboard_rows";
   const RPC_HEROES = "nc_distinct_heroes";
+  const RPC_PETS = "nc_distinct_pets";
 
   function qs(sel, root = document) {
     return root.querySelector(sel);
@@ -18,14 +18,12 @@
     return Array.from(root.querySelectorAll(sel));
   }
 
-  function normalizeHeroName(name) {
+  function normalizeName(name) {
     return (name || "").trim();
   }
 
   function toIconSlug(name) {
-    return normalizeHeroName(name)
-      .toLowerCase()
-      .replace(/[^a-z0-9]/g, "");
+    return normalizeName(name).toLowerCase().replace(/[^a-z0-9]/g, "");
   }
 
   function parseCompUnits(compStr) {
@@ -76,7 +74,6 @@
     return active ? Number(active.getAttribute("data-round")) : 1;
   }
 
-  // Leaderboard: round buttons (single selection)
   function setActiveLbRound(root, round) {
     qsa(".nc-lb-round-btn", root).forEach((btn) => {
       const isActive = btn.getAttribute("data-round") === String(round);
@@ -92,40 +89,44 @@
   }
 
   // -------------------------
-  // Hero datalist autocomplete
+  // Autocomplete lists
   // -------------------------
 
-  async function fetchDistinctHeroes() {
+  async function rpcListNames(rpcName) {
     if (typeof supabaseClient === "undefined") {
       throw new Error("supabaseClient is not available");
     }
-    const { data, error } = await supabaseClient.rpc(RPC_HEROES);
+    const { data, error } = await supabaseClient.rpc(rpcName);
     if (error) throw error;
-    return (data || []).map((r) => normalizeHeroName(r.name)).filter(Boolean);
+    return (data || []).map((r) => normalizeName(r.name)).filter(Boolean);
   }
 
-  function fillHeroDatalist(root, heroNames) {
-    const dl = qs("#ncHeroList", root);
+  function fillDatalist(root, id, names) {
+    const dl = qs(`#${id}`, root);
     if (!dl) return;
     dl.innerHTML = "";
-    for (const name of heroNames) {
+    for (const name of names) {
       const opt = document.createElement("option");
       opt.value = name;
       dl.appendChild(opt);
     }
   }
 
-  let heroNamesLoaded = false;
+  let listsLoaded = false;
 
-  async function ensureHeroList(root) {
-    if (heroNamesLoaded) return;
+  async function ensureLists(root) {
+    if (listsLoaded) return;
     try {
-      const names = await fetchDistinctHeroes();
-      fillHeroDatalist(root, names);
+      const [heroes, pets] = await Promise.all([
+        rpcListNames(RPC_HEROES),
+        rpcListNames(RPC_PETS),
+      ]);
+      fillDatalist(root, "ncHeroList", heroes);
+      fillDatalist(root, "ncPetList", pets);
     } catch (e) {
-      console.error("Failed loading distinct heroes:", e);
+      console.error("Failed loading autocomplete lists:", e);
     } finally {
-      heroNamesLoaded = true;
+      listsLoaded = true;
     }
   }
 
@@ -137,17 +138,16 @@
     const panel = qs("#ncPanelComps", root);
     if (!panel) return [];
 
-    const rows = qsa(".nc-filter-col-force .nc-filter-row, .nc-filter-col-force .nc-force-row", panel);
+    const rows = qsa(".nc-filter-col-force .nc-force-row", panel);
     const out = [];
 
     for (const row of rows) {
-      const hero = normalizeHeroName(qs(".nc-force-hero", row)?.value || "");
+      const hero = normalizeName(qs(".nc-force-hero", row)?.value || "");
       const si = (qs(".nc-force-si", row)?.value || "").trim();
       const furn = (qs(".nc-force-furn", row)?.value || "").trim();
       if (!hero) continue;
       out.push({ hero, si, furn });
     }
-
     return out;
   }
 
@@ -156,7 +156,7 @@
     if (!panel) return [];
 
     const inputs = qsa(".nc-blacklist-hero", panel);
-    const names = inputs.map((i) => normalizeHeroName(i.value)).filter(Boolean);
+    const names = inputs.map((i) => normalizeName(i.value)).filter(Boolean);
 
     const seen = new Set();
     const out = [];
@@ -170,24 +170,38 @@
     return out;
   }
 
+  function readCompsPet(root) {
+    const panel = qs("#ncPanelComps", root);
+    if (!panel) return "";
+    return normalizeName(qs(".nc-pet-input", panel)?.value || "");
+  }
+
+  function readCompsBlacklistPet(root) {
+    const panel = qs("#ncPanelComps", root);
+    if (!panel) return "";
+    return normalizeName(qs(".nc-blacklist-pet", panel)?.value || "");
+  }
+
   function readLeaderboardForce(root) {
     const panel = qs("#ncPanelLeaderboard", root);
     if (!panel) return [];
 
-    const rows = qsa(".nc-lb-row, .nc-filter-row, .nc-leaderboard-row", panel);
+    const rows = qsa(".nc-leaderboard-row", panel);
     const out = [];
-
-    if (rows.length === 0) return out;
-
     for (const row of rows) {
-      const hero = normalizeHeroName(qs(".nc-lb-hero", row)?.value || "");
+      const hero = normalizeName(qs(".nc-lb-hero", row)?.value || "");
       const si = (qs(".nc-lb-si", row)?.value || "").trim();
       const furn = (qs(".nc-lb-furn", row)?.value || "").trim();
       if (!hero) continue;
       out.push({ hero, si, furn });
     }
-
     return out;
+  }
+
+  function readLeaderboardPet(root) {
+    const panel = qs("#ncPanelLeaderboard", root);
+    if (!panel) return "";
+    return normalizeName(qs(".nc-lb-pet", panel)?.value || "");
   }
 
   // -------------------------
@@ -210,7 +224,6 @@
 
   function makeIconImg({ name, kind, sizePx }) {
     const slug = toIconSlug(name);
-
     const img = document.createElement("img");
     const base = kind === "pet" ? "icons/pets" : "icons/heroes2";
     img.src = `${base}/${slug}.jpg`;
@@ -231,7 +244,6 @@
         img.src = `${base}/${slug}.png`;
         return;
       }
-
       if (img.dataset.fallback !== "1") {
         img.dataset.fallback = "1";
         img.src = "icons/heroes2/unknown.png";
@@ -239,7 +251,6 @@
         img.title = "Unknown";
         return;
       }
-
       img.style.display = "none";
     });
 
@@ -304,13 +315,6 @@
       card.appendChild(row);
       results.appendChild(card);
     }
-
-    const mq = window.matchMedia("(max-width: 900px)");
-    const applyMq = () => {
-      results.style.gridTemplateColumns = mq.matches ? "1fr" : "repeat(2, minmax(0, 1fr))";
-    };
-    applyMq();
-    mq.addEventListener?.("change", applyMq);
   }
 
   function renderLeaderboard(root, rows) {
@@ -379,6 +383,8 @@
     const round = getSelectedRound(root);
     const force = readCompsForce(root);
     const blacklist = readCompsBlacklist(root);
+    const pet = readCompsPet(root);
+    const blacklistPet = readCompsBlacklistPet(root);
 
     setStatus(root, "Loading comps...");
     const results = qs("#ncCompsResults", root);
@@ -389,6 +395,8 @@
         p_round: round,
         p_force: force,
         p_blacklist: blacklist,
+        p_pet: pet,
+        p_blacklist_pet: blacklistPet,
       });
 
       if (token !== lastCompsToken) return;
@@ -424,6 +432,7 @@
 
     const round = getLeaderboardRound(root);
     const force = readLeaderboardForce(root);
+    const pet = readLeaderboardPet(root);
 
     setLbStatus(root, "Loading leaderboard...");
     renderLeaderboard(root, []);
@@ -432,6 +441,7 @@
       const { data, error } = await supabaseClient.rpc(RPC_LB, {
         p_round: round,
         p_force: force,
+        p_pet: pet,
       });
 
       if (token !== lastLbToken) return;
@@ -469,7 +479,7 @@
     const root = qs("#ncCompsPage");
     if (!root) return;
 
-    await ensureHeroList(root);
+    await ensureLists(root);
 
     const debouncedComps = debounce(() => loadComps(root), 250);
     const debouncedLb = debounce(() => loadLeaderboard(root), 250);
