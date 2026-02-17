@@ -544,8 +544,13 @@
     gridEl.innerHTML = '';
 
     const all = (comps || []);
+    // Minimum sample threshold for recommendations
+    const MIN_RECO_SAMPLES = 3;
+
+    // Only comps with enough samples are eligible for "recommended" picking
+    const eligibleForReco = all.filter(c => (Number(c?.n) || 0) >= MIN_RECO_SAMPLES);
     const selectedKeys = (selectMax > 0)
-      ? computeSelectedCompKeys(all, selectMax, excludedHeroes)
+      ? computeSelectedCompKeys(eligibleForReco, selectMax, excludedHeroes)
       : new Set();
 
     // When "recommended only" is enabled, show only selected comps (ignores density filters).

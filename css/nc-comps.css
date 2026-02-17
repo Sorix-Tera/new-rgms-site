@@ -241,6 +241,13 @@
   color: black;
 }
 
+#ncCompsPage .nc-pet-input {
+  width: 56%;
+}
+#ncCompsPage .nc-lb-pet {
+  width: 59%;
+}
+
 /* ------------------------------------------------------------------ */
 /* Leaderboard filters: split layout + round buttons                   */
 /* ------------------------------------------------------------------ */
