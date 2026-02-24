@@ -9,6 +9,13 @@
   const RPC_LB = "nc_leaderboard_rows";
   const RPC_HEROES = "nc_distinct_heroes";
   const RPC_PETS = "nc_distinct_pets";
+  const NC_TABLE = "nc";
+  const NC_DATE_COL = "date";
+
+  // Simple in-memory cache for the most recent comps query (so changing sort doesn't refetch).
+  let lastCompsQueryKey = null;
+  let lastCompsRows = null;
+
 
   function qs(sel, root = document) {
     return root.querySelector(sel);
@@ -36,6 +43,82 @@
     if (val == null || Number.isNaN(val)) return "—";
     return `${Number(val).toFixed(2)}s`;
   }
+
+  function getCompsSortKey(root) {
+    const sel = qs("#ncCompsSort", root);
+    return sel ? sel.value : "run_count";
+  }
+
+  function sortCompsRows(rows, sortKey) {
+    const key = (sortKey === "run_count" || sortKey === "avg_time" || sortKey === "best_time")
+      ? sortKey
+      : "run_count";
+
+    const arr = Array.isArray(rows) ? rows.slice() : [];
+    arr.sort((a, b) => {
+      const av = Number(a?.[key]);
+      const bv = Number(b?.[key]);
+      const an = Number.isFinite(av) ? av : (key === "run_count" ? -Infinity : +Infinity);
+      const bn = Number.isFinite(bv) ? bv : (key === "run_count" ? -Infinity : +Infinity);
+
+      // run_count: DESC (most used first)
+      if (key === "run_count") return bn - an;
+
+      // avg_time / best_time: ASC (fastest first)
+      return an - bn;
+    });
+
+    return arr;
+  }
+
+  async function loadLastUpdated(root) {
+    const el = qs("#ncLastUpdated", root);
+    if (!el) return;
+
+    if (typeof supabaseClient === "undefined") {
+      el.textContent = "Last updated (UTC): —";
+      return;
+    }
+
+    try {
+      const { data, error } = await supabaseClient
+        .from(NC_TABLE)
+        .select(NC_DATE_COL)
+        .order(NC_DATE_COL, { ascending: false })
+        .limit(1);
+
+      if (error) {
+        console.error("Last updated query error:", error);
+        el.textContent = "Last updated (UTC): —";
+        return;
+      }
+
+      const raw = Array.isArray(data) && data[0] ? data[0][NC_DATE_COL] : null;
+      if (!raw) {
+        el.textContent = "Last updated (UTC): —";
+        return;
+      }
+
+      const d = new Date(raw);
+      if (Number.isNaN(d.getTime())) {
+        el.textContent = `Last updated (UTC): ${String(raw)}`;
+        return;
+      }
+
+      el.textContent = `Last updated (UTC): ${d.toLocaleString(undefined, {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+      })}`;
+    } catch (err) {
+      console.error("Error loading last updated:", err);
+      el.textContent = "Last updated (UTC): —";
+    }
+  }
+
 
   function debounce(fn, waitMs) {
     let t = null;
@@ -386,6 +469,22 @@
     const pet = readCompsPet(root);
     const blacklistPet = readCompsBlacklistPet(root);
 
+    const sortKey = getCompsSortKey(root);
+    const queryKey = JSON.stringify({
+      round,
+      force,
+      blacklist,
+      pet,
+      blacklistPet,
+    });
+
+    // If only the sort changed, avoid refetching and just re-render.
+    if (queryKey === lastCompsQueryKey && Array.isArray(lastCompsRows)) {
+      setStatus(root, "");
+      renderComps(root, sortCompsRows(lastCompsRows, sortKey));
+      return;
+    }
+
     setStatus(root, "Loading comps...");
     const results = qs("#ncCompsResults", root);
     if (results) results.innerHTML = "";
@@ -408,14 +507,18 @@
       }
 
       const rows = data || [];
-      if (rows.length === 0) {
+      lastCompsQueryKey = queryKey;
+      lastCompsRows = rows;
+
+      const sortedRows = sortCompsRows(rows, sortKey);
+      if (sortedRows.length === 0) {
         setStatus(root, "No comps match these filters.");
         renderComps(root, []);
         return;
       }
 
       setStatus(root, "");
-      renderComps(root, rows);
+      renderComps(root, sortedRows);
     } catch (err) {
       console.error("Error loading comps:", err);
       setStatus(root, "Error loading comps from Supabase.");
@@ -480,6 +583,7 @@
     if (!root) return;
 
     await ensureLists(root);
+    await loadLastUpdated(root);
 
     const debouncedComps = debounce(() => loadComps(root), 250);
     const debouncedLb = debounce(() => loadLeaderboard(root), 250);

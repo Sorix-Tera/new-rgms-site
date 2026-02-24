@@ -55,6 +55,18 @@ permalink: "nc-comps.html"
         <button class="nc-round-tab" type="button" role="tab" aria-selected="false" data-round="6">R6</button>
       </div>
 
+      <div class="nc-comps-meta" aria-label="NC comps metadata">
+        <div id="ncLastUpdated" class="nc-last-updated">Last updated (UTC): —</div>
+        <div class="nc-sort">
+          <label class="nc-sort-label" for="ncCompsSort">Sort:</label>
+          <select id="ncCompsSort" class="nc-select nc-sort-select" aria-label="Sort comps">
+            <option value="run_count" selected>Most used</option>
+            <option value="avg_time">Avg time</option>
+            <option value="best_time">Best time</option>
+          </select>
+        </div>
+      </div>
+
       <section class="filters nc-comps-filters" aria-label="NC comps filters">
         <div class="nc-filter-col nc-filter-col-force">
           <div class="nc-filter-title">Force Hero</div>
