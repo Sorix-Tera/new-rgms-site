@@ -383,3 +383,36 @@
     grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
+/* -------------------------------------------------------
+   NC comps meta row (Last updated + Sort)
+------------------------------------------------------- */
+
+#ncCompsPage .nc-comps-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.9rem;
+}
+
+#ncCompsPage .nc-last-updated {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+#ncCompsPage .nc-sort {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+}
+
+#ncCompsPage .nc-sort-label {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+#ncCompsPage .nc-sort-select {
+  width: auto;
+  min-width: 10.5rem;
+}
