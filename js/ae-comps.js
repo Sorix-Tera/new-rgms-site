@@ -147,7 +147,7 @@
     if (!finderState.excludedHeroes.size) {
       return finderState.averagedComps;
     }
-
+  
     return finderState.averagedComps.filter((comp) => {
       return !comp.heroes.some((hero) => finderState.excludedHeroes.has(hero));
     });
