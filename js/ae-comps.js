@@ -624,6 +624,9 @@
     if (!finderRoot) return;
 
     const filteredComps = getFilteredAveragedComps();
+    console.log('excludedHeroes', [...finderState.excludedHeroes]);
+    console.log('averagedComps', finderState.averagedComps.length);
+    console.log('filteredComps', filteredComps.length);
 
     if (!filteredComps.length) {
       renderFinderBoxes([]);
