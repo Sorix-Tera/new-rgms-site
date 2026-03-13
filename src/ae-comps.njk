@@ -1,0 +1,163 @@
+{% extends "base.njk" %}
+
+{% block title %}AE Comps{% endblock %}
+
+{% block content %}
+<section class="ae-comps-page">
+  <header class="ae-comps-header">
+    <h1>AE Comps</h1>
+    <p>Private builder for testing and saving Abyssal Expedition boss comps.</p>
+  </header>
+
+  <div class="ae-tabs" role="tablist" aria-label="AE comp tools">
+    <button
+      type="button"
+      class="ae-tab is-active"
+      role="tab"
+      id="ae-tab-builder"
+      aria-selected="true"
+      aria-controls="ae-panel-builder"
+      data-target="builder"
+    >
+      Comp Builder
+    </button>
+    <button
+      type="button"
+      class="ae-tab"
+      role="tab"
+      id="ae-tab-other"
+      aria-selected="false"
+      aria-controls="ae-panel-other"
+      data-target="other"
+    >
+      Tab 2
+    </button>
+  </div>
+
+  <section
+    class="ae-tab-panel is-active"
+    role="tabpanel"
+    id="ae-panel-builder"
+    aria-labelledby="ae-tab-builder"
+    data-panel="builder"
+  >
+    <div
+      id="aeCompBuilder"
+      class="ae-builder"
+      data-submit-url="/api/ae-comps"
+    >
+      <div class="ae-builder-card">
+        <div class="ae-slots-wrap">
+          <div class="ae-slots" id="aeSlots">
+            {% for i in [1,2,3,4,5] %}
+              <button
+                type="button"
+                class="ae-slot hero-slot"
+                data-slot-index="{{ i - 1 }}"
+                data-slot-type="hero"
+                aria-label="Hero slot {{ i }}"
+              >
+                <span class="ae-slot-label">Hero {{ i }}</span>
+              </button>
+            {% endfor %}
+
+            <button
+              type="button"
+              class="ae-slot pet-slot"
+              data-slot-index="5"
+              data-slot-type="pet"
+              aria-label="Pet slot"
+            >
+              <span class="ae-slot-label">Pet</span>
+            </button>
+          </div>
+
+          <div class="ae-submit-row">
+            <label class="ae-damage-field" for="aeDamage">
+              <span>Damage</span>
+              <input
+                id="aeDamage"
+                name="damage"
+                type="number"
+                step="any"
+                inputmode="decimal"
+                placeholder="e.g. 12.75"
+              />
+            </label>
+
+            <button type="button" id="aeSendBtn" class="ae-send-btn">Send</button>
+          </div>
+
+          <p id="aeBuilderMessage" class="ae-builder-message" aria-live="polite"></p>
+        </div>
+      </div>
+
+      <div class="ae-picker-grid">
+        <section class="ae-icon-panel heroes-panel">
+          <div class="ae-panel-head">
+            <h2>Heroes</h2>
+            <span>{{ heroIcons | length if heroIcons else 0 }}</span>
+          </div>
+          <div class="ae-icons-grid heroes-grid" id="aeHeroGrid">
+            {% for hero in heroIcons %}
+              <button
+                type="button"
+                class="ae-icon-btn"
+                data-kind="hero"
+                data-name="{{ hero.name }}"
+                data-src="{{ hero.src }}"
+                aria-label="Add {{ hero.name }}"
+                title="{{ hero.name }}"
+              >
+                <img src="{{ hero.src }}" alt="{{ hero.name }}" loading="lazy" />
+                <span>{{ hero.name }}</span>
+              </button>
+            {% endfor %}
+          </div>
+        </section>
+
+        <section class="ae-icon-panel pets-panel">
+          <div class="ae-panel-head">
+            <h2>Pets</h2>
+            <span>{{ petIcons | length if petIcons else 0 }}</span>
+          </div>
+          <div class="ae-icons-grid pets-grid" id="aePetGrid">
+            {% for pet in petIcons %}
+              <button
+                type="button"
+                class="ae-icon-btn"
+                data-kind="pet"
+                data-name="{{ pet.name }}"
+                data-src="{{ pet.src }}"
+                aria-label="Add {{ pet.name }}"
+                title="{{ pet.name }}"
+              >
+                <img src="{{ pet.src }}" alt="{{ pet.name }}" loading="lazy" />
+                <span>{{ pet.name }}</span>
+              </button>
+            {% endfor %}
+          </div>
+        </section>
+      </div>
+    </div>
+  </section>
+
+  <section
+    class="ae-tab-panel"
+    role="tabpanel"
+    id="ae-panel-other"
+    aria-labelledby="ae-tab-other"
+    data-panel="other"
+    hidden
+  >
+    <div class="ae-builder-card ae-placeholder-card">
+      <p>Second tab placeholder. We can wire this next.</p>
+    </div>
+  </section>
+</section>
+{% endblock %}
+
+{% block scripts %}
+  {{ super() }}
+  <script src="/js/ae-comps.js" defer></script>
+{% endblock %}
