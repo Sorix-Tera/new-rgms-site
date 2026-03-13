@@ -220,7 +220,26 @@
 
     <section class="ae-panel" id="aePanelFinder" role="tabpanel" aria-labelledby="aeTabFinder" data-panel="finder" hidden>
       <div id="aeCompFinder" class="ae-finder-wrap">
-
+        <div class="ae-finder-toolbar">
+          <div class="ae-hero-filter" id="aeHeroFilter">
+            <button type="button" class="ae-hero-filter__toggle" id="aeHeroFilterToggle">
+              Filter heroes
+            </button>
+        
+            <div class="ae-hero-filter__menu" id="aeHeroFilterMenu" hidden>
+              <div class="ae-hero-filter__actions">
+                <button type="button" id="aeHeroFilterAll">All</button>
+                <button type="button" id="aeHeroFilterNone">None</button>
+              </div>
+        
+              <div class="ae-hero-filter__list" id="aeHeroFilterList"></div>
+            </div>
+          </div>
+        
+          <div class="ae-finder-total" id="aeFinderTotal">
+            -
+          </div>
+        </div>
         <p id="aeFinderStatus" class="page-status">Open this tab to load saved comps.</p>
         <div id="aeFinderBoxes" class="ae-finder-boxes"></div>
       </div>
