@@ -24,7 +24,7 @@
   }
 
   function iconPath(kind, file) {
-    return kind === 'hero' ? `/icons/heroes2/${file}` : `/icons/pets/${file}`;
+    return kind === 'hero' ? `icons/heroes2/${file}` : `icons/pets/${file}`;
   }
 
   function makeIconButton(kind, file) {
