@@ -446,8 +446,8 @@
 
   function iconSrc(kind, name) {
     return kind === 'pet'
-      ? `/icons/pets/${name}.jpg`
-      : `/icons/heroes2/${name}.jpg`;
+      ? `icons/pets/${name}.jpg`
+      : `icons/heroes2/${name}.jpg`;
   }
 
   function renderFinderBoxes(boxes) {
@@ -482,7 +482,7 @@
       return `
         <article class="ae-box">
           <div class="ae-box-head">
-            <h3 class="ae-box-title">Box ${boxIndex + 1}</h3>
+            <h3 class="ae-box-title">Comp ${boxIndex + 1}</h3>
             <div class="ae-box-total">${fmtB(box.total)}</div>
           </div>
           <div class="ae-box-grid">
