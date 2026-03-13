@@ -20,6 +20,7 @@
 
   const tabs = Array.from(document.querySelectorAll('.ae-tab'));
   const panels = Array.from(document.querySelectorAll('.ae-panel'));
+  const heroSearchInput = root.querySelector("#aeHeroSearch");
 
   const state = {
     slots: [null, null, null, null, null, null],
@@ -44,6 +45,17 @@
     const num = Number(value);
     if (!Number.isFinite(num)) return '—';
     return `${num.toFixed(1)}b`;
+  }
+
+  function filterHeroGrid() {
+    if (!heroGrid) return;
+    const query = (heroSearchInput?.value || "").trim().toLowerCase();
+  
+    heroGrid.querySelectorAll(".ae-icon-btn").forEach((btn) => {
+      const name = (btn.dataset.name || "").toLowerCase();
+      const visible = query === "" || name.includes(query);
+      btn.classList.toggle("is-hidden", !visible);
+    });
   }
 
   function setBuilderMessage(text, kind = '') {
@@ -573,8 +585,12 @@
   }
 
   function init() {
+    if (heroSearchInput) {
+      heroSearchInput.addEventListener("input", filterHeroGrid);
+    }
     initTabs();
     initBuilder();
+    filterHeroGrid();
   }
 
   init();
