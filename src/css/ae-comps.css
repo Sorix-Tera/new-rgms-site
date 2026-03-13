@@ -4,13 +4,8 @@
   gap: 1rem;
 }
 
-.ae-comps-header h1 {
-  margin: 0 0 0.25rem;
-}
-
-.ae-comps-header p {
-  margin: 0;
-  opacity: 0.8;
+.ae-comps-header {
+  gap: 1rem;
 }
 
 .ae-tabs {
@@ -193,6 +188,9 @@
 .ae-icons-grid {
   display: grid;
   gap: 0.6rem;
+  max-height: 70vh;
+  overflow: auto;
+  padding-right: 0.2rem;
 }
 
 .heroes-grid {
@@ -253,6 +251,10 @@
 
   .ae-picker-grid {
     grid-template-columns: 1fr;
+  }
+
+  .ae-icons-grid {
+    max-height: none;
   }
 }
 
