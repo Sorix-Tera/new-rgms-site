@@ -1,51 +1,50 @@
-{% extends "base.njk" %}
+---
+layout: layouts/base.njk
+title: "AE Comps · TangledSpore's RGMs!"
+permalink: "ae-comps.html"
+extraHead: '<link rel="stylesheet" href="/css/ae-comps.css" />'
+extraScripts: '<script src="/js/ae-comps.js" defer></script>'
+---
 
-{% block title %}AE Comps{% endblock %}
+<main class="page ae-comps-page">
+  <header class="page-header ae-comps-header">
+    <h1 class="page-title">AE Comps</h1>
+    <p class="page-subtitle">Private builder for testing and saving Abyssal Expedition boss comps.</p>
 
-{% block content %}
-<section class="ae-comps-page">
-  <header class="ae-comps-header">
-    <h1>AE Comps</h1>
-    <p>Private builder for testing and saving Abyssal Expedition boss comps.</p>
+    <div class="ae-tabs" role="tablist" aria-label="AE comp tools">
+      <button
+        type="button"
+        class="ae-tab is-active"
+        role="tab"
+        id="aeTabBuilder"
+        aria-selected="true"
+        aria-controls="aePanelBuilder"
+        data-target="builder"
+      >
+        Comp Builder
+      </button>
+      <button
+        type="button"
+        class="ae-tab"
+        role="tab"
+        id="aeTabOther"
+        aria-selected="false"
+        aria-controls="aePanelOther"
+        data-target="other"
+      >
+        Tab 2
+      </button>
+    </div>
   </header>
-
-  <div class="ae-tabs" role="tablist" aria-label="AE comp tools">
-    <button
-      type="button"
-      class="ae-tab is-active"
-      role="tab"
-      id="ae-tab-builder"
-      aria-selected="true"
-      aria-controls="ae-panel-builder"
-      data-target="builder"
-    >
-      Comp Builder
-    </button>
-    <button
-      type="button"
-      class="ae-tab"
-      role="tab"
-      id="ae-tab-other"
-      aria-selected="false"
-      aria-controls="ae-panel-other"
-      data-target="other"
-    >
-      Tab 2
-    </button>
-  </div>
 
   <section
     class="ae-tab-panel is-active"
     role="tabpanel"
-    id="ae-panel-builder"
-    aria-labelledby="ae-tab-builder"
+    id="aePanelBuilder"
+    aria-labelledby="aeTabBuilder"
     data-panel="builder"
   >
-    <div
-      id="aeCompBuilder"
-      class="ae-builder"
-      data-submit-url="/api/ae-comps"
-    >
+    <div id="aeCompBuilder" class="ae-builder">
       <div class="ae-builder-card">
         <div class="ae-slots-wrap">
           <div class="ae-slots" id="aeSlots">
@@ -96,47 +95,17 @@
         <section class="ae-icon-panel heroes-panel">
           <div class="ae-panel-head">
             <h2>Heroes</h2>
-            <span>{{ heroIcons | length if heroIcons else 0 }}</span>
+            <span id="aeHeroCount">0</span>
           </div>
-          <div class="ae-icons-grid heroes-grid" id="aeHeroGrid">
-            {% for hero in heroIcons %}
-              <button
-                type="button"
-                class="ae-icon-btn"
-                data-kind="hero"
-                data-name="{{ hero.name }}"
-                data-src="{{ hero.src }}"
-                aria-label="Add {{ hero.name }}"
-                title="{{ hero.name }}"
-              >
-                <img src="{{ hero.src }}" alt="{{ hero.name }}" loading="lazy" />
-                <span>{{ hero.name }}</span>
-              </button>
-            {% endfor %}
-          </div>
+          <div class="ae-icons-grid heroes-grid" id="aeHeroGrid"></div>
         </section>
 
         <section class="ae-icon-panel pets-panel">
           <div class="ae-panel-head">
             <h2>Pets</h2>
-            <span>{{ petIcons | length if petIcons else 0 }}</span>
+            <span id="aePetCount">0</span>
           </div>
-          <div class="ae-icons-grid pets-grid" id="aePetGrid">
-            {% for pet in petIcons %}
-              <button
-                type="button"
-                class="ae-icon-btn"
-                data-kind="pet"
-                data-name="{{ pet.name }}"
-                data-src="{{ pet.src }}"
-                aria-label="Add {{ pet.name }}"
-                title="{{ pet.name }}"
-              >
-                <img src="{{ pet.src }}" alt="{{ pet.name }}" loading="lazy" />
-                <span>{{ pet.name }}</span>
-              </button>
-            {% endfor %}
-          </div>
+          <div class="ae-icons-grid pets-grid" id="aePetGrid"></div>
         </section>
       </div>
     </div>
@@ -145,8 +114,8 @@
   <section
     class="ae-tab-panel"
     role="tabpanel"
-    id="ae-panel-other"
-    aria-labelledby="ae-tab-other"
+    id="aePanelOther"
+    aria-labelledby="aeTabOther"
     data-panel="other"
     hidden
   >
@@ -154,10 +123,4 @@
       <p>Second tab placeholder. We can wire this next.</p>
     </div>
   </section>
-</section>
-{% endblock %}
-
-{% block scripts %}
-  {{ super() }}
-  <script src="/js/ae-comps.js" defer></script>
-{% endblock %}
+</main>
