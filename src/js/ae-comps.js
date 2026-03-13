@@ -20,7 +20,7 @@
 
   const tabs = Array.from(document.querySelectorAll('.ae-tab'));
   const panels = Array.from(document.querySelectorAll('.ae-panel'));
-  const heroSearchInput = document.querySelector("#aeHeroSearch");
+  const heroSearchInput = document.querySelector('#aeHeroSearch');
 
   const state = {
     slots: [null, null, null, null, null, null],
@@ -41,6 +41,21 @@
   const finderBoxesEl = document.getElementById('aeFinderBoxes');
   const finderBestTotalEl = document.getElementById('aeFinderBestTotal');
 
+  const heroFilterRoot = document.getElementById('aeHeroFilter');
+  const heroFilterToggle = document.getElementById('aeHeroFilterToggle');
+  const heroFilterMenu = document.getElementById('aeHeroFilterMenu');
+  const heroFilterList = document.getElementById('aeHeroFilterList');
+  const heroFilterAllBtn = document.getElementById('aeHeroFilterAll');
+  const heroFilterNoneBtn = document.getElementById('aeHeroFilterNone');
+  const finderTotalEl = document.getElementById('aeFinderTotal');
+
+  const finderState = {
+    rawRows: [],
+    averagedComps: [],
+    allHeroes: [],
+    excludedHeroes: new Set(),
+  };
+
   function fmtB(value) {
     const num = Number(value);
     if (!Number.isFinite(num)) return '—';
@@ -49,28 +64,101 @@
 
   function filterHeroGrid() {
     if (!heroGrid) return;
-    const query = (heroSearchInput?.value || "").trim().toLowerCase();
-  
-    heroGrid.querySelectorAll(".ae-icon-btn").forEach((btn) => {
-      const name = (btn.dataset.name || "").toLowerCase();
-      const visible = query === "" || name.includes(query);
-      btn.classList.toggle("is-hidden", !visible);
+
+    const query = (heroSearchInput?.value || '').trim().toLowerCase();
+
+    heroGrid.querySelectorAll('.ae-icon-btn').forEach((btn) => {
+      const name = (btn.dataset.name || '').toLowerCase();
+      const visible = query === '' || name.includes(query);
+      btn.classList.toggle('is-hidden', !visible);
     });
   }
-  
+
   function resetBuilder() {
     state.slots = [null, null, null, null, null, null];
-  
+
     if (damageInput) {
-      damageInput.value = "";
+      damageInput.value = '';
     }
-  
+
     clearValidation();
     renderSlots();
-  
+
     if (heroSearchInput) {
-      heroSearchInput.value = "";
+      heroSearchInput.value = '';
       filterHeroGrid();
+    }
+  }
+
+  function extractUniqueHeroes(rows) {
+    const set = new Set();
+
+    rows.forEach((row) => {
+      [row.hero1, row.hero2, row.hero3, row.hero4, row.hero5].forEach((hero) => {
+        const v = String(hero || '').trim().toLowerCase();
+        if (v) set.add(v);
+      });
+    });
+
+    return Array.from(set).sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true })
+    );
+  }
+
+  function renderHeroFilter() {
+    if (!heroFilterList) return;
+
+    heroFilterList.innerHTML = '';
+
+    finderState.allHeroes.forEach((hero) => {
+      const checked = !finderState.excludedHeroes.has(hero);
+
+      const label = document.createElement('label');
+      label.className = 'ae-hero-filter__item';
+
+      label.innerHTML = `
+        <input type="checkbox" data-hero="${hero}" ${checked ? 'checked' : ''}>
+        <span>${hero}</span>
+      `;
+
+      heroFilterList.appendChild(label);
+    });
+
+    updateHeroFilterToggleLabel();
+  }
+
+  function updateHeroFilterToggleLabel() {
+    if (!heroFilterToggle) return;
+
+    const total = finderState.allHeroes.length;
+    const excluded = finderState.excludedHeroes.size;
+    const selected = total - excluded;
+
+    if (selected === total) {
+      heroFilterToggle.textContent = 'Filter heroes (all)';
+    } else if (selected === 0) {
+      heroFilterToggle.textContent = 'Filter heroes (none)';
+    } else {
+      heroFilterToggle.textContent = `Filter heroes (${selected}/${total})`;
+    }
+  }
+
+  function getFilteredAveragedComps() {
+    if (!finderState.excludedHeroes.size) {
+      return finderState.averagedComps;
+    }
+
+    return finderState.averagedComps.filter((comp) => {
+      return !comp.heroes.some((hero) => finderState.excludedHeroes.has(hero));
+    });
+  }
+
+  function setFinderTotal(value) {
+    if (finderTotalEl) {
+      finderTotalEl.textContent = value == null ? '-' : `${Number(value).toFixed(1)}b`;
+    }
+    if (finderBestTotalEl) {
+      finderBestTotalEl.textContent = value == null ? '—' : `${Number(value).toFixed(1)}b`;
     }
   }
 
@@ -261,6 +349,11 @@
 
       setBuilderMessage('Comp saved.', 'is-success');
       resetBuilder();
+
+      if (state.finderLoaded) {
+        state.finderLoaded = false;
+        loadFinder();
+      }
     } catch (err) {
       console.error(err);
       setBuilderMessage(`Could not save comp: ${err.message || 'unknown error'}`, 'is-error');
@@ -365,6 +458,7 @@
 
       const key = [...heroes, pet].join('|');
       let entry = map.get(key);
+
       if (!entry) {
         entry = {
           id: key,
@@ -483,12 +577,12 @@
     if (!finderBoxesEl) return;
 
     if (!boxes.length) {
-      finderBoxesEl.innerHTML = '<p class="ae-empty-note">No valid 6-comp boxes could be built from the saved data yet.</p>';
-      if (finderBestTotalEl) finderBestTotalEl.textContent = '—';
+      finderBoxesEl.innerHTML = '<p class="ae-empty-note">No valid 6-comp boxes could be built from the current filtered data.</p>';
+      setFinderTotal(null);
       return;
     }
 
-    if (finderBestTotalEl) finderBestTotalEl.textContent = fmtB(boxes[0].total);
+    setFinderTotal(boxes[0].total);
 
     finderBoxesEl.innerHTML = boxes.map((box, boxIndex) => {
       const compsHtml = box.comps.map((comp) => {
@@ -511,7 +605,7 @@
       return `
         <article class="ae-box">
           <div class="ae-box-head">
-            <h3 class="ae-box-title">Comp ${boxIndex + 1}</h3>
+            <h3 class="ae-box-title">Box ${boxIndex + 1}</h3>
             <div class="ae-box-total">${fmtB(box.total)}</div>
           </div>
           <div class="ae-box-grid">
@@ -522,14 +616,49 @@
     }).join('');
   }
 
+  function recomputeFinder() {
+    if (!finderRoot) return;
+
+    const filteredComps = getFilteredAveragedComps();
+
+    if (!filteredComps.length) {
+      renderFinderBoxes([]);
+      setFinderStatus('No comps remain after the current hero filter.');
+      return;
+    }
+
+    setFinderStatus(`Building best boxes from ${filteredComps.length} filtered averaged comps...`);
+    const boxes = buildTopBoxes(filteredComps, 24);
+    renderFinderBoxes(boxes);
+
+    if (!boxes.length) {
+      setFinderStatus('No valid 6-comp boxes could be built from the current filtered data.');
+      return;
+    }
+
+    setFinderStatus(`Showing ${boxes.length} highest-total boxes from ${filteredComps.length} filtered averaged comps.`);
+  }
+
   async function loadFinder() {
-    if (state.finderLoaded || state.finderLoading) return;
+    if (state.finderLoading) return;
+    if (state.finderLoaded) {
+      recomputeFinder();
+      return;
+    }
+
     state.finderLoading = true;
     setFinderStatus('Loading saved comps...');
 
     try {
       const rows = await fetchAllAeComps();
       const aggregates = aggregateRows(rows);
+
+      finderState.rawRows = rows || [];
+      finderState.averagedComps = aggregates;
+      finderState.allHeroes = extractUniqueHeroes(finderState.rawRows);
+      finderState.excludedHeroes.clear();
+
+      renderHeroFilter();
 
       if (!aggregates.length) {
         renderFinderBoxes([]);
@@ -538,19 +667,70 @@
         return;
       }
 
-      setFinderStatus(`Loaded ${aggregates.length} unique comps. Building best boxes...`);
-      const boxes = buildTopBoxes(aggregates, 24);
-      renderFinderBoxes(boxes);
-      setFinderStatus(`Showing ${boxes.length} highest-total boxes from ${aggregates.length} unique averaged comps.`);
+      recomputeFinder();
       state.finderLoaded = true;
     } catch (err) {
       console.error(err);
-      if (finderBestTotalEl) finderBestTotalEl.textContent = '—';
+      setFinderTotal(null);
       if (finderBoxesEl) finderBoxesEl.innerHTML = '';
       setFinderStatus(`Could not load comp finder: ${err.message || 'unknown error'}`);
     } finally {
       state.finderLoading = false;
     }
+  }
+
+  function initHeroFilterEvents() {
+    if (heroFilterToggle && heroFilterMenu) {
+      heroFilterToggle.addEventListener('click', () => {
+        const isHidden = heroFilterMenu.hasAttribute('hidden');
+        if (isHidden) {
+          heroFilterMenu.removeAttribute('hidden');
+        } else {
+          heroFilterMenu.setAttribute('hidden', '');
+        }
+      });
+    }
+
+    if (heroFilterList) {
+      heroFilterList.addEventListener('change', (event) => {
+        const input = event.target.closest('input[type="checkbox"][data-hero]');
+        if (!input) return;
+
+        const hero = input.dataset.hero;
+        if (!hero) return;
+
+        if (input.checked) {
+          finderState.excludedHeroes.delete(hero);
+        } else {
+          finderState.excludedHeroes.add(hero);
+        }
+
+        updateHeroFilterToggleLabel();
+        recomputeFinder();
+      });
+    }
+
+    if (heroFilterAllBtn) {
+      heroFilterAllBtn.addEventListener('click', () => {
+        finderState.excludedHeroes.clear();
+        renderHeroFilter();
+        recomputeFinder();
+      });
+    }
+
+    if (heroFilterNoneBtn) {
+      heroFilterNoneBtn.addEventListener('click', () => {
+        finderState.excludedHeroes = new Set(finderState.allHeroes);
+        renderHeroFilter();
+        recomputeFinder();
+      });
+    }
+
+    document.addEventListener('click', (event) => {
+      if (!heroFilterRoot || !heroFilterMenu) return;
+      if (heroFilterRoot.contains(event.target)) return;
+      heroFilterMenu.setAttribute('hidden', '');
+    });
   }
 
   function initTabs() {
@@ -603,10 +783,12 @@
 
   function init() {
     if (heroSearchInput) {
-      heroSearchInput.addEventListener("input", filterHeroGrid);
+      heroSearchInput.addEventListener('input', filterHeroGrid);
     }
+
     initTabs();
     initBuilder();
+    initHeroFilterEvents();
     filterHeroGrid();
   }
 
