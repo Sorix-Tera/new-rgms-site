@@ -21,6 +21,7 @@
   const tabs = Array.from(document.querySelectorAll('.ae-tab'));
   const panels = Array.from(document.querySelectorAll('.ae-panel'));
   const heroSearchInput = document.querySelector('#aeHeroSearch');
+  const sodToggle = document.getElementById('aeSodToggle');
 
   const state = {
     slots: [null, null, null, null, null, null],
@@ -55,6 +56,10 @@
     allHeroes: [],
     excludedHeroes: new Set(),
   };
+
+  function getRequiredCompCount() {
+    return sodToggle?.checked ? 6 : 5;
+  }
 
   function fmtB(value) {
     const num = Number(value);
@@ -147,7 +152,7 @@
     if (!finderState.excludedHeroes.size) {
       return finderState.averagedComps;
     }
-  
+
     return finderState.averagedComps.filter((comp) => {
       return !comp.heroes.some((hero) => finderState.excludedHeroes.has(hero));
     });
@@ -489,12 +494,70 @@
       .sort((a, b) => b.avg - a.avg);
   }
 
-  function buildTopBoxes(comps, desiredCount = 24) {
-    const candidateLimit = Math.min(
-      comps.length,
-      finderState.excludedHeroes.size ? 300 : 120
-    );
-    const candidates = comps.slice(0, candidateLimit);
+  function buildTopBoxes(comps, desiredCount = 24, requiredCompCount = 6) {
+    const candidates = comps.slice(0, Math.min(comps.length, 120));
+
+    if (candidates.length <= 18) {
+      const all = [];
+      const n = candidates.length;
+
+      function isValidCombo(indices) {
+        const usedHeroes = new Set();
+        const usedPets = new Set();
+
+        for (let k = 0; k < indices.length; k += 1) {
+          const comp = candidates[indices[k]];
+
+          if (usedPets.has(comp.pet)) return false;
+          usedPets.add(comp.pet);
+
+          for (let h = 0; h < comp.heroes.length; h += 1) {
+            const hero = comp.heroes[h];
+            if (usedHeroes.has(hero)) return false;
+            usedHeroes.add(hero);
+          }
+        }
+
+        return true;
+      }
+
+      function buildCombo(start, chosen) {
+        if (chosen.length === requiredCompCount) {
+          if (!isValidCombo(chosen)) return;
+
+          const compsInBox = chosen.map((i) => candidates[i]);
+          const total = compsInBox.reduce((sum, comp) => sum + comp.avg, 0);
+          const signature = compsInBox.map((comp) => comp.id).sort().join('||');
+
+          all.push({
+            comps: compsInBox,
+            total,
+            signature,
+          });
+          return;
+        }
+
+        for (let i = start; i <= n - (requiredCompCount - chosen.length); i += 1) {
+          chosen.push(i);
+          buildCombo(i + 1, chosen);
+          chosen.pop();
+        }
+      }
+
+      buildCombo(0, []);
+
+      const dedup = new Map();
+      all.forEach((box) => {
+        if (!dedup.has(box.signature) || dedup.get(box.signature).total < box.total) {
+          dedup.set(box.signature, box);
+        }
+      });
+
+      return Array.from(dedup.values())
+        .sort((a, b) => b.total - a.total)
+        .slice(0, desiredCount);
+    }
+
     const n = candidates.length;
     const prefix = new Array(n + 1).fill(0);
 
@@ -527,7 +590,7 @@
     }
 
     function dfs(startIndex, chosen, usedHeroes, usedPets, total) {
-      const need = 6 - chosen.length;
+      const need = requiredCompCount - chosen.length;
 
       if (need === 0) {
         pushBox({ comps: chosen.slice(), total });
@@ -542,22 +605,20 @@
         const comp = candidates[i];
         const bound = total + comp.avg + optimistic(i + 1, need - 1);
         if (bound < threshold()) continue;
+        if (usedPets.has(comp.pet)) continue;
 
-        let compatible = !usedPets.has(comp.pet);
-        if (compatible) {
-          for (let h = 0; h < comp.heroes.length; h += 1) {
-            if (usedHeroes.has(comp.heroes[h])) {
-              compatible = false;
-              break;
-            }
+        let compatible = true;
+        for (let h = 0; h < comp.heroes.length; h += 1) {
+          if (usedHeroes.has(comp.heroes[h])) {
+            compatible = false;
+            break;
           }
         }
-
         if (!compatible) continue;
 
-        comp.heroes.forEach((hero) => usedHeroes.add(hero));
-        usedPets.add(comp.pet);
         chosen.push(comp);
+        usedPets.add(comp.pet);
+        comp.heroes.forEach((hero) => usedHeroes.add(hero));
 
         dfs(i + 1, chosen, usedHeroes, usedPets, total + comp.avg);
 
@@ -580,8 +641,10 @@
   function renderFinderBoxes(boxes) {
     if (!finderBoxesEl) return;
 
+    const requiredCompCount = getRequiredCompCount();
+
     if (!boxes.length) {
-      finderBoxesEl.innerHTML = '<p class="ae-empty-note">No valid 6-comp boxes could be built from the current filtered data.</p>';
+      finderBoxesEl.innerHTML = `<p class="ae-empty-note">No valid ${requiredCompCount}-comp boxes could be built from the current filtered data.</p>`;
       setFinderTotal(null);
       return;
     }
@@ -624,6 +687,7 @@
     if (!finderRoot) return;
 
     const filteredComps = getFilteredAveragedComps();
+    const requiredCompCount = getRequiredCompCount();
 
     if (!filteredComps.length) {
       renderFinderBoxes([]);
@@ -632,15 +696,15 @@
     }
 
     setFinderStatus(`Building best boxes from ${filteredComps.length} filtered averaged comps...`);
-    const boxes = buildTopBoxes(filteredComps, 24);
+    const boxes = buildTopBoxes(filteredComps, 24, requiredCompCount);
     renderFinderBoxes(boxes);
 
     if (!boxes.length) {
-      setFinderStatus('No valid 6-comp boxes could be built from the current filtered data.');
+      setFinderStatus(`No valid ${requiredCompCount}-comp boxes could be built from the current filtered data.`);
       return;
     }
 
-    setFinderStatus(`Showing ${boxes.length} highest-total boxes from ${filteredComps.length} filtered averaged comps.`);
+    setFinderStatus(`Showing ${boxes.length} highest-total boxes with ${requiredCompCount} comps each from ${filteredComps.length} filtered averaged comps.`);
   }
 
   async function loadFinder() {
@@ -727,6 +791,14 @@
         finderState.excludedHeroes = new Set(finderState.allHeroes);
         renderHeroFilter();
         recomputeFinder();
+      });
+    }
+
+    if (sodToggle) {
+      sodToggle.addEventListener('change', () => {
+        if (state.finderLoaded) {
+          recomputeFinder();
+        }
       });
     }
 
