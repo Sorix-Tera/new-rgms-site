@@ -1,68 +1,110 @@
 ---
 layout: layouts/base.njk
 title: "AE Comps · TangledSpore's RGMs!"
-permalink: "ae-comps.html"
+permalink: "ae-comps/index.html"
+extraHead: '<link rel="stylesheet" href="/css/ae-comps.css" />'
+extraScripts: '<script src="/js/ae-comps.js" defer></script>'
 ---
 
-<main class="page ae-page" id="aeCompsPage">
+<main class="page ae-page" id="aePage">
   <header class="page-header">
     <h1 class="page-title">AE Comps</h1>
-    <p class="page-subtitle">Private builder for testing and saving Abyssal Expedition boss comps.</p>
+    <p class="page-subtitle">
+      Private builder and finder for Abyssal Expedition boss comps.
+    </p>
   </header>
 
-  <section class="ae-section" aria-label="AE comp tools">
-    <div class="cf-tabs ae-tabs" role="tablist" aria-label="AE tabs">
-      <button class="cf-tab ae-tab is-active" id="aeTabBuilder" role="tab" aria-selected="true" aria-controls="aePanelBuilder" data-target="builder">Comp Builder</button>
-      <button class="cf-tab ae-tab" id="aeTabTwo" role="tab" aria-selected="false" aria-controls="aePanelTwo" data-target="two">Tab 2</button>
+  <section class="ae-tabs-wrap" aria-label="AE tools">
+    <div class="cf-tabs ae-tabs" role="tablist" aria-label="AE tools">
+      <button class="cf-tab ae-tab is-active" id="aeTabBuilder" role="tab" aria-selected="true" aria-controls="aePanelBuilder" data-target="builder">
+        Comp Builder
+      </button>
+      <button class="cf-tab ae-tab" id="aeTabFinder" role="tab" aria-selected="false" aria-controls="aePanelFinder" data-target="finder">
+        Comp Finder
+      </button>
     </div>
 
-    <div class="ae-panels">
-      <section class="ae-panel is-active" id="aePanelBuilder" role="tabpanel" aria-labelledby="aeTabBuilder" data-panel="builder">
-        <div class="ae-builder-card">
-          <div class="ae-builder-top">
-            <div class="ae-slots" id="aeSlots" aria-label="Selected comp">
-              {% for i in [1,2,3,4,5] %}
-              <div class="ae-slot" data-slot-index="{{ i - 1 }}" data-slot-type="hero" draggable="false" aria-label="Hero slot {{ i }}">
-                <span class="ae-slot-placeholder">Hero {{ i }}</span>
-              </div>
-              {% endfor %}
-              <div class="ae-slot ae-slot-pet" data-slot-index="5" data-slot-type="pet" draggable="false" aria-label="Pet slot">
-                <span class="ae-slot-placeholder">Pet</span>
-              </div>
-            </div>
-
-            <div class="ae-controls">
-              <label class="ae-damage-field" for="aeDamage">Damage</label>
-              <input id="aeDamage" class="filters-select ae-damage-input" type="number" step="any" inputmode="decimal" placeholder="e.g. 12.75" />
-              <button type="button" class="button ae-send-btn" id="aeSendBtn">Send</button>
-            </div>
+    <section class="ae-panel is-active" id="aePanelBuilder" role="tabpanel" aria-labelledby="aeTabBuilder" data-panel="builder">
+      <div id="aeCompBuilder" class="ae-builder-card">
+        <div class="ae-builder-top">
+          <div class="ae-slots" id="aeSlots">
+            {% for i in [1,2,3,4,5] %}
+              <button
+                type="button"
+                class="ae-slot"
+                data-slot-index="{{ i - 1 }}"
+                data-slot-type="hero"
+                aria-label="Hero slot {{ i }}"
+              >
+                <span class="ae-slot-empty-label">Hero {{ i }}</span>
+              </button>
+            {% endfor %}
+            <button
+              type="button"
+              class="ae-slot ae-slot-pet"
+              data-slot-index="5"
+              data-slot-type="pet"
+              aria-label="Pet slot"
+            >
+              <span class="ae-slot-empty-label">Pet</span>
+            </button>
           </div>
 
-          <p class="ae-message" id="aeMessage" aria-live="polite"></p>
+          <div class="ae-builder-actions">
+            <label class="ae-damage-field" for="aeDamage">
+              <span class="ae-field-label">Damage</span>
+              <div class="ae-damage-input-wrap">
+                <input
+                  id="aeDamage"
+                  name="damage"
+                  type="number"
+                  step="0.1"
+                  min="0"
+                  inputmode="decimal"
+                  placeholder="0.0"
+                />
+                <span class="ae-damage-unit">b</span>
+              </div>
+            </label>
+
+            <button type="button" id="aeSendBtn" class="ae-send-btn">Send</button>
+          </div>
+
+          <p id="aeBuilderMessage" class="page-status ae-builder-message" aria-live="polite"></p>
         </div>
 
         <div class="ae-picker-layout">
-          <section class="ae-picker-panel ae-heroes-panel" aria-labelledby="aeHeroesTitle">
-            <div class="ae-panel-head">
-              <h2 id="aeHeroesTitle">Heroes</h2>
+          <section class="ae-library-card ae-library-heroes" aria-label="Heroes">
+            <div class="ae-library-head">
+              <h2 class="page-section-title">Heroes</h2>
             </div>
             <div class="ae-icon-grid ae-hero-grid" id="aeHeroGrid"></div>
           </section>
 
-          <section class="ae-picker-panel ae-pets-panel" aria-labelledby="aePetsTitle">
-            <div class="ae-panel-head">
-              <h2 id="aePetsTitle">Pets</h2>
+          <section class="ae-library-card ae-library-pets" aria-label="Pets">
+            <div class="ae-library-head">
+              <h2 class="page-section-title">Pets</h2>
             </div>
             <div class="ae-icon-grid ae-pet-grid" id="aePetGrid"></div>
           </section>
         </div>
-      </section>
+      </div>
+    </section>
 
-      <section class="ae-panel" id="aePanelTwo" role="tabpanel" aria-labelledby="aeTabTwo" data-panel="two" hidden>
-        <div class="ae-builder-card">
-          <p class="page-subtitle" style="margin: 0;">Second tab placeholder.</p>
+    <section class="ae-panel" id="aePanelFinder" role="tabpanel" aria-labelledby="aeTabFinder" data-panel="finder" hidden>
+      <div id="aeCompFinder" class="ae-finder-wrap">
+        <div class="ae-finder-summary">
+          <div class="chart-card ae-summary-card">
+            <div class="ae-summary-inner">
+              <span class="ae-summary-label">Best box total</span>
+              <strong id="aeFinderBestTotal" class="ae-summary-value">—</strong>
+            </div>
+          </div>
         </div>
-      </section>
-    </div>
+
+        <p id="aeFinderStatus" class="page-status">Open this tab to load saved comps.</p>
+        <div id="aeFinderBoxes" class="ae-finder-boxes"></div>
+      </div>
+    </section>
   </section>
 </main>
