@@ -57,6 +57,22 @@
       btn.classList.toggle("is-hidden", !visible);
     });
   }
+  
+  function resetBuilder() {
+    state.slots = [null, null, null, null, null, null];
+  
+    if (damageInput) {
+      damageInput.value = "";
+    }
+  
+    clearValidation();
+    renderSlots();
+  
+    if (heroSearchInput) {
+      heroSearchInput.value = "";
+      filterHeroGrid();
+    }
+  }
 
   function setBuilderMessage(text, kind = '') {
     if (!builderMessageEl) return;
@@ -244,6 +260,7 @@
       if (error) throw error;
 
       setBuilderMessage('Comp saved.', 'is-success');
+      resetBuilder();
     } catch (err) {
       console.error(err);
       setBuilderMessage(`Could not save comp: ${err.message || 'unknown error'}`, 'is-error');
