@@ -1,103 +1,139 @@
-
 (function () {
-  const HERO_FILES = ["aantandra.jpg", "aathalia.jpg", "abaden.jpg", "abelinda.jpg", "abrutus.jpg", "adrian.jpg", "aeironn.jpg", "aestrilda.jpg", "aezizh.jpg", "afawkes.jpg", "ainz.jpg", "alaro.jpg", "albedo.jpg", "alna.jpg", "alucius.jpg", "alvida.jpg", "alyca.jpg", "anasta.jpg", "angelo.jpg", "ankhira.jpg", "anoki.jpg", "antandra.jpg", "apippa.jpg", "arden.jpg", "arkadios.jpg", "arthur.jpg", "asafiya.jpg", "ashemira.jpg", "askriath.jpg", "asolise.jpg", "astar.jpg", "atalene.jpg", "athalia.jpg", "athane.jpg", "atheus.jpg", "athoran.jpg", "audrae.jpg", "aurelia.jpg", "baden.jpg", "begris.jpg", "belinda.jpg", "bloodsnarl.jpg", "bronn.jpg", "brutus.jpg", "cassius.jpg", "cecilia.jpg", "cha.jpg", "cr.jpg", "crassio.jpg", "daemia.jpg", "daimon.jpg", "desira.jpg", "dgwyneth.jpg", "dreaf.jpg", "drez.jpg", "edwin.jpg", "eironn.jpg", "eletha.jpg", "elthara.jpg", "eluard.jpg", "emilia.jpg", "envydiel.jpg", "eorin.jpg", "estrilda.jpg", "eugene.jpg", "ezio.jpg", "ezizh.jpg", "fane.jpg", "fawkes.jpg", "ferael.jpg", "flora.jpg", "framton.jpg", "gavus.jpg", "geralt.jpg", "ginneas.jpg", "golus.jpg", "gorok.jpg", "gorren.jpg", "gorvo.jpg", "gourgue.jpg", "granit.jpg", "grezhul.jpg", "gwyneth.jpg", "haelia.jpg", "haelus.jpg", "hendrik.jpg", "hildwin.jpg", "hodgkin.jpg", "hogan.jpg", "icariel.jpg", "ira.jpg", "isabella.jpg", "ivan.jpg", "izold.jpg", "jerome.jpg", "joan.jpg", "joker.jpg", "kaelon.jpg", "kalene.jpg", "kalthin.jpg", "kaz.jpg", "kelthur.jpg", "khasos.jpg", "khazard.jpg", "knox.jpg", "kregor.jpg", "kren.jpg", "laios.jpg", "lan.jpg", "lavatune.jpg", "leofric.jpg", "leonardo.jpg", "lethos.jpg", "leviathan.jpg", "liberta.jpg", "lorsan.jpg", "lucilla.jpg", "lucius.jpg", "lucretia.jpg", "lyca.jpg", "lysander.jpg", "maetria.jpg", "malkrie.jpg", "marcille.jpg", "mehira.jpg", "melion.jpg", "melusina.jpg", "merek.jpg", "merlin.jpg", "mezoth.jpg", "mira.jpg", "mirael.jpg", "misha.jpg", "mishka.jpg", "morael.jpg", "morrow.jpg", "mortas.jpg", "morvus.jpg", "mulan.jpg", "nakoruru.jpg", "nara.jpg", "naroko.jpg", "nemora.jpg", "nevanthi.jpg", "niru.jpg", "numisu.jpg", "nyla.jpg", "oden.jpg", "ogi.jpg", "oku.jpg", "olgath.jpg", "orthros.jpg", "oscar.jpg", "palmer.jpg", "peggy.jpg", "pippa.jpg", "prince.jpg", "pulina.jpg", "queen.jpg", "raine.jpg", "raku.jpg", "randle.jpg", "raoul.jpg", "rem.jpg", "respen.jpg", "rigby.jpg", "rimuru.jpg", "robin.jpg", "rosaline.jpg", "rowan.jpg", "safiya.jpg", "saitama.jpg", "salaki.jpg", "satrana.jpg", "saurus.jpg", "saveas.jpg", "scarlet.jpg", "seirus.jpg", "selene.jpg", "serenmira.jpg", "sezis.jpg", "shaltear.jpg", "shemira.jpg", "shuna.jpg", "silas.jpg", "silvina.jpg", "simona.jpg", "sion.jpg", "sjw.jpg", "skreg.jpg", "skriath.jpg", "skylan.jpg", "solise.jpg", "sonja.jpg", "steixius.jpg", "talene.jpg", "talimar.jpg", "tamrus.jpg", "tarnos.jpg", "tasi.jpg", "tavriel.jpg", "thali.jpg", "thane.jpg", "theowyn.jpg", "thesku.jpg", "thoran.jpg", "tidus.jpg", "titus.jpg", "torne.jpg", "treznor.jpg", "trishea.jpg", "tsumiki.jpg", "twins.jpg", "ukyo.jpg", "ulmus.jpg", "ulric.jpg", "umbriel.jpg", "vedan.jpg", "veithael.jpg", "velufira.jpg", "vika.jpg", "villanelle.jpg", "vurk.jpg", "vyloris.jpg", "walker.jpg", "warek.jpg", "wukong.jpg", "yennefer.jpg", "zaphrael.jpg", "zikis.jpg", "zohra.jpg", "zolrath.jpg", "harvey.jpg", "odysseus.jpg"];
-  const PET_FILES = ["bellbellow.jpg", "bellbellow_1.jpg", "chest.jpg", "chest_1.jpg", "dragon.jpg", "dragon_1.jpg", "dreary.jpg", "feline.jpg", "feline_1.jpg", "fire.jpg", "fire_1.jpg", "fox.jpg", "fox_1.jpg", "ghost.jpg", "ghost_1.jpg", "grassy.jpg", "ibis.jpg", "ibis_1.jpg", "ice.jpg", "ice_1.jpg", "lion.jpg", "lion_1.jpg", "owl.jpg", "owl_1.jpg", "panda.jpg", "panda_1.jpg", "pegasus.jpg", "pegasus_1.jpg", "phanta.jpg", "phanta_1.jpg", "polar.jpg", "polar_1.jpg", "rabbit.jpg", "radish.jpg", "radish_1.jpg", "ridge.jpg", "ridge_1.jpg", "roamer.jpg", "roamer_1.jpg", "rock.jpg", "rock_1.jpg", "savage.jpg", "savage_1.jpg", "seal.jpg", "seal_1.jpg", "spooder.jpg", "spooder_1.jpg", "talismane.jpg", "talismane_1.jpg", "thistlekin.jpg", "thistlekin_1.jpg", "tufty.jpg", "unknown.png"];
+  const HERO_NAMES = ["aantandra","aathalia","abaden","abelinda","abrutus","adrian","aeironn","aestrilda","aezizh","afawkes","ainz","alaro","albedo","alna","alucius","alvida","alyca","anasta","angelo","ankhira","anoki","antandra","apippa","arden","arkadios","arthur","asafiya","ashemira","askriath","asolise","astar","atalene","athalia","athane","atheus","athoran","audrae","aurelia","baden","begris","belinda","bloodsnarl","bronn","brutus","cassius","cecilia","cha","cr","crassio","daemia","daimon","desira","dgwyneth","dreaf","drez","edwin","eironn","eletha","elthara","eluard","emilia","envydiel","eorin","estrilda","eugene","ezio","ezizh","fane","fawkes","ferael","flora","framton","gavus","geralt","ginneas","golus","gorok","gorren","gorvo","gourgue","granit","grezhul","gwyneth","haelia","haelus","hendrik","hildwin","hodgkin","hogan","icariel","ira","isabella","ivan","izold","jerome","joan","joker","kaelon","kalene","kalthin","kaz","kelthur","khasos","khazard","knox","kregor","kren","laios","lan","lavatune","leofric","leonardo","lethos","leviathan","liberta","lorsan","lucilla","lucius","lucretia","lyca","lysander","maetria","malkrie","marcille","mehira","melion","melusina","merek","merlin","mezoth","mira","mirael","misha","mishka","morael","morrow","mortas","morvus","mulan","nakoruru","nara","naroko","nemora","nevanthi","niru","numisu","nyla","oden","ogi","oku","olgath","orthros","oscar","palmer","peggy","pippa","prince","pulina","queen","raine","raku","randle","raoul","rem","respen","rigby","rimuru","robin","rosaline","rowan","safiya","saitama","salaki","satrana","saurus","saveas","scarlet","seirus","selene","serenmira","sezis","shaltear","shemira","shuna","silas","silvina","simona","sion","sjw","skreg","skriath","skylan","solise","sonja","steixius","talene","talimar","tamrus","tarnos","tasi","tavriel","thali","thane","theowyn","thesku","thoran","tidus","titus","torne","treznor","trishea","tsumiki","twins","ukyo","ulmus","ulric","umbriel","vedan","veithael","velufira","vika","villanelle","vurk","vyloris","walker","warek","wukong","yennefer","zaphrael","zikis","zohra","zolrath"];
+  const PET_NAMES = ["bellbellow","chest","dragon","dreary","feline","fire","fox","ghost","grassy","ibis","ice","lion","owl","panda","pegasus","phanta","polar","rabbit","radish","ridge","roamer","rock","savage","seal","spooder","talismane","thistlekin","tufty"];
 
-  const page = document.getElementById('aeCompsPage');
+  const HEROES = HERO_NAMES.map((name) => ({
+    name,
+    src: `/icons/heroes2/${name}.jpg`,
+  }));
+
+  const PETS = PET_NAMES.map((name) => ({
+    name,
+    src: `/icons/pets/${name}.jpg`,
+  }));
+
+  const page = document.getElementById('aePage');
   if (!page) return;
 
-  const heroGrid = document.getElementById('aeHeroGrid');
-  const petGrid = document.getElementById('aePetGrid');
-  const slots = Array.from(document.querySelectorAll('.ae-slot'));
-  const damageInput = document.getElementById('aeDamage');
-  const sendBtn = document.getElementById('aeSendBtn');
-  const messageEl = document.getElementById('aeMessage');
+  const builderRoot = document.getElementById('aeCompBuilder');
+  const finderRoot = document.getElementById('aeCompFinder');
+
   const tabs = Array.from(document.querySelectorAll('.ae-tab'));
   const panels = Array.from(document.querySelectorAll('.ae-panel'));
 
   const state = {
-    slots: Array(6).fill(null),
+    slots: [null, null, null, null, null, null],
+    submitting: false,
+    finderLoaded: false,
+    finderLoading: false,
+    dragFromIndex: null,
   };
 
-  function fileToName(file) {
-    return file.replace(/\.[^.]+$/, '');
+  const slotEls = builderRoot ? Array.from(builderRoot.querySelectorAll('.ae-slot')) : [];
+  const heroGrid = builderRoot ? builderRoot.querySelector('#aeHeroGrid') : null;
+  const petGrid = builderRoot ? builderRoot.querySelector('#aePetGrid') : null;
+  const damageInput = builderRoot ? builderRoot.querySelector('#aeDamage') : null;
+  const sendBtn = builderRoot ? builderRoot.querySelector('#aeSendBtn') : null;
+  const builderMessageEl = builderRoot ? builderRoot.querySelector('#aeBuilderMessage') : null;
+
+  const finderStatusEl = document.getElementById('aeFinderStatus');
+  const finderBoxesEl = document.getElementById('aeFinderBoxes');
+  const finderBestTotalEl = document.getElementById('aeFinderBestTotal');
+
+  function fmtB(value) {
+    const num = Number(value);
+    if (!Number.isFinite(num)) return '—';
+    return `${num.toFixed(1)}b`;
   }
 
-  function iconPath(kind, file) {
-    return kind === 'hero' ? `icons/heroes2/${file}` : `icons/pets/${file}`;
+  function setBuilderMessage(text, kind = '') {
+    if (!builderMessageEl) return;
+    builderMessageEl.textContent = text || '';
+    builderMessageEl.classList.remove('is-error', 'is-success');
+    if (kind) builderMessageEl.classList.add(kind);
   }
 
-  function makeIconButton(kind, file) {
-    const name = fileToName(file);
+  function setFinderStatus(text) {
+    if (finderStatusEl) finderStatusEl.textContent = text || '';
+  }
+
+  function clearValidation() {
+    slotEls.forEach((el) => el.classList.remove('is-missing', 'is-drop-target'));
+    if (damageInput?.parentElement) {
+      damageInput.parentElement.classList.remove('is-missing');
+    }
+    setBuilderMessage('');
+  }
+
+  function makeIconButton(item, kind) {
     const btn = document.createElement('button');
     btn.type = 'button';
     btn.className = 'ae-icon-btn';
     btn.dataset.kind = kind;
-    btn.dataset.name = name;
-    btn.dataset.src = iconPath(kind, file);
-    btn.title = name;
-
-    const img = document.createElement('img');
-    img.src = btn.dataset.src;
-    img.alt = name;
-    img.loading = 'lazy';
-    btn.appendChild(img);
-
+    btn.dataset.name = item.name;
+    btn.dataset.src = item.src;
+    btn.title = item.name;
+    btn.setAttribute('aria-label', `Add ${item.name}`);
+    btn.innerHTML = `<img src="${item.src}" alt="${item.name}" loading="lazy" />`;
     return btn;
   }
 
-  function populateIcons() {
-    HERO_FILES.forEach((file) => heroGrid.appendChild(makeIconButton('hero', file)));
-    PET_FILES.forEach((file) => petGrid.appendChild(makeIconButton('pet', file)));
+  function populateIconGrids() {
+    if (!heroGrid || !petGrid) return;
+
+    const heroFrag = document.createDocumentFragment();
+    HEROES.forEach((hero) => heroFrag.appendChild(makeIconButton(hero, 'hero')));
+    heroGrid.replaceChildren(heroFrag);
+
+    const petFrag = document.createDocumentFragment();
+    PETS.forEach((pet) => petFrag.appendChild(makeIconButton(pet, 'pet')));
+    petGrid.replaceChildren(petFrag);
   }
 
-  function setMessage(text, kind = '') {
-    messageEl.textContent = text || '';
-    messageEl.classList.remove('is-error', 'is-success');
-    if (kind) messageEl.classList.add(kind);
-  }
+  function updateLibraryStates() {
+    const usedHeroes = new Set(
+      state.slots.slice(0, 5).filter(Boolean).map((item) => item.name)
+    );
+    const usedPet = state.slots[5]?.name || null;
 
-  function clearValidation() {
-    slots.forEach((slotEl) => slotEl.classList.remove('is-missing'));
-    damageInput.classList.remove('is-missing');
-  }
-
-  function refreshUsedIcons() {
-    const selected = new Set(state.slots.filter(Boolean).map((item) => `${item.kind}:${item.name}`));
-    document.querySelectorAll('.ae-icon-btn').forEach((btn) => {
-      const key = `${btn.dataset.kind}:${btn.dataset.name}`;
-      btn.classList.toggle('is-used', selected.has(key));
+    builderRoot?.querySelectorAll('.ae-icon-btn').forEach((btn) => {
+      const kind = btn.dataset.kind;
+      const name = btn.dataset.name;
+      const isSelected = kind === 'pet' ? usedPet === name : usedHeroes.has(name);
+      btn.classList.toggle('is-selected', isSelected);
+      btn.setAttribute('aria-pressed', isSelected ? 'true' : 'false');
     });
   }
 
   function renderSlots() {
-    slots.forEach((slotEl, index) => {
+    slotEls.forEach((slotEl) => {
+      const index = Number(slotEl.dataset.slotIndex);
       const item = state.slots[index];
-      slotEl.classList.remove('is-filled');
-      slotEl.innerHTML = '';
+
+      slotEl.classList.remove('has-item', 'is-drop-target');
+
       if (!item) {
-        const span = document.createElement('span');
-        span.className = 'ae-slot-placeholder';
-        span.textContent = slotEl.dataset.slotType === 'pet' ? 'Pet' : `Hero ${index + 1}`;
-        slotEl.appendChild(span);
-        slotEl.draggable = false;
+        slotEl.innerHTML = `
+          <div class="ae-slot-empty">
+            <span class="ae-slot-empty-label">${index === 5 ? 'Pet' : `Hero ${index + 1}`}</span>
+          </div>
+        `;
         return;
       }
 
-      slotEl.classList.add('is-filled');
-      slotEl.draggable = true;
+      slotEl.classList.add('has-item');
+      slotEl.innerHTML = `
+        <div class="ae-slot-content" draggable="true">
+          <img src="${item.src}" alt="${item.name}" />
+        </div>
+      `;
 
-      const img = document.createElement('img');
-      img.src = item.src;
-      img.alt = item.name;
-      slotEl.appendChild(img);
-
-      const label = document.createElement('span');
-      label.className = 'ae-slot-name';
-      label.textContent = item.name;
-      slotEl.appendChild(label);
+      const dragNode = slotEl.querySelector('.ae-slot-content');
+      dragNode.addEventListener('dragstart', onDragStart);
+      dragNode.addEventListener('dragend', onDragEnd);
     });
-    refreshUsedIcons();
+
+    updateLibraryStates();
   }
 
   function firstEmptyHeroSlot() {
@@ -107,85 +143,72 @@
     return -1;
   }
 
-  function addIcon(kind, name, src) {
-    clearValidation();
-    setMessage('');
+  function addItem(kind, name, src) {
+    if (!name || !src) return;
 
     if (kind === 'hero') {
-      if (state.slots.some((item) => item && item.kind === 'hero' && item.name === name)) return;
-      const index = firstEmptyHeroSlot();
-      if (index === -1) {
-        setMessage('All 5 hero slots are already filled.', 'is-error');
-        return;
-      }
-      state.slots[index] = { kind, name, src };
-    } else {
-      if (state.slots[5] && state.slots[5].name === name) return;
+      if (state.slots.slice(0, 5).some((item) => item?.name === name)) return;
+      const emptyIndex = firstEmptyHeroSlot();
+      if (emptyIndex === -1) return;
+      state.slots[emptyIndex] = { kind, name, src };
+    } else if (kind === 'pet') {
       state.slots[5] = { kind, name, src };
+    } else {
+      return;
     }
 
     renderSlots();
-  }
-
-  function removeFromSlot(index) {
-    if (!state.slots[index]) return;
-    state.slots[index] = null;
     clearValidation();
-    setMessage('');
+  }
+
+  function removeItem(index) {
+    if (index < 0 || index > 5) return;
+    state.slots[index] = null;
     renderSlots();
+    clearValidation();
   }
 
-  function slotTypeForIndex(index) {
-    return index === 5 ? 'pet' : 'hero';
-  }
+  function swapOrMoveSlots(fromIndex, toIndex) {
+    if (fromIndex === toIndex || fromIndex == null || toIndex == null) return;
 
-  function moveOrSwap(fromIndex, toIndex) {
-    if (fromIndex === toIndex) return;
     const fromItem = state.slots[fromIndex];
-    const toItem = state.slots[toIndex];
     if (!fromItem) return;
 
-    const targetType = slotTypeForIndex(toIndex);
-    if (fromItem.kind !== targetType) return;
-    if (toItem && toItem.kind !== fromItem.kind) return;
+    const fromType = fromIndex === 5 ? 'pet' : 'hero';
+    const toType = toIndex === 5 ? 'pet' : 'hero';
+    if (fromType !== toType) return;
 
-    state.slots[fromIndex] = toItem || null;
+    const toItem = state.slots[toIndex] || null;
     state.slots[toIndex] = fromItem;
-    clearValidation();
-    setMessage('');
+    state.slots[fromIndex] = toItem;
+
     renderSlots();
+    clearValidation();
   }
 
-  function validate() {
+  function validateBuilder() {
     let ok = true;
-    clearValidation();
 
     for (let i = 0; i < 6; i += 1) {
-      if (!state.slots[i]) {
-        slots[i].classList.add('is-missing');
-        ok = false;
-      }
+      const missing = !state.slots[i];
+      slotEls[i]?.classList.toggle('is-missing', missing);
+      if (missing) ok = false;
     }
 
-    const damage = damageInput.value.trim();
-    if (!damage) {
-      damageInput.classList.add('is-missing');
-      ok = false;
-    }
+    const rawDamage = damageInput?.value?.trim() || '';
+    const damageMissing = rawDamage === '' || Number.isNaN(Number(rawDamage));
+    damageInput?.parentElement?.classList.toggle('is-missing', damageMissing);
+    if (damageMissing) ok = false;
 
     if (!ok) {
-      setMessage('Fill all 5 hero slots, the pet slot, and the damage field before sending.', 'is-error');
+      setBuilderMessage('Please fill all 5 hero slots, the pet slot, and the damage value.', 'is-error');
     }
+
     return ok;
   }
 
-  async function submitComp() {
-    if (!validate()) return;
-
-    if (typeof supabaseClient === 'undefined') {
-      setMessage('Supabase client is not available on this page.', 'is-error');
-      return;
-    }
+  async function handleSubmit() {
+    if (state.submitting || !validateBuilder()) return;
 
     const payload = {
       hero1: state.slots[0].name,
@@ -197,22 +220,307 @@
       damage: Number(damageInput.value),
     };
 
+    state.submitting = true;
     sendBtn.disabled = true;
-    setMessage('Sending...');
+    setBuilderMessage('Saving...');
 
     try {
-      const { error } = await supabaseClient.from('ae-comps').insert([payload]);
+      const { error } = await supabaseClient
+        .from('ae-comps')
+        .insert([payload]);
+
       if (error) throw error;
 
-      setMessage('Comp saved.', 'is-success');
-      state.slots = Array(6).fill(null);
-      damageInput.value = '';
-      clearValidation();
-      renderSlots();
-    } catch (error) {
-      setMessage(error?.message || 'Failed to save comp.', 'is-error');
+      setBuilderMessage('Comp saved.', 'is-success');
+    } catch (err) {
+      console.error(err);
+      setBuilderMessage(`Could not save comp: ${err.message || 'unknown error'}`, 'is-error');
     } finally {
+      state.submitting = false;
       sendBtn.disabled = false;
+    }
+  }
+
+  function onGridClick(event) {
+    const btn = event.target.closest('.ae-icon-btn');
+    if (!btn) return;
+    addItem(btn.dataset.kind, btn.dataset.name, btn.dataset.src);
+  }
+
+  function onSlotClick(event) {
+    const slotEl = event.currentTarget;
+    const index = Number(slotEl.dataset.slotIndex);
+    if (!state.slots[index]) return;
+    removeItem(index);
+  }
+
+  function onDragStart(event) {
+    const slotEl = event.target.closest('.ae-slot');
+    if (!slotEl) return;
+
+    state.dragFromIndex = Number(slotEl.dataset.slotIndex);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(state.dragFromIndex));
+  }
+
+  function onDragEnd() {
+    state.dragFromIndex = null;
+    slotEls.forEach((el) => el.classList.remove('is-drop-target'));
+  }
+
+  function onDragOver(event) {
+    const slotEl = event.currentTarget;
+    const toIndex = Number(slotEl.dataset.slotIndex);
+    const fromIndex = state.dragFromIndex;
+    if (fromIndex == null) return;
+
+    const fromType = fromIndex === 5 ? 'pet' : 'hero';
+    const toType = toIndex === 5 ? 'pet' : 'hero';
+    if (fromType !== toType) return;
+
+    event.preventDefault();
+    slotEl.classList.add('is-drop-target');
+  }
+
+  function onDragLeave(event) {
+    event.currentTarget.classList.remove('is-drop-target');
+  }
+
+  function onDrop(event) {
+    event.preventDefault();
+
+    const slotEl = event.currentTarget;
+    const toIndex = Number(slotEl.dataset.slotIndex);
+    const raw = event.dataTransfer.getData('text/plain');
+    const fromIndex = raw === '' ? state.dragFromIndex : Number(raw);
+
+    slotEl.classList.remove('is-drop-target');
+    if (Number.isNaN(fromIndex) || Number.isNaN(toIndex)) return;
+    swapOrMoveSlots(fromIndex, toIndex);
+  }
+
+  async function fetchAllAeComps() {
+    const rows = [];
+    const pageSize = 1000;
+    let from = 0;
+
+    while (true) {
+      const to = from + pageSize - 1;
+      const { data, error } = await supabaseClient
+        .from('ae-comps')
+        .select('hero1, hero2, hero3, hero4, hero5, pet, damage')
+        .range(from, to);
+
+      if (error) throw error;
+      if (!data || !data.length) break;
+
+      rows.push(...data);
+      if (data.length < pageSize) break;
+      from += pageSize;
+    }
+
+    return rows;
+  }
+
+  function aggregateRows(rows) {
+    const map = new Map();
+
+    rows.forEach((row) => {
+      const heroes = [row.hero1, row.hero2, row.hero3, row.hero4, row.hero5]
+        .map((v) => String(v || '').trim().toLowerCase());
+
+      const pet = String(row.pet || '').trim().toLowerCase();
+      const damage = Number(row.damage);
+
+      if (heroes.some((v) => !v) || !pet || !Number.isFinite(damage)) return;
+
+      const key = [...heroes, pet].join('|');
+      let entry = map.get(key);
+      if (!entry) {
+        entry = {
+          id: key,
+          heroes,
+          pet,
+          sum: 0,
+          count: 0,
+        };
+        map.set(key, entry);
+      }
+
+      entry.sum += damage;
+      entry.count += 1;
+    });
+
+    return Array.from(map.values())
+      .map((entry) => {
+        const items = new Set([...entry.heroes, entry.pet]);
+        return {
+          id: entry.id,
+          heroes: entry.heroes,
+          pet: entry.pet,
+          avg: entry.sum / entry.count,
+          count: entry.count,
+          items,
+        };
+      })
+      .sort((a, b) => b.avg - a.avg);
+  }
+
+  function buildTopBoxes(comps, desiredCount = 24) {
+    const candidates = comps.slice(0, Math.min(comps.length, 90));
+    const n = candidates.length;
+    const prefix = new Array(n + 1).fill(0);
+
+    for (let i = 0; i < n; i += 1) {
+      prefix[i + 1] = prefix[i] + candidates[i].avg;
+    }
+
+    function optimistic(index, need) {
+      const end = Math.min(n, index + need);
+      return prefix[end] - prefix[index];
+    }
+
+    const best = [];
+    const seen = new Set();
+
+    function pushBox(box) {
+      const signature = box.comps.map((comp) => comp.id).sort().join('||');
+      if (seen.has(signature)) return;
+      seen.add(signature);
+      best.push({ ...box, signature });
+      best.sort((a, b) => b.total - a.total);
+      if (best.length > desiredCount) {
+        const removed = best.pop();
+        if (removed) seen.delete(removed.signature);
+      }
+    }
+
+    function threshold() {
+      return best.length >= desiredCount ? best[best.length - 1].total : -Infinity;
+    }
+
+    function dfs(startIndex, chosen, usedHeroes, usedPets, total) {
+      const need = 6 - chosen.length;
+
+      if (need === 0) {
+        pushBox({ comps: chosen.slice(), total });
+        return;
+      }
+
+      if (startIndex >= n) return;
+      if (n - startIndex < need) return;
+      if (total + optimistic(startIndex, need) < threshold()) return;
+
+      for (let i = startIndex; i <= n - need; i += 1) {
+        const comp = candidates[i];
+        const bound = total + comp.avg + optimistic(i + 1, need - 1);
+        if (bound < threshold()) continue;
+
+        let compatible = !usedPets.has(comp.pet);
+        if (compatible) {
+          for (let h = 0; h < comp.heroes.length; h += 1) {
+            if (usedHeroes.has(comp.heroes[h])) {
+              compatible = false;
+              break;
+            }
+          }
+        }
+
+        if (!compatible) continue;
+
+        comp.heroes.forEach((hero) => usedHeroes.add(hero));
+        usedPets.add(comp.pet);
+        chosen.push(comp);
+
+        dfs(i + 1, chosen, usedHeroes, usedPets, total + comp.avg);
+
+        chosen.pop();
+        usedPets.delete(comp.pet);
+        comp.heroes.forEach((hero) => usedHeroes.delete(hero));
+      }
+    }
+
+    dfs(0, [], new Set(), new Set(), 0);
+    return best.sort((a, b) => b.total - a.total);
+  }
+
+  function iconSrc(kind, name) {
+    return kind === 'pet'
+      ? `/icons/pets/${name}.jpg`
+      : `/icons/heroes2/${name}.jpg`;
+  }
+
+  function renderFinderBoxes(boxes) {
+    if (!finderBoxesEl) return;
+
+    if (!boxes.length) {
+      finderBoxesEl.innerHTML = '<p class="ae-empty-note">No valid 6-comp boxes could be built from the saved data yet.</p>';
+      if (finderBestTotalEl) finderBestTotalEl.textContent = '—';
+      return;
+    }
+
+    if (finderBestTotalEl) finderBestTotalEl.textContent = fmtB(boxes[0].total);
+
+    finderBoxesEl.innerHTML = boxes.map((box, boxIndex) => {
+      const compsHtml = box.comps.map((comp) => {
+        const heroHtml = comp.heroes
+          .map((hero) => `<img src="${iconSrc('hero', hero)}" alt="${hero}" title="${hero}" loading="lazy" />`)
+          .join('');
+        const petHtml = `<img src="${iconSrc('pet', comp.pet)}" alt="${comp.pet}" title="${comp.pet}" loading="lazy" />`;
+
+        return `
+          <div class="ae-box-comp">
+            <div class="ae-box-comp-icons">
+              ${heroHtml}
+              ${petHtml}
+            </div>
+            <div class="ae-box-comp-damage">${fmtB(comp.avg)}</div>
+          </div>
+        `;
+      }).join('');
+
+      return `
+        <article class="ae-box">
+          <div class="ae-box-head">
+            <h3 class="ae-box-title">Box ${boxIndex + 1}</h3>
+            <div class="ae-box-total">${fmtB(box.total)}</div>
+          </div>
+          <div class="ae-box-grid">
+            ${compsHtml}
+          </div>
+        </article>
+      `;
+    }).join('');
+  }
+
+  async function loadFinder() {
+    if (state.finderLoaded || state.finderLoading) return;
+    state.finderLoading = true;
+    setFinderStatus('Loading saved comps...');
+
+    try {
+      const rows = await fetchAllAeComps();
+      const aggregates = aggregateRows(rows);
+
+      if (!aggregates.length) {
+        renderFinderBoxes([]);
+        setFinderStatus('No saved comps found yet.');
+        state.finderLoaded = true;
+        return;
+      }
+
+      setFinderStatus(`Loaded ${aggregates.length} unique comps. Building best boxes...`);
+      const boxes = buildTopBoxes(aggregates, 24);
+      renderFinderBoxes(boxes);
+      setFinderStatus(`Showing ${boxes.length} highest-total boxes from ${aggregates.length} unique averaged comps.`);
+      state.finderLoaded = true;
+    } catch (err) {
+      console.error(err);
+      if (finderBestTotalEl) finderBestTotalEl.textContent = '—';
+      if (finderBoxesEl) finderBoxesEl.innerHTML = '';
+      setFinderStatus(`Could not load comp finder: ${err.message || 'unknown error'}`);
+    } finally {
+      state.finderLoading = false;
     }
   }
 
@@ -220,80 +528,54 @@
     tabs.forEach((tab) => {
       tab.addEventListener('click', () => {
         const target = tab.dataset.target;
+
         tabs.forEach((btn) => {
           const active = btn === tab;
           btn.classList.toggle('is-active', active);
           btn.setAttribute('aria-selected', active ? 'true' : 'false');
         });
+
         panels.forEach((panel) => {
           const active = panel.dataset.panel === target;
           panel.classList.toggle('is-active', active);
           panel.hidden = !active;
         });
+
+        if (target === 'finder') {
+          loadFinder();
+        }
       });
     });
   }
 
-  heroGrid.addEventListener('click', (event) => {
-    const btn = event.target.closest('.ae-icon-btn');
-    if (!btn) return;
-    addIcon(btn.dataset.kind, btn.dataset.name, btn.dataset.src);
-  });
+  function initBuilder() {
+    if (!builderRoot) return;
 
-  petGrid.addEventListener('click', (event) => {
-    const btn = event.target.closest('.ae-icon-btn');
-    if (!btn) return;
-    addIcon(btn.dataset.kind, btn.dataset.name, btn.dataset.src);
-  });
+    populateIconGrids();
+    renderSlots();
 
-  slots.forEach((slotEl) => {
-    slotEl.addEventListener('click', (event) => {
-      if (event.target.closest('.ae-slot-name, img, .ae-slot-placeholder') || event.currentTarget === event.target) {
-        const index = Number(slotEl.dataset.slotIndex);
-        if (state.slots[index]) removeFromSlot(index);
-      }
+    heroGrid?.addEventListener('click', onGridClick);
+    petGrid?.addEventListener('click', onGridClick);
+
+    slotEls.forEach((slotEl) => {
+      slotEl.addEventListener('click', onSlotClick);
+      slotEl.addEventListener('dragover', onDragOver);
+      slotEl.addEventListener('dragleave', onDragLeave);
+      slotEl.addEventListener('drop', onDrop);
     });
 
-    slotEl.addEventListener('dragstart', (event) => {
-      if (!slotEl.draggable) {
-        event.preventDefault();
-        return;
-      }
-      event.dataTransfer.setData('text/plain', slotEl.dataset.slotIndex);
-      event.dataTransfer.effectAllowed = 'move';
+    damageInput?.addEventListener('input', () => {
+      damageInput.parentElement?.classList.remove('is-missing');
+      setBuilderMessage('');
     });
 
-    slotEl.addEventListener('dragover', (event) => {
-      event.preventDefault();
-      slotEl.classList.add('is-drop-target');
-    });
+    sendBtn?.addEventListener('click', handleSubmit);
+  }
 
-    slotEl.addEventListener('dragleave', () => {
-      slotEl.classList.remove('is-drop-target');
-    });
+  function init() {
+    initTabs();
+    initBuilder();
+  }
 
-    slotEl.addEventListener('drop', (event) => {
-      event.preventDefault();
-      slotEl.classList.remove('is-drop-target');
-      const fromIndex = Number(event.dataTransfer.getData('text/plain'));
-      const toIndex = Number(slotEl.dataset.slotIndex);
-      if (Number.isNaN(fromIndex) || Number.isNaN(toIndex)) return;
-      moveOrSwap(fromIndex, toIndex);
-    });
-
-    slotEl.addEventListener('dragend', () => {
-      slots.forEach((slot) => slot.classList.remove('is-drop-target'));
-    });
-  });
-
-  damageInput.addEventListener('input', () => {
-    if (damageInput.value.trim()) damageInput.classList.remove('is-missing');
-    if (messageEl.classList.contains('is-error')) setMessage('');
-  });
-
-  sendBtn.addEventListener('click', submitComp);
-
-  populateIcons();
-  renderSlots();
-  initTabs();
+  init();
 })();
