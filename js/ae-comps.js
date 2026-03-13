@@ -490,7 +490,11 @@
   }
 
   function buildTopBoxes(comps, desiredCount = 24) {
-    const candidates = comps.slice(0, Math.min(comps.length, 90));
+    const candidateLimit = Math.min(
+      comps.length,
+      finderState.excludedHeroes.size ? 300 : 120
+    );
+    const candidates = comps.slice(0, candidateLimit);
     const n = candidates.length;
     const prefix = new Array(n + 1).fill(0);
 
