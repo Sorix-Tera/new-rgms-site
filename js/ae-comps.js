@@ -475,7 +475,7 @@
         map.set(key, entry);
       }
 
-      entry.sum += damage;
+      entry.max = Math.max(entry.max, damage);
       entry.count += 1;
     });
 
@@ -486,7 +486,7 @@
           id: entry.id,
           heroes: entry.heroes,
           pet: entry.pet,
-          avg: entry.sum / entry.count,
+          avg: entry.max,
           count: entry.count,
           items,
         };
