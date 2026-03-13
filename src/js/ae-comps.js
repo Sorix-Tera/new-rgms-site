@@ -20,7 +20,7 @@
 
   const tabs = Array.from(document.querySelectorAll('.ae-tab'));
   const panels = Array.from(document.querySelectorAll('.ae-panel'));
-  const heroSearchInput = root.querySelector("#aeHeroSearch");
+  const heroSearchInput = document.querySelector("#aeHeroSearch");
 
   const state = {
     slots: [null, null, null, null, null, null],
