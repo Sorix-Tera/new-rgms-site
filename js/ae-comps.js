@@ -346,14 +346,53 @@
     setBuilderMessage('Saving...');
 
     try {
-      const { error } = await supabaseClient
+      const existingQuery = supabaseClient
         .from('ae-comps')
-        .insert([payload]);
+        .select('damage')
+        .eq('hero1', payload.hero1)
+        .eq('hero2', payload.hero2)
+        .eq('hero3', payload.hero3)
+        .eq('hero4', payload.hero4)
+        .eq('hero5', payload.hero5)
+        .eq('pet', payload.pet);
 
-      if (error) throw error;
+      const { data: existingRows, error: existingError } = await existingQuery;
 
-      setBuilderMessage('Comp saved.', 'is-success');
-      resetBuilder();
+      if (existingError) throw existingError;
+
+      if (!existingRows || existingRows.length === 0) {
+        const { error: insertError } = await supabaseClient
+          .from('ae-comps')
+          .insert([payload]);
+
+        if (insertError) throw insertError;
+
+        setBuilderMessage('Comp saved.', 'is-success');
+        resetBuilder();
+      } else {
+        const currentBestDamage = Math.max(
+          ...existingRows.map((row) => Number(row.damage)).filter(Number.isFinite)
+        );
+
+        if (payload.damage > currentBestDamage) {
+          const { error: updateError } = await supabaseClient
+            .from('ae-comps')
+            .update({ damage: payload.damage })
+            .eq('hero1', payload.hero1)
+            .eq('hero2', payload.hero2)
+            .eq('hero3', payload.hero3)
+            .eq('hero4', payload.hero4)
+            .eq('hero5', payload.hero5)
+            .eq('pet', payload.pet);
+
+          if (updateError) throw updateError;
+
+          setBuilderMessage('Comp updated with higher damage.', 'is-success');
+          resetBuilder();
+        } else {
+          setBuilderMessage('Comp already exists.', 'is-error');
+        }
+      }
 
       if (state.finderLoaded) {
         state.finderLoaded = false;
@@ -469,7 +508,7 @@
           id: key,
           heroes,
           pet,
-          sum: 0,
+          max: damage,
           count: 0,
         };
         map.set(key, entry);
