@@ -73,9 +73,17 @@ permalink: "ae-comps.html"
 
         <div class="ae-picker-layout">
           <section class="ae-library-card ae-library-heroes" aria-label="Heroes">
-            <div class="ae-library-head">
-              <h2 class="page-section-title">Heroes</h2>
-            </div>
+            <div class="ae-library-head ae-library-head--with-search">
+                <h2>Heroes</h2>
+                <input
+                  id="aeHeroSearch"
+                  class="ae-hero-search"
+                  type="text"
+                  placeholder="Search hero..."
+                  autocomplete="off"
+                  spellcheck="false"
+                />
+              </div>
             <div class="ae-icon-grid ae-hero-grid" id="aeHeroGrid"></div>
           </section>
 
