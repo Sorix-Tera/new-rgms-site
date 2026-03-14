@@ -376,14 +376,12 @@
           const { error: updateError } = await supabaseClient
             .from('ae-comps')
             .update({ damage: payload.damage })
-            .match({
-              hero1: payload.hero1,
-              hero2: payload.hero2,
-              hero3: payload.hero3,
-              hero4: payload.hero4,
-              hero5: payload.hero5,
-              pet: payload.pet,
-            });
+            .eq('hero1', payload.hero1)
+            .eq('hero2', payload.hero2)
+            .eq('hero3', payload.hero3)
+            .eq('hero4', payload.hero4)
+            .eq('hero5', payload.hero5)
+            .eq('pet', payload.pet)
 
           if (updateError) throw updateError;
 
