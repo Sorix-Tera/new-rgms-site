@@ -373,6 +373,7 @@
         const currentDamage = Number(existing.damage);
 
         if (Number.isFinite(currentDamage) && payload.damage > currentDamage) {
+          console.log("Have to update!", payload)
           const { error: updateError } = await supabaseClient
             .from('ae-comps')
             .update({ damage: payload.damage })
