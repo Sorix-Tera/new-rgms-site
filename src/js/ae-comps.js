@@ -81,14 +81,18 @@
 
   function resetBuilder() {
     state.slots = [null, null, null, null, null, null];
-
+  
     if (damageInput) {
       damageInput.value = '';
     }
-
-    clearValidation();
+  
+    slotEls.forEach((el) => el.classList.remove('is-missing', 'is-drop-target'));
+    if (damageInput?.parentElement) {
+      damageInput.parentElement.classList.remove('is-missing');
+    }
+  
     renderSlots();
-
+  
     if (heroSearchInput) {
       heroSearchInput.value = '';
       filterHeroGrid();
@@ -373,7 +377,6 @@
         const currentDamage = Number(existing.damage);
 
         if (Number.isFinite(currentDamage) && payload.damage > currentDamage) {
-          console.log("Have to update!", payload)
           const { error: updateError } = await supabaseClient
             .from('ae-comps')
             .update({ damage: payload.damage })
