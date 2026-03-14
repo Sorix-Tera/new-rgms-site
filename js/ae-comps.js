@@ -346,17 +346,16 @@
     setBuilderMessage('Saving...');
 
     try {
-      const existingQuery = supabaseClient
+      const { data: existingRows, error: existingError } = await supabaseClient
         .from('ae-comps')
-        .select('damage')
+        .select('hero1, hero2, hero3, hero4, hero5, pet, damage')
         .eq('hero1', payload.hero1)
         .eq('hero2', payload.hero2)
         .eq('hero3', payload.hero3)
         .eq('hero4', payload.hero4)
         .eq('hero5', payload.hero5)
-        .eq('pet', payload.pet);
-
-      const { data: existingRows, error: existingError } = await existingQuery;
+        .eq('pet', payload.pet)
+        .limit(1);
 
       if (existingError) throw existingError;
 
@@ -370,20 +369,21 @@
         setBuilderMessage('Comp saved.', 'is-success');
         resetBuilder();
       } else {
-        const currentBestDamage = Math.max(
-          ...existingRows.map((row) => Number(row.damage)).filter(Number.isFinite)
-        );
+        const existing = existingRows[0];
+        const currentDamage = Number(existing.damage);
 
-        if (payload.damage > currentBestDamage) {
+        if (Number.isFinite(currentDamage) && payload.damage > currentDamage) {
           const { error: updateError } = await supabaseClient
             .from('ae-comps')
             .update({ damage: payload.damage })
-            .eq('hero1', payload.hero1)
-            .eq('hero2', payload.hero2)
-            .eq('hero3', payload.hero3)
-            .eq('hero4', payload.hero4)
-            .eq('hero5', payload.hero5)
-            .eq('pet', payload.pet);
+            .match({
+              hero1: payload.hero1,
+              hero2: payload.hero2,
+              hero3: payload.hero3,
+              hero4: payload.hero4,
+              hero5: payload.hero5,
+              pet: payload.pet,
+            });
 
           if (updateError) throw updateError;
 
@@ -531,6 +531,28 @@
         };
       })
       .sort((a, b) => b.avg - a.avg);
+  }
+
+  function buildNonOverlappingBoxes(comps, desiredCount = 24, requiredCompCount = 6) {
+    const remaining = comps.slice();
+    const result = [];
+
+    while (remaining.length >= requiredCompCount && result.length < desiredCount) {
+      const boxList = buildTopBoxes(remaining, 1, requiredCompCount);
+      if (!boxList.length) break;
+
+      const bestBox = boxList[0];
+      result.push(bestBox);
+
+      const usedIds = new Set(bestBox.comps.map((comp) => comp.id));
+      for (let i = remaining.length - 1; i >= 0; i -= 1) {
+        if (usedIds.has(remaining[i].id)) {
+          remaining.splice(i, 1);
+        }
+      }
+    }
+
+    return result;
   }
 
   function buildTopBoxes(comps, desiredCount = 24, requiredCompCount = 6) {
@@ -735,7 +757,7 @@
     }
 
     setFinderStatus(`Building best boxes from ${filteredComps.length} filtered averaged comps...`);
-    const boxes = buildTopBoxes(filteredComps, 24, requiredCompCount);
+    const boxes = buildNonOverlappingBoxes(filteredComps, 24, requiredCompCount);
     renderFinderBoxes(boxes);
 
     if (!boxes.length) {
@@ -743,7 +765,7 @@
       return;
     }
 
-    setFinderStatus(`Showing ${boxes.length} highest-total boxes with ${requiredCompCount} comps each from ${filteredComps.length} filtered averaged comps.`);
+    setFinderStatus(`Showing ${boxes.length} highest-total non-overlapping boxes with ${requiredCompCount} comps each from ${filteredComps.length} filtered averaged comps.`);
   }
 
   async function loadFinder() {
