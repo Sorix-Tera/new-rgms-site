@@ -5,7 +5,7 @@
   <title>AE map · TangledSpore&#39;s RGMs!</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="stylesheet" href="css/style.css" />
-  
+  <link rel="stylesheet" href="css/ae-map.css" />
 </head>
 <body>
   <header class="top-bar">
@@ -86,7 +86,59 @@
 
   
 <main class="page" id="aeMapPage">
+  <section class="ae-map-shell">
+    <div class="ae-map-panel">
+      <div class="ae-map-header">
+        <div>
+          <div class="ae-map-title">Abyssal Expedition map planner</div>
+          <div class="ae-map-subtitle">
+            Click hexes to mark your path. The grid is generated automatically over the whole map, so you can fine-tune the alignment with the controls below and ignore any out-of-bounds hexes.
+          </div>
+        </div>
+        <div class="ae-map-stats">
+          <div class="ae-map-pill">Selected tiles: <strong id="aeMapSelectedCount">0</strong></div>
+          <div class="ae-map-pill">Rendered hexes: <strong id="aeMapHexCount">0</strong></div>
+        </div>
+      </div>
 
+      <div class="ae-map-controls" aria-label="Grid settings">
+        <div class="ae-map-control">
+          <label for="aeMapSize">Hex size <output id="aeMapSizeOut">9 px</output></label>
+          <input id="aeMapSize" type="range" min="5" max="20" step="0.25" value="9" />
+        </div>
+        <div class="ae-map-control">
+          <label for="aeMapOriginX">Origin X <output id="aeMapOriginXOut">8 px</output></label>
+          <input id="aeMapOriginX" type="range" min="-60" max="60" step="1" value="8" />
+        </div>
+        <div class="ae-map-control">
+          <label for="aeMapOriginY">Origin Y <output id="aeMapOriginYOut">8 px</output></label>
+          <input id="aeMapOriginY" type="range" min="-60" max="60" step="1" value="8" />
+        </div>
+        <div class="ae-map-control">
+          <label for="aeMapOpacity">Grid opacity <output id="aeMapOpacityOut">75%</output></label>
+          <input id="aeMapOpacity" type="range" min="0" max="100" step="1" value="75" />
+        </div>
+      </div>
+
+      <div class="ae-map-actions">
+        <button class="ae-map-button is-primary" id="aeMapToggleGrid" type="button">Hide grid</button>
+        <button class="ae-map-button" id="aeMapClear" type="button">Clear selection</button>
+        <button class="ae-map-button" id="aeMapSave" type="button">Save plan</button>
+        <button class="ae-map-button" id="aeMapLoad" type="button">Load plan</button>
+      </div>
+
+      <div class="ae-map-viewport">
+        <div class="ae-map-stage">
+          <img id="aeMapImage" class="ae-map-image" src="icons/ae_map.jpeg" alt="Abyssal Expedition map" />
+          <svg id="aeMapOverlay" class="ae-map-overlay" aria-hidden="true"></svg>
+        </div>
+      </div>
+
+      <div class="ae-map-help">
+        Tip: first adjust the hex size until the overlay roughly matches the map, then nudge Origin X and Origin Y until the centers line up. Your last saved layout and selected tiles are stored in your browser.
+      </div>
+    </div>
+  </section>
 </main>
 
 
@@ -96,7 +148,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  
+  <script src="js/ae-map.js" defer></script>
   <script src="js/core.js" defer></script>
   <script src="js/leaderboard.js" defer></script>
   <script src="js/cursed-realm.js" defer></script>
