@@ -7,7 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn) return;
 
-  const HEX_SIZE = 31.2;
+  const HEX_RX = 31.2;
+  const HEX_RY = 27.8;
   const ORIGIN_X = 0;
   const ORIGIN_Y = 0;
 
@@ -81,32 +82,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
   function hexToPixel(q, r) {
     return {
-      x: ORIGIN_X + HEX_SIZE * sqrt3 * (q + r / 2),
-      y: ORIGIN_Y + HEX_SIZE * 1.5 * r,
+      x: ORIGIN_X + HEX_RX * sqrt3 * (q + r / 2),
+      y: ORIGIN_Y + HEX_RY * 1.5 * r,
     };
   }
 
   function pixelToHex(x, y) {
     const px = x - ORIGIN_X;
     const py = y - ORIGIN_Y;
-
-    const qf = ((sqrt3 / 3) * px - (1 / 3) * py) / HEX_SIZE;
-    const rf = ((2 / 3) * py) / HEX_SIZE;
-
+  
+    const qf = (px / (sqrt3 * HEX_RX)) - (py / (3 * HEX_RY));
+    const rf = (2 * py) / (3 * HEX_RY);
+  
     return cubeRound(qf, rf);
   }
 
   function hexPoints(q, r) {
     const c = hexToPixel(q, r);
     const pts = [];
-
+  
     for (let i = 0; i < 6; i++) {
       const angle = ((60 * i) - 30) * Math.PI / 180;
-      const x = c.x + HEX_SIZE * Math.cos(angle);
-      const y = c.y + HEX_SIZE * Math.sin(angle);
+      const x = c.x + HEX_RX * Math.cos(angle);
+      const y = c.y + HEX_RY * Math.sin(angle);
       pts.push(`${x},${y}`);
     }
-
+  
     return pts.join(" ");
   }
 
