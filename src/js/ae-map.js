@@ -9,7 +9,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const HEX_SIZE = 32;
   const ORIGIN_X = 5;
-  const ORIGIN_Y = 0;
+  const ORIGIN_Y = -5;
 
   const MAP_SRC = "icons/ae_map.jpeg";
   const STORAGE_KEY = "ae-map-selected-v1";
