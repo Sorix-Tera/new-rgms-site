@@ -4,8 +4,9 @@ document.addEventListener("DOMContentLoaded", () => {
   const countEl = document.getElementById("aeMapCount");
   const clearBtn = document.getElementById("aeMapClear");
   const resetViewBtn = document.getElementById("aeMapResetView");
+  const colorPicker = document.getElementById("aeMapColorPicker");
 
-  if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn) return;
+  if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn || !colorPicker) return;
 
   const HEX_RX = 36.95;
   const HEX_RY = 32;
@@ -13,10 +14,15 @@ document.addEventListener("DOMContentLoaded", () => {
   const ORIGIN_Y = 30;
 
   const MAP_SRC = "icons/ae_map.jpeg";
-  const STORAGE_KEY = "ae-map-selected-v1";
+  const STORAGE_KEY = "ae-map-selected-v2";
+
+  const COLORS = ["cyan", "red", "green", "yellow", "purple", "orange"];
+  let activeColor = "cyan";
 
   const sqrt3 = Math.sqrt(3);
-  const selected = new Set();
+
+  // key -> color
+  const selected = new Map();
 
   let imgW = 0;
   let imgH = 0;
@@ -90,24 +96,24 @@ document.addEventListener("DOMContentLoaded", () => {
   function pixelToHex(x, y) {
     const px = x - ORIGIN_X;
     const py = y - ORIGIN_Y;
-  
+
     const qf = (px / (sqrt3 * HEX_RX)) - (py / (3 * HEX_RY));
     const rf = (2 * py) / (3 * HEX_RY);
-  
+
     return cubeRound(qf, rf);
   }
 
   function hexPoints(q, r) {
     const c = hexToPixel(q, r);
     const pts = [];
-  
+
     for (let i = 0; i < 6; i++) {
       const angle = ((60 * i) - 30) * Math.PI / 180;
       const x = c.x + HEX_RX * Math.cos(angle);
       const y = c.y + HEX_RY * Math.sin(angle);
       pts.push(`${x},${y}`);
     }
-  
+
     return pts.join(" ");
   }
 
@@ -141,32 +147,60 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
+  function getCounts() {
+    const counts = {
+      cyan: 0,
+      red: 0,
+      green: 0,
+      yellow: 0,
+      purple: 0,
+      orange: 0,
+    };
+
+    selected.forEach((color) => {
+      if (counts[color] !== undefined) counts[color] += 1;
+    });
+
+    return counts;
+  }
+
   function updateCount() {
     countEl.textContent = String(selected.size);
+
+    const counts = getCounts();
+    COLORS.forEach((color) => {
+      const el = document.getElementById(`count-${color}`);
+      if (el) el.textContent = String(counts[color]);
+    });
   }
 
   function saveSelection() {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify([...selected]));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(Object.fromEntries(selected)));
   }
 
   function loadSelection() {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
       if (!raw) return;
-      const arr = JSON.parse(raw);
-      if (!Array.isArray(arr)) return;
-      arr.forEach((k) => selected.add(String(k)));
+      const obj = JSON.parse(raw);
+      if (!obj || typeof obj !== "object") return;
+
+      Object.entries(obj).forEach(([k, color]) => {
+        if (COLORS.includes(color)) {
+          selected.set(k, color);
+        }
+      });
     } catch (_) {}
   }
 
   function renderSelected() {
     selectedLayer.innerHTML = "";
 
-    selected.forEach((k) => {
+    selected.forEach((color, k) => {
       const { q, r } = parseKey(k);
       const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
       poly.setAttribute("points", hexPoints(q, r));
-      poly.setAttribute("class", "ae-map-selected");
+      poly.setAttribute("class", `ae-map-selected--${color}`);
       selectedLayer.appendChild(poly);
     });
 
@@ -222,11 +256,12 @@ document.addEventListener("DOMContentLoaded", () => {
     const p = screenToMap(clientX, clientY);
     const { q, r } = pixelToHex(p.x, p.y);
     const k = key(q, r);
+    const existingColor = selected.get(k);
 
-    if (selected.has(k)) {
+    if (existingColor === activeColor) {
       selected.delete(k);
     } else {
-      selected.add(k);
+      selected.set(k, activeColor);
     }
 
     renderSelected();
@@ -242,6 +277,21 @@ document.addEventListener("DOMContentLoaded", () => {
       toggleHexAt(e.clientX, e.clientY);
     }
   }
+
+  function setActiveColor(color) {
+    if (!COLORS.includes(color)) return;
+    activeColor = color;
+
+    colorPicker.querySelectorAll(".ae-map-color-btn").forEach((btn) => {
+      btn.classList.toggle("is-active", btn.dataset.color === color);
+    });
+  }
+
+  colorPicker.addEventListener("click", (e) => {
+    const btn = e.target.closest(".ae-map-color-btn");
+    if (!btn) return;
+    setActiveColor(btn.dataset.color);
+  });
 
   img.addEventListener("load", () => {
     imgW = img.naturalWidth;
