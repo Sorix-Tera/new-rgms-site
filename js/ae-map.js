@@ -7,9 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn) return;
 
-  const HEX_SIZE = 35;
-  const ORIGIN_X = 6;
-  const ORIGIN_Y = -12;
+  const HEX_SIZE = 31.2;
+  const ORIGIN_X = 0;
+  const ORIGIN_Y = 0;
 
   const MAP_SRC = "icons/ae_map.jpeg";
   const STORAGE_KEY = "ae-map-selected-v1";
