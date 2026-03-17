@@ -7,8 +7,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn) return;
 
-  const HEX_RX = 31.2;
-  const HEX_RY = 27.8;
+  const HEX_RX = 31.5;
+  const HEX_RY = 27.5;
   const ORIGIN_X = 0;
   const ORIGIN_Y = 0;
 
