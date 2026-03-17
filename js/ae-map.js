@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn) return;
 
-  const HEX_SIZE = 62;
+  const HEX_SIZE = 45;
   const ORIGIN_X = 44;
   const ORIGIN_Y = 54;
 
