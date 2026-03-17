@@ -146,7 +146,7 @@
 .ae-map-selected {
   fill: rgba(0, 200, 255, 0.26);
   stroke: rgba(0, 220, 255, 0.9);
-  stroke-width: 10;
+  stroke-width: 2;
   vector-effect: non-scaling-stroke;
   pointer-events: none;
 }
