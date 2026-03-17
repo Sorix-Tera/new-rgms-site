@@ -7,9 +7,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn) return;
 
-  const HEX_SIZE = 45;
-  const ORIGIN_X = 44;
-  const ORIGIN_Y = 54;
+  const HEX_SIZE = 40;
+  const ORIGIN_X = 22;
+  const ORIGIN_Y = 27;
 
   const MAP_SRC = "icons/ae_map.jpeg";
   const STORAGE_KEY = "ae-map-selected-v1";
@@ -179,7 +179,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fitScale = Math.min(vw / imgW, vh / imgH);
     minScale = fitScale;
-    maxScale = fitScale * 12;
+    maxScale = fitScale * 15;
     scale = fitScale;
 
     tx = (vw - imgW * scale) / 2;
