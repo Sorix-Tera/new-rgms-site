@@ -1,213 +1,349 @@
-(function () {
-  const page = document.getElementById('aeMapPage');
-  if (!page) return;
+document.addEventListener("DOMContentLoaded", () => {
+  const page = document.getElementById("aeMapPage");
+  const viewport = document.getElementById("aeMapViewport");
+  const countEl = document.getElementById("aeMapCount");
+  const clearBtn = document.getElementById("aeMapClear");
+  const resetViewBtn = document.getElementById("aeMapResetView");
 
-  const els = {
-    image: document.getElementById('aeMapImage'),
-    overlay: document.getElementById('aeMapOverlay'),
-    selectedCount: document.getElementById('aeMapSelectedCount'),
-    hexCount: document.getElementById('aeMapHexCount'),
-    size: document.getElementById('aeMapSize'),
-    sizeOut: document.getElementById('aeMapSizeOut'),
-    originX: document.getElementById('aeMapOriginX'),
-    originXOut: document.getElementById('aeMapOriginXOut'),
-    originY: document.getElementById('aeMapOriginY'),
-    originYOut: document.getElementById('aeMapOriginYOut'),
-    opacity: document.getElementById('aeMapOpacity'),
-    opacityOut: document.getElementById('aeMapOpacityOut'),
-    clear: document.getElementById('aeMapClear'),
-    save: document.getElementById('aeMapSave'),
-    load: document.getElementById('aeMapLoad'),
-    toggleGrid: document.getElementById('aeMapToggleGrid')
-  };
+  if (!page || !viewport || !countEl || !clearBtn || !resetViewBtn) return;
 
-  const STORAGE_KEY = 'ae-map-planner-v1';
-  const state = {
-    selected: new Set(),
-    polygons: new Map(),
-    showGrid: true,
-    imageWidth: 0,
-    imageHeight: 0
-  };
+  const HEX_SIZE = 62;
+  const ORIGIN_X = 44;
+  const ORIGIN_Y = 54;
 
-  const NS = 'http://www.w3.org/2000/svg';
+  const MAP_SRC = "icons/ae_map.jpeg";
+  const STORAGE_KEY = "ae-map-selected-v1";
 
-  function pointyHexPoints(cx, cy, size) {
-    const pts = [];
-    for (let i = 0; i < 6; i += 1) {
-      const angle = ((60 * i) - 30) * Math.PI / 180;
-      pts.push(`${(cx + size * Math.cos(angle)).toFixed(2)},${(cy + size * Math.sin(angle)).toFixed(2)}`);
-    }
-    return pts.join(' ');
-  }
+  const sqrt3 = Math.sqrt(3);
+  const selected = new Set();
 
-  function axialToPixel(q, r, size, originX, originY) {
-    return {
-      x: originX + size * Math.sqrt(3) * (q + r / 2),
-      y: originY + size * 1.5 * r
-    };
-  }
+  let imgW = 0;
+  let imgH = 0;
 
-  function tileKey(q, r) {
+  let stage;
+  let overlay;
+  let selectedLayer;
+  let hitbox;
+  let status;
+
+  let fitScale = 1;
+  let scale = 1;
+  let minScale = 1;
+  let maxScale = 1;
+  let tx = 0;
+  let ty = 0;
+
+  let isDragging = false;
+  let pointerMoved = false;
+  let dragStartX = 0;
+  let dragStartY = 0;
+  let startTx = 0;
+  let startTy = 0;
+
+  const img = new Image();
+  img.src = MAP_SRC;
+  img.alt = "Abyssal Expedition map";
+  img.className = "ae-map-image";
+  img.draggable = false;
+
+  function key(q, r) {
     return `${q},${r}`;
   }
 
-  function setOutput(input, output, suffix = '') {
-    output.textContent = `${input.value}${suffix}`;
+  function parseKey(k) {
+    const [q, r] = k.split(",").map(Number);
+    return { q, r };
   }
 
-  function updateOutputs() {
-    setOutput(els.size, els.sizeOut, ' px');
-    setOutput(els.originX, els.originXOut, ' px');
-    setOutput(els.originY, els.originYOut, ' px');
-    setOutput(els.opacity, els.opacityOut, '%');
-    els.overlay.style.opacity = String(Number(els.opacity.value) / 100);
-  }
+  function cubeRound(qf, rf) {
+    let x = qf;
+    let z = rf;
+    let y = -x - z;
 
-  function updateCounts() {
-    els.selectedCount.textContent = String(state.selected.size);
-    els.hexCount.textContent = String(state.polygons.size);
-  }
+    let rx = Math.round(x);
+    let ry = Math.round(y);
+    let rz = Math.round(z);
 
-  function applySelectionToPolygon(key) {
-    const poly = state.polygons.get(key);
-    if (!poly) return;
-    poly.classList.toggle('is-selected', state.selected.has(key));
-  }
+    const xDiff = Math.abs(rx - x);
+    const yDiff = Math.abs(ry - y);
+    const zDiff = Math.abs(rz - z);
 
-  function toggleTile(key) {
-    if (state.selected.has(key)) {
-      state.selected.delete(key);
+    if (xDiff > yDiff && xDiff > zDiff) {
+      rx = -ry - rz;
+    } else if (yDiff > zDiff) {
+      ry = -rx - rz;
     } else {
-      state.selected.add(key);
-    }
-    applySelectionToPolygon(key);
-    updateCounts();
-  }
-
-  function renderGrid() {
-    if (!state.imageWidth || !state.imageHeight) return;
-
-    state.polygons.clear();
-    els.overlay.innerHTML = '';
-
-    const size = Number(els.size.value);
-    const originX = Number(els.originX.value);
-    const originY = Number(els.originY.value);
-
-    const margin = size * 2;
-    const qMin = Math.floor((-originX - margin) / (Math.sqrt(3) * size)) - 2;
-    const qMax = Math.ceil((state.imageWidth - originX + margin) / (Math.sqrt(3) * size)) + 2;
-    const rMin = Math.floor((-originY - margin) / (1.5 * size)) - 2;
-    const rMax = Math.ceil((state.imageHeight - originY + margin) / (1.5 * size)) + 2;
-
-    const frag = document.createDocumentFragment();
-
-    for (let r = rMin; r <= rMax; r += 1) {
-      for (let q = qMin; q <= qMax; q += 1) {
-        const { x, y } = axialToPixel(q, r, size, originX, originY);
-        if (x < -margin || x > state.imageWidth + margin || y < -margin || y > state.imageHeight + margin) {
-          continue;
-        }
-
-        const key = tileKey(q, r);
-        const poly = document.createElementNS(NS, 'polygon');
-        poly.setAttribute('points', pointyHexPoints(x, y, size));
-        poly.setAttribute('data-key', key);
-        poly.setAttribute('class', 'ae-map-hex');
-        if (state.selected.has(key)) poly.classList.add('is-selected');
-        frag.appendChild(poly);
-        state.polygons.set(key, poly);
-      }
+      rz = -rx - ry;
     }
 
-    els.overlay.appendChild(frag);
-    updateCounts();
+    return { q: rx, r: rz };
   }
 
-  function savePlan() {
-    const payload = {
-      size: Number(els.size.value),
-      originX: Number(els.originX.value),
-      originY: Number(els.originY.value),
-      opacity: Number(els.opacity.value),
-      showGrid: state.showGrid,
-      selected: Array.from(state.selected)
+  function hexToPixel(q, r) {
+    return {
+      x: ORIGIN_X + HEX_SIZE * sqrt3 * (q + r / 2),
+      y: ORIGIN_Y + HEX_SIZE * 1.5 * r,
     };
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
   }
 
-  function loadPlan() {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return;
+  function pixelToHex(x, y) {
+    const px = x - ORIGIN_X;
+    const py = y - ORIGIN_Y;
 
+    const qf = ((sqrt3 / 3) * px - (1 / 3) * py) / HEX_SIZE;
+    const rf = ((2 / 3) * py) / HEX_SIZE;
+
+    return cubeRound(qf, rf);
+  }
+
+  function hexPoints(q, r) {
+    const c = hexToPixel(q, r);
+    const pts = [];
+
+    for (let i = 0; i < 6; i++) {
+      const angle = ((60 * i) - 30) * Math.PI / 180;
+      const x = c.x + HEX_SIZE * Math.cos(angle);
+      const y = c.y + HEX_SIZE * Math.sin(angle);
+      pts.push(`${x},${y}`);
+    }
+
+    return pts.join(" ");
+  }
+
+  function clampPan() {
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+    const scaledW = imgW * scale;
+    const scaledH = imgH * scale;
+
+    if (scaledW <= vw) {
+      tx = (vw - scaledW) / 2;
+    } else {
+      const minTx = vw - scaledW;
+      tx = Math.max(minTx, Math.min(0, tx));
+    }
+
+    if (scaledH <= vh) {
+      ty = (vh - scaledH) / 2;
+    } else {
+      const minTy = vh - scaledH;
+      ty = Math.max(minTy, Math.min(0, ty));
+    }
+  }
+
+  function applyTransform() {
+    clampPan();
+    stage.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+
+    if (status) {
+      status.textContent = `Zoom: ${(scale / fitScale).toFixed(2)}×`;
+    }
+  }
+
+  function updateCount() {
+    countEl.textContent = String(selected.size);
+  }
+
+  function saveSelection() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify([...selected]));
+  }
+
+  function loadSelection() {
     try {
-      const payload = JSON.parse(raw);
-      if (typeof payload.size === 'number') els.size.value = String(payload.size);
-      if (typeof payload.originX === 'number') els.originX.value = String(payload.originX);
-      if (typeof payload.originY === 'number') els.originY.value = String(payload.originY);
-      if (typeof payload.opacity === 'number') els.opacity.value = String(payload.opacity);
-      state.showGrid = payload.showGrid !== false;
-      state.selected = new Set(Array.isArray(payload.selected) ? payload.selected : []);
-      els.overlay.classList.toggle('ae-map-hidden', !state.showGrid);
-      updateOutputs();
-      renderGrid();
-    } catch (err) {
-      console.error('Unable to load saved AE map plan.', err);
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const arr = JSON.parse(raw);
+      if (!Array.isArray(arr)) return;
+      arr.forEach((k) => selected.add(String(k)));
+    } catch (_) {}
+  }
+
+  function renderSelected() {
+    selectedLayer.innerHTML = "";
+
+    selected.forEach((k) => {
+      const { q, r } = parseKey(k);
+      const poly = document.createElementNS("http://www.w3.org/2000/svg", "polygon");
+      poly.setAttribute("points", hexPoints(q, r));
+      poly.setAttribute("class", "ae-map-selected");
+      selectedLayer.appendChild(poly);
+    });
+
+    updateCount();
+    saveSelection();
+  }
+
+  function resetView() {
+    const vw = viewport.clientWidth;
+    const vh = viewport.clientHeight;
+
+    fitScale = Math.min(vw / imgW, vh / imgH);
+    minScale = fitScale;
+    maxScale = fitScale * 12;
+    scale = fitScale;
+
+    tx = (vw - imgW * scale) / 2;
+    ty = (vh - imgH * scale) / 2;
+
+    applyTransform();
+  }
+
+  function screenToMap(clientX, clientY) {
+    const rect = viewport.getBoundingClientRect();
+    const x = (clientX - rect.left - tx) / scale;
+    const y = (clientY - rect.top - ty) / scale;
+    return { x, y };
+  }
+
+  function zoomAt(clientX, clientY, factor) {
+    const oldScale = scale;
+    let newScale = scale * factor;
+
+    if (newScale < minScale) newScale = minScale;
+    if (newScale > maxScale) newScale = maxScale;
+    if (newScale === oldScale) return;
+
+    const rect = viewport.getBoundingClientRect();
+    const px = clientX - rect.left;
+    const py = clientY - rect.top;
+
+    const mapX = (px - tx) / oldScale;
+    const mapY = (py - ty) / oldScale;
+
+    scale = newScale;
+    tx = px - mapX * scale;
+    ty = py - mapY * scale;
+
+    applyTransform();
+  }
+
+  function toggleHexAt(clientX, clientY) {
+    const p = screenToMap(clientX, clientY);
+    const { q, r } = pixelToHex(p.x, p.y);
+    const k = key(q, r);
+
+    if (selected.has(k)) {
+      selected.delete(k);
+    } else {
+      selected.add(k);
+    }
+
+    renderSelected();
+  }
+
+  function handlePointerUp(e) {
+    if (!isDragging) return;
+
+    isDragging = false;
+    viewport.classList.remove("is-dragging");
+
+    if (!pointerMoved) {
+      toggleHexAt(e.clientX, e.clientY);
     }
   }
 
-  function initImage() {
-    state.imageWidth = els.image.naturalWidth;
-    state.imageHeight = els.image.naturalHeight;
+  img.addEventListener("load", () => {
+    imgW = img.naturalWidth;
+    imgH = img.naturalHeight;
 
-    els.overlay.setAttribute('viewBox', `0 0 ${state.imageWidth} ${state.imageHeight}`);
-    els.overlay.setAttribute('width', state.imageWidth);
-    els.overlay.setAttribute('height', state.imageHeight);
+    viewport.classList.remove("ae-map-loading");
+    viewport.innerHTML = "";
 
-    if (!localStorage.getItem(STORAGE_KEY)) {
-      els.size.value = '9';
-      els.originX.value = '8';
-      els.originY.value = '8';
-      els.opacity.value = '75';
-    }
+    stage = document.createElement("div");
+    stage.className = "ae-map-stage";
+    stage.style.width = `${imgW}px`;
+    stage.style.height = `${imgH}px`;
 
-    updateOutputs();
-    loadPlan();
-    renderGrid();
-  }
+    overlay = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    overlay.setAttribute("class", "ae-map-overlay");
+    overlay.setAttribute("width", imgW);
+    overlay.setAttribute("height", imgH);
+    overlay.setAttribute("viewBox", `0 0 ${imgW} ${imgH}`);
 
-  els.overlay.addEventListener('click', (event) => {
-    const poly = event.target.closest('.ae-map-hex');
-    if (!poly) return;
-    toggleTile(poly.dataset.key);
-  });
+    selectedLayer = document.createElementNS("http://www.w3.org/2000/svg", "g");
+    overlay.appendChild(selectedLayer);
 
-  [els.size, els.originX, els.originY, els.opacity].forEach((input) => {
-    input.addEventListener('input', () => {
-      updateOutputs();
-      renderGrid();
+    hitbox = document.createElement("div");
+    hitbox.className = "ae-map-hitbox";
+
+    status = document.createElement("div");
+    status.className = "ae-map-status";
+
+    stage.appendChild(img);
+    stage.appendChild(overlay);
+    stage.appendChild(hitbox);
+    viewport.appendChild(stage);
+    viewport.appendChild(status);
+
+    loadSelection();
+    renderSelected();
+    resetView();
+
+    viewport.addEventListener(
+      "wheel",
+      (e) => {
+        e.preventDefault();
+        const factor = e.deltaY < 0 ? 1.12 : 1 / 1.12;
+        zoomAt(e.clientX, e.clientY, factor);
+      },
+      { passive: false }
+    );
+
+    viewport.addEventListener("pointerdown", (e) => {
+      if (e.button !== 0) return;
+
+      isDragging = true;
+      pointerMoved = false;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+      startTx = tx;
+      startTy = ty;
+
+      viewport.classList.add("is-dragging");
+      viewport.setPointerCapture?.(e.pointerId);
+    });
+
+    viewport.addEventListener("pointermove", (e) => {
+      if (!isDragging) return;
+
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+
+      if (Math.abs(dx) > 4 || Math.abs(dy) > 4) {
+        pointerMoved = true;
+      }
+
+      tx = startTx + dx;
+      ty = startTy + dy;
+      applyTransform();
+    });
+
+    viewport.addEventListener("pointerup", handlePointerUp);
+    viewport.addEventListener("pointercancel", () => {
+      isDragging = false;
+      viewport.classList.remove("is-dragging");
+    });
+
+    clearBtn.addEventListener("click", () => {
+      selected.clear();
+      renderSelected();
+    });
+
+    resetViewBtn.addEventListener("click", () => {
+      resetView();
+    });
+
+    window.addEventListener("resize", () => {
+      const zoomRatio = scale / fitScale;
+      resetView();
+      scale = Math.min(maxScale, Math.max(minScale, fitScale * zoomRatio));
+      clampPan();
+      applyTransform();
     });
   });
 
-  els.clear.addEventListener('click', () => {
-    state.selected.clear();
-    state.polygons.forEach((_, key) => applySelectionToPolygon(key));
-    updateCounts();
+  img.addEventListener("error", () => {
+    viewport.classList.remove("ae-map-loading");
+    viewport.innerHTML = `<div style="padding:20px;color:#fff;">Failed to load map image: ${MAP_SRC}</div>`;
   });
-
-  els.save.addEventListener('click', savePlan);
-  els.load.addEventListener('click', loadPlan);
-
-  els.toggleGrid.addEventListener('click', () => {
-    state.showGrid = !state.showGrid;
-    els.overlay.classList.toggle('ae-map-hidden', !state.showGrid);
-    els.toggleGrid.textContent = state.showGrid ? 'Hide grid' : 'Show grid';
-  });
-
-  if (els.image.complete) {
-    initImage();
-  } else {
-    els.image.addEventListener('load', initImage, { once: true });
-  }
-})();
+});
