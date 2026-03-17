@@ -10,14 +10,50 @@ permalink: "ae-map.html"
       <div class="ae-map-toolbar-left">
         <h1 class="ae-map-title">Abyssal Expedition Map</h1>
         <div class="ae-map-count">
-          Selected tiles: <strong id="aeMapCount">0</strong>
+          Total selected: <strong id="aeMapCount">0</strong>
         </div>
       </div>
 
       <div class="ae-map-toolbar-right">
+        <div class="ae-map-color-picker" id="aeMapColorPicker">
+          <button type="button" class="ae-map-color-btn is-active" data-color="cyan" title="Cyan"></button>
+          <button type="button" class="ae-map-color-btn" data-color="red" title="Red"></button>
+          <button type="button" class="ae-map-color-btn" data-color="green" title="Green"></button>
+          <button type="button" class="ae-map-color-btn" data-color="yellow" title="Yellow"></button>
+          <button type="button" class="ae-map-color-btn" data-color="purple" title="Purple"></button>
+          <button type="button" class="ae-map-color-btn" data-color="orange" title="Orange"></button>
+        </div>
+
         <button type="button" class="ae-map-btn" id="aeMapResetView">Reset view</button>
         <button type="button" class="ae-map-btn" id="aeMapClear">Clear selection</button>
         <div class="ae-map-hint">Wheel = zoom · Drag = move</div>
+      </div>
+    </div>
+
+    <div class="ae-map-color-counts" id="aeMapColorCounts">
+      <div class="ae-map-color-stat">
+        <span class="ae-map-color-dot is-cyan"></span>
+        Cyan: <strong id="count-cyan">0</strong>
+      </div>
+      <div class="ae-map-color-stat">
+        <span class="ae-map-color-dot is-red"></span>
+        Red: <strong id="count-red">0</strong>
+      </div>
+      <div class="ae-map-color-stat">
+        <span class="ae-map-color-dot is-green"></span>
+        Green: <strong id="count-green">0</strong>
+      </div>
+      <div class="ae-map-color-stat">
+        <span class="ae-map-color-dot is-yellow"></span>
+        Yellow: <strong id="count-yellow">0</strong>
+      </div>
+      <div class="ae-map-color-stat">
+        <span class="ae-map-color-dot is-purple"></span>
+        Purple: <strong id="count-purple">0</strong>
+      </div>
+      <div class="ae-map-color-stat">
+        <span class="ae-map-color-dot is-orange"></span>
+        Orange: <strong id="count-orange">0</strong>
       </div>
     </div>
 

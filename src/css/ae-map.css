@@ -165,3 +165,118 @@
     display: none;
   }
 }
+
+
+.ae-map-color-picker {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ae-map-color-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 999px;
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+  padding: 0;
+  appearance: none;
+  transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.ae-map-color-btn:hover {
+  transform: scale(1.08);
+}
+
+.ae-map-color-btn.is-active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.16);
+}
+
+.ae-map-color-btn[data-color="cyan"] { background: #22d3ee; }
+.ae-map-color-btn[data-color="red"] { background: #ef4444; }
+.ae-map-color-btn[data-color="green"] { background: #22c55e; }
+.ae-map-color-btn[data-color="yellow"] { background: #facc15; }
+.ae-map-color-btn[data-color="purple"] { background: #a855f7; }
+.ae-map-color-btn[data-color="orange"] { background: #f97316; }
+
+.ae-map-color-counts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  align-items: center;
+  background: rgba(20, 24, 30, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 10px 14px;
+  color: #fff;
+}
+
+.ae-map-color-stat {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.95rem;
+}
+
+.ae-map-color-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+  display: inline-block;
+}
+
+.ae-map-color-dot.is-cyan { background: #22d3ee; }
+.ae-map-color-dot.is-red { background: #ef4444; }
+.ae-map-color-dot.is-green { background: #22c55e; }
+.ae-map-color-dot.is-yellow { background: #facc15; }
+.ae-map-color-dot.is-purple { background: #a855f7; }
+.ae-map-color-dot.is-orange { background: #f97316; }
+
+.ae-map-selected--cyan {
+  fill: rgba(34, 211, 238, 0.35);
+  stroke: rgba(34, 211, 238, 0.95);
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.ae-map-selected--red {
+  fill: rgba(239, 68, 68, 0.35);
+  stroke: rgba(239, 68, 68, 0.95);
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.ae-map-selected--green {
+  fill: rgba(34, 197, 94, 0.35);
+  stroke: rgba(34, 197, 94, 0.95);
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.ae-map-selected--yellow {
+  fill: rgba(250, 204, 21, 0.35);
+  stroke: rgba(250, 204, 21, 0.95);
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.ae-map-selected--purple {
+  fill: rgba(168, 85, 247, 0.35);
+  stroke: rgba(168, 85, 247, 0.95);
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
+
+.ae-map-selected--orange {
+  fill: rgba(249, 115, 22, 0.35);
+  stroke: rgba(249, 115, 22, 0.95);
+  stroke-width: 6;
+  vector-effect: non-scaling-stroke;
+  pointer-events: none;
+}
