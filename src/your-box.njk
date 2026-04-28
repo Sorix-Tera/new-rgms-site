@@ -2,7 +2,10 @@
 layout: layouts/base.njk
 title: "Your Box · TangledSpore's RGMs!"
 permalink: "your-box.html"
-extraScripts: '<script src="js/your-box.js" defer></script>'
+extraScripts: '
+  <script>const HERO_LIST = {{ heroes | dump | safe }};</script>
+  <script src="js/your-box.js" defer></script>
+'
 ---
 
 <main class="page" id="yourBoxPage">
