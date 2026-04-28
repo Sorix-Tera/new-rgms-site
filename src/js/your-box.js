@@ -13,37 +13,7 @@
   const SI_LABELS   = { 29: '<30', 30: '30', 40: '40', 50: '50' };
 
   // Full hero list (alphabetical, from icons/heroes2/)
-  const HEROES = [
-    'aantandra','aathalia','abaden','abelinda','abrutus','adrian','aeironn',
-    'aestrilda','aezizh','afawkes','ainz','alaro','albedo','alna','alucius',
-    'alvida','alyca','anasta','angelo','ankhira','anoki','antandra','apippa',
-    'arden','arkadios','arthur','asafiya','ashemira','askriath','asolise',
-    'astar','atalene','athalia','athane','atheus','athoran','audrae','aurelia',
-    'baden','begris','belinda','bloodsnarl','bronn','brutus','cassius','cecilia',
-    'cha','crassio','daemia','daimon','desira','dgwyneth','dracula','dreaf',
-    'drez','edwin','eironn','eletha','elthara','eluard','emilia','envydiel',
-    'eorin','estrilda','eugene','ezio','ezizh','fane','fawkes','ferael','flora',
-    'framton','gavus','geralt','ginneas','golus','gorok','gorren','gorvo',
-    'gourgue','granit','grezhul','gwyneth','haelia','haelus','harvey','hendrik',
-    'hildwin','hodgkin','hogan','icariel','ira','isabella','ivan','izold',
-    'jerome','joan','joker','kaelon','kalene','kalthin','kaz','kelthur',
-    'khasos','khazard','knox','kregor','kren','laios','lan','lavatune','leofric',
-    'leonardo','lethos','leviathan','liberta','lorsan','lucilla','lucius',
-    'lucretia','lyca','lysander','maetria','malkrie','marcille','mehira',
-    'melion','melusina','merek','merlin','mezoth','mira','mirael','misha',
-    'mishka','morael','morrow','mortas','morvus','mulan','nakoruru','nara',
-    'naroko','nemora','nevanthi','niru','numisu','nyla','oden','odysseus','ogi',
-    'oku','olgath','orthros','oscar','palmer','peggy','pippa','prince','pulina',
-    'queen','raine','raku','randle','raoul','rem','respen','rigby','rimuru',
-    'robin','rosaline','rowan','safiya','saitama','salaki','satrana','saurus',
-    'saveas','scarlet','seirus','selene','serenmira','sezis','shaltear',
-    'shemira','shuna','silas','silvina','simona','sion','sjw','skreg','skriath',
-    'skylan','solise','sonja','steixius','talene','talimar','tamrus','tarnos',
-    'tasi','tavriel','thali','thane','theowyn','thesku','thoran','tidus','titus',
-    'torne','treznor','trishea','tsumiki','twins','ukyo','ulmus','ulric',
-    'umbriel','vedan','veithael','velufira','vika','villanelle','vurk','vyloris',
-    'walker','warek','wukong','yennefer','zaphrael','zikis','zohra','zolrath',
-  ];
+  const HEROES = (typeof HERO_LIST !== 'undefined') ? HERO_LIST : [];
 
   // ── Storage helpers ───────────────────────────────────────────────────────
 
