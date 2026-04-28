@@ -188,15 +188,15 @@
           alert('Invalid file: expected a JSON object.');
           return;
         }
-        // Sanitize: only keep known heroes and valid values
         const clean = {};
         HEROES.forEach((hero) => {
           if (parsed[hero]) {
             const d = parsed[hero];
             clean[hero] = {
-              si:   SI_OPTIONS.includes(d.si)     ? d.si   : 29,
-              furn: FURN_OPTIONS.includes(d.furn) ? d.furn : 0,
-              engr: ENGR_OPTIONS.includes(d.engr) ? d.engr : 0,
+              owned: typeof d.owned === 'boolean' ? d.owned : true,  // ← added
+              si:    SI_OPTIONS.includes(d.si)     ? d.si   : 29,
+              furn:  FURN_OPTIONS.includes(d.furn) ? d.furn : 0,
+              engr:  ENGR_OPTIONS.includes(d.engr) ? d.engr : 0,
             };
           }
         });
