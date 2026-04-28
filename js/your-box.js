@@ -35,7 +35,7 @@
   }
 
   function getHeroData(box, hero) {
-    return box[hero] || { si: 29, furn: 0, engr: 0 };
+    return box[hero] || { owned: true, si: 29, furn: 0, engr: 0 };
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -61,10 +61,9 @@
     const card = document.createElement('div');
     card.className = 'yb-card';
     card.dataset.hero = hero;
-
-    // Determine extension (most are .jpg, unknown is .png)
+  
     const ext = (hero === 'unknown') ? 'png' : 'jpg';
-
+  
     const img = document.createElement('img');
     img.className = 'yb-hero-img';
     img.src = `icons/heroes2/${hero}.${ext}`;
@@ -72,49 +71,76 @@
     img.loading = 'lazy';
     img.width = 56;
     img.height = 56;
-
+  
     const name = document.createElement('div');
     name.className = 'yb-hero-name';
     name.textContent = hero;
-
+  
     const fields = document.createElement('div');
     fields.className = 'yb-fields';
-
+  
     function makeField(labelText, options, labelMap, key, currentVal) {
       const wrap = document.createElement('div');
       wrap.className = 'yb-field';
-
+  
       const lbl = document.createElement('span');
       lbl.className = 'yb-field-label';
       lbl.textContent = labelText;
-
+  
       const sel = buildSelectEl(labelText, options, labelMap, currentVal, (val) => {
         box[hero] = getHeroData(box, hero);
         box[hero][key] = val;
         saveBox(box);
         updateCardHighlight(card, box[hero]);
       });
-
+      sel.classList.add('yb-investment-select');
+  
       wrap.appendChild(lbl);
       wrap.appendChild(sel);
       return wrap;
     }
-
+  
     fields.appendChild(makeField('SI',   SI_OPTIONS,   SI_LABELS, 'si',   data.si));
-    fields.appendChild(makeField('Furn', FURN_OPTIONS, null,       'furn', data.furn));
-    fields.appendChild(makeField('Engr', ENGR_OPTIONS, null,       'engr', data.engr));
-
+    fields.appendChild(makeField('Furn', FURN_OPTIONS, null,      'furn', data.furn));
+    fields.appendChild(makeField('Engr', ENGR_OPTIONS, null,      'engr', data.engr));
+  
+    // Owned toggle — clicking the icon area flips ownership
+    const toggleBtn = document.createElement('button');
+    toggleBtn.className = 'yb-owned-toggle';
+    toggleBtn.setAttribute('aria-label', 'Toggle owned');
+    toggleBtn.setAttribute('title', data.owned ? 'Click to mark as not owned' : 'Click to mark as owned');
+    toggleBtn.textContent = data.owned ? '✓ Owned' : '✗ Not owned';
+  
+    toggleBtn.addEventListener('click', () => {
+      box[hero] = getHeroData(box, hero);
+      box[hero].owned = !box[hero].owned;
+      saveBox(box);
+      applyOwnedState(card, box[hero].owned);
+      updateCardHighlight(card, box[hero]);
+      toggleBtn.textContent = box[hero].owned ? '✓ Owned' : '✗ Not owned';
+      toggleBtn.title = box[hero].owned ? 'Click to mark as not owned' : 'Click to mark as owned';
+    });
+  
     card.appendChild(img);
     card.appendChild(name);
+    card.appendChild(toggleBtn);
     card.appendChild(fields);
-
+  
+    applyOwnedState(card, data.owned);
     updateCardHighlight(card, data);
     return card;
   }
 
-  // Cards with any non-minimum investment get a subtle golden highlight
+  function applyOwnedState(card, owned) {
+    card.classList.toggle('yb-card--unowned', !owned);
+    // Disable/enable all investment selects
+    card.querySelectorAll('.yb-investment-select').forEach(sel => {
+      sel.disabled = !owned;
+    });
+  }
+  
   function updateCardHighlight(card, data) {
-    const isInvested = data.si > 29 || data.furn > 0 || data.engr > 0;
+    const isInvested = data.owned && (data.si > 29 || data.furn > 0 || data.engr > 0);
     card.classList.toggle('yb-card--invested', isInvested);
   }
 
