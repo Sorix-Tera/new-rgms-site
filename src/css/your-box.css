@@ -163,6 +163,54 @@
   padding: 2rem 0;
 }
 
+/* Owned toggle button */
+.yb-owned-toggle {
+  font-size: 0.62rem;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  border: 1px solid rgba(100, 200, 120, 0.35);
+  background: rgba(100, 200, 120, 0.08);
+  color: rgba(100, 200, 120, 0.85);
+  font-family: inherit;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: 100%;
+  text-align: center;
+}
+
+.yb-owned-toggle:hover {
+  background: rgba(100, 200, 120, 0.16);
+  border-color: rgba(100, 200, 120, 0.6);
+}
+
+/* Unowned state */
+.yb-card--unowned {
+  opacity: 0.38;
+  border-color: rgba(255, 255, 255, 0.03) !important;
+  background: var(--bg-elevated) !important;
+}
+
+.yb-card--unowned .yb-owned-toggle {
+  border-color: rgba(255, 107, 107, 0.35);
+  background: rgba(255, 107, 107, 0.08);
+  color: rgba(255, 107, 107, 0.75);
+}
+
+.yb-card--unowned .yb-owned-toggle:hover {
+  background: rgba(255, 107, 107, 0.16);
+  border-color: rgba(255, 107, 107, 0.6);
+  opacity: 1;
+}
+
+.yb-card--unowned .yb-hero-img {
+  filter: grayscale(80%);
+}
+
+.yb-select:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
 /* Responsive */
 @media (max-width: 600px) {
   .yb-grid {
