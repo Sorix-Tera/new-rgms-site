@@ -1,0 +1,183 @@
+/* ── Your Box page ─────────────────────────────────────────────────────────── */
+
+.yb-toolbar {
+  margin-bottom: 1.25rem;
+}
+
+/* Buttons */
+.yb-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.3rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.82rem;
+  font-family: inherit;
+  font-weight: 500;
+  cursor: pointer;
+  min-height: 2.1rem;
+  transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+  white-space: nowrap;
+}
+
+.yb-btn-primary {
+  background: rgba(242, 193, 79, 0.14);
+  border-color: rgba(242, 193, 79, 0.4);
+  color: var(--accent);
+}
+.yb-btn-primary:hover {
+  background: rgba(242, 193, 79, 0.24);
+  border-color: rgba(242, 193, 79, 0.7);
+}
+
+.yb-btn-secondary {
+  background: var(--bg-elevated-soft);
+  border-color: var(--border-subtle);
+  color: var(--text-muted);
+}
+.yb-btn-secondary:hover {
+  border-color: rgba(255,255,255,0.15);
+  color: var(--text);
+}
+
+.yb-btn-danger {
+  background: rgba(255, 107, 107, 0.08);
+  border-color: rgba(255, 107, 107, 0.3);
+  color: var(--danger);
+}
+.yb-btn-danger:hover {
+  background: rgba(255, 107, 107, 0.16);
+  border-color: rgba(255, 107, 107, 0.55);
+}
+
+/* Hero grid */
+.yb-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(108px, 1fr));
+  gap: 0.65rem;
+}
+
+/* Hero card */
+.yb-card {
+  background: var(--bg-elevated);
+  border: 1px solid rgba(255, 255, 255, 0.04);
+  border-radius: var(--radius-md);
+  padding: 0.55rem 0.45rem 0.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.yb-card:hover {
+  border-color: rgba(255, 255, 255, 0.1);
+  background: var(--bg-elevated-soft);
+}
+
+.yb-card--invested {
+  border-color: rgba(242, 193, 79, 0.3);
+  background: radial-gradient(circle at top center, rgba(242, 193, 79, 0.06) 0%, var(--bg-elevated) 70%);
+}
+
+.yb-card--invested:hover {
+  border-color: rgba(242, 193, 79, 0.55);
+}
+
+/* Hero icon */
+.yb-hero-img {
+  width: 56px;
+  height: 56px;
+  border-radius: 8px;
+  object-fit: cover;
+  display: block;
+  background: #11121a;
+}
+
+/* Hero name */
+.yb-hero-name {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  text-align: center;
+  text-transform: capitalize;
+  line-height: 1.2;
+  word-break: break-word;
+  max-width: 100%;
+}
+
+/* Investment fields */
+.yb-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 0.22rem;
+  width: 100%;
+}
+
+.yb-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.25rem;
+}
+
+.yb-field-label {
+  font-size: 0.65rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  min-width: 2rem;
+}
+
+.yb-select {
+  flex: 1;
+  min-width: 0;
+  border-radius: 6px;
+  border: 1px solid var(--border-subtle);
+  background: rgba(5, 6, 10, 0.7);
+  color: var(--text);
+  font-size: 0.72rem;
+  font-family: inherit;
+  padding: 0.15rem 0.3rem;
+  outline: none;
+  cursor: pointer;
+  text-align: center;
+  transition: border-color 0.15s ease;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.yb-select:focus {
+  border-color: rgba(242, 193, 79, 0.5);
+  box-shadow: 0 0 0 1px rgba(242, 193, 79, 0.2);
+}
+
+/* When a select has a non-default value, tint it gold */
+.yb-card--invested .yb-select:not([data-default="true"]) {
+  color: var(--accent);
+}
+
+.yb-no-results {
+  text-align: center;
+  padding: 2rem 0;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .yb-grid {
+    grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+    gap: 0.5rem;
+  }
+
+  .yb-hero-img {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+@media (max-width: 400px) {
+  .yb-grid {
+    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  }
+}
