@@ -144,7 +144,7 @@
 
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="js/your-box.js" defer></script>
+   <script>const HERO_LIST = {{ heroes | dump | safe }};</script> <script src="js/your-box.js" defer></script> 
   <script src="js/core.js" defer></script>
   <script src="js/main.js" defer></script>
 </body>
