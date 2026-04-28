@@ -1,0 +1,54 @@
+---
+layout: layouts/base.njk
+title: "Your Box · TangledSpore's RGMs!"
+permalink: "your-box.html"
+---
+<script>const HERO_LIST = {{ heroes | dump | safe }};</script>
+<script src="js/your-box.js" defer></script>
+
+<main class="page" id="yourBoxPage">
+  <header class="page-header">
+    <h1 class="page-title">Your Box</h1>
+    <p class="page-subtitle">
+      Set your investment level for each hero. Data is saved locally in your browser.
+    </p>
+  </header>
+
+  <!-- Toolbar -->
+  <section class="filters yb-toolbar" aria-label="Box tools">
+    <div class="filters-group">
+      <span class="filters-label">Search</span>
+      <input
+        id="ybSearch"
+        class="filters-input"
+        type="search"
+        placeholder="Filter heroes..."
+      />
+    </div>
+
+    <span class="filters-spacer"></span>
+
+    <div class="filters-group">
+      <button id="ybResetAll" class="yb-btn yb-btn-danger" title="Reset all heroes to minimum values">
+        Reset all
+      </button>
+      <button id="ybImport" class="yb-btn yb-btn-secondary" title="Import box from a JSON file">
+        ↑ Import
+      </button>
+      <button id="ybExport" class="yb-btn yb-btn-primary" title="Export box as a JSON file">
+        ↓ Export
+      </button>
+    </div>
+
+    <input type="file" id="ybFileInput" accept=".json" style="display:none" />
+  </section>
+
+  <!-- Hero grid -->
+  <section id="ybGrid" class="yb-grid" aria-label="Hero roster">
+    <!-- Filled by JS -->
+  </section>
+
+  <p id="ybNoResults" class="page-status yb-no-results" style="display:none">
+    No heroes match your search.
+  </p>
+</main>
