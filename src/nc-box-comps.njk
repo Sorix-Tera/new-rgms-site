@@ -1,0 +1,117 @@
+---
+layout: layouts/base.njk
+title: "My NC Comps · TangledSpore's RGMs!"
+permalink: "nc-box-comps.html"
+extraScripts: '<script src="js/nc-box-comps.js" defer></script>'
+---
+
+<script>const HERO_LIST = {{ heroes | dump | safe }};</script>
+<script>const PET_LIST  = {{ pets  | dump | safe }};</script>
+
+<main class="page" id="nbcPage">
+  <header class="page-header">
+    <h1 class="page-title">My NC Comps</h1>
+    <p class="page-subtitle">
+      Best 6-comp set from the database that matches your box — with no overlapping heroes or pets across rounds.
+    </p>
+  </header>
+
+  <!-- Merc section -->
+  <section class="nbc-merc-section" aria-label="Mercenary override">
+    <button id="nbcMercToggle" class="nbc-merc-toggle" type="button">
+      + Add a merc
+    </button>
+
+    <div class="nbc-merc-panel" aria-hidden="true">
+      <div class="nbc-merc-panel-inner">
+
+        <div class="nbc-merc-field nbc-merc-hero-wrap">
+          <label class="nbc-merc-label" for="nbcMercHero">Hero</label>
+          <input
+            id="nbcMercHero"
+            class="nbc-merc-input"
+            type="text"
+            list="nbcHeroList"
+            placeholder="Hero name…"
+            autocomplete="off"
+            aria-label="Merc hero name"
+          />
+          <datalist id="nbcHeroList">
+            {% for hero in heroes %}
+              <option value="{{ hero }}">{{ hero }}</option>
+            {% endfor %}
+          </datalist>
+        </div>
+
+        <div class="nbc-merc-field">
+          <label class="nbc-merc-label" for="nbcMercSi">SI</label>
+          <select id="nbcMercSi" class="nbc-merc-select" aria-label="Merc SI level">
+            <option value="29">&lt;30</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+            <option value="50">50</option>
+          </select>
+        </div>
+
+        <div class="nbc-merc-field">
+          <label class="nbc-merc-label" for="nbcMercFurn">Furn</label>
+          <select id="nbcMercFurn" class="nbc-merc-select" aria-label="Merc Furniture level">
+            <option value="0">0</option>
+            <option value="3">3</option>
+            <option value="9">9</option>
+          </select>
+        </div>
+
+        <div class="nbc-merc-field">
+          <label class="nbc-merc-label" for="nbcMercEngr">Engr</label>
+          <select id="nbcMercEngr" class="nbc-merc-select" aria-label="Merc Engraving level" disabled title="Engraving not yet tracked in database">
+            <option value="0">0</option>
+            <option value="30">30</option>
+            <option value="60">60</option>
+            <option value="80">80</option>
+          </select>
+        </div>
+
+        <span class="nbc-merc-engr-note" title="Engraving data will be added in a future update">
+          Engr not yet tracked
+        </span>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- Pet blacklist section -->
+  <section class="nbc-pet-bl-section" aria-label="Pet blacklist">
+    <div class="nbc-pet-bl-controls">
+      <div class="nbc-pet-bl-add">
+        <select id="nbcPetBlSelect" class="nbc-merc-select nbc-pet-bl-select" aria-label="Select pet to remove">
+          <option value="">— Select a pet —</option>
+          {% for pet in pets %}
+            <option value="{{ pet }}">{{ pet }}</option>
+          {% endfor %}
+        </select>
+        <button id="nbcPetBlBtn" class="nbc-pet-bl-btn" type="button">
+          Remove pet
+        </button>
+      </div>
+
+      <div id="nbcPetBlTags" class="nbc-pet-bl-tags" aria-label="Removed pets" aria-live="polite">
+        <!-- Tags injected by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Find button + status -->
+  <div class="nbc-action-row">
+    <button id="nbcFindBtn" class="nbc-find-btn" type="button">
+      Find my best comps
+    </button>
+    <span id="nbcStatus" class="nbc-status" aria-live="polite"></span>
+  </div>
+
+  <!-- Results: 3×2 grid, R1→R6 -->
+  <section id="nbcResultsGrid" class="nbc-results-grid" aria-label="My NC comps results">
+    <!-- Filled by JS after clicking Find -->
+  </section>
+
+</main>

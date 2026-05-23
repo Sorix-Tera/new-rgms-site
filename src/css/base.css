@@ -43,3 +43,19 @@ a:hover {
   text-decoration: none;
 }
 
+/* Native <select> dropdowns: options inherit the page's dark background/text
+   because browsers render the dropdown popup using the element's own colors.
+   Without this, light-themed OSes show near-white text on a white background. */
+select {
+  background-color: #171b27; /* --bg-elevated-soft */
+  color: #f3f4f8;            /* --text */
+}
+
+option {
+  background-color: #171b27; /* --bg-elevated-soft */
+  color: #f3f4f8;            /* --text */
+}
+
+option:disabled {
+  color: #a0a4b8; /* --text-muted */
+}

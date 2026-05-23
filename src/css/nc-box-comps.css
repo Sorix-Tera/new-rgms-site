@@ -1,0 +1,410 @@
+/* ── NC Box Comps page ────────────────────────────────────────────────────── */
+
+/* ── Merc section ────────────────────────────────────────────────────────── */
+
+.nbc-merc-section {
+  margin-bottom: 1.5rem;
+}
+
+.nbc-merc-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.38rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 193, 79, 0.35);
+  background: rgba(242, 193, 79, 0.08);
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  white-space: nowrap;
+}
+
+.nbc-merc-toggle:hover {
+  background: rgba(242, 193, 79, 0.16);
+  border-color: rgba(242, 193, 79, 0.55);
+}
+
+.nbc-merc-toggle.is-active {
+  background: rgba(242, 193, 79, 0.14);
+  border-color: rgba(242, 193, 79, 0.5);
+}
+
+.nbc-merc-panel {
+  display: none;
+  margin-top: 0.85rem;
+  padding: 1rem 1.1rem;
+  background: rgba(5, 6, 10, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+}
+
+.nbc-merc-panel.is-open {
+  display: block;
+}
+
+.nbc-merc-panel-inner {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 0.75rem;
+}
+
+.nbc-merc-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.nbc-merc-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.nbc-merc-hero-wrap {
+  flex: 1 1 180px;
+  min-width: 160px;
+}
+
+.nbc-merc-input,
+.nbc-merc-select {
+  padding: 0.38rem 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+  width: 100%;
+  transition: border-color 0.15s ease, background 0.15s ease;
+}
+
+.nbc-merc-input:focus,
+.nbc-merc-select:focus {
+  outline: none;
+  border-color: rgba(242, 193, 79, 0.4);
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.nbc-merc-select {
+  width: 80px;
+  cursor: pointer;
+}
+
+.nbc-merc-engr-note {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+  align-self: flex-end;
+  padding-bottom: 0.42rem;
+  white-space: nowrap;
+}
+
+/* ── Action row ──────────────────────────────────────────────────────────── */
+
+.nbc-action-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.nbc-find-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.45rem 1.25rem;
+  border-radius: 999px;
+  border: 1px solid rgba(242, 193, 79, 0.4);
+  background: rgba(242, 193, 79, 0.12);
+  color: var(--accent);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.08s ease;
+  white-space: nowrap;
+}
+
+.nbc-find-btn:hover {
+  background: rgba(242, 193, 79, 0.22);
+  border-color: rgba(242, 193, 79, 0.65);
+}
+
+.nbc-find-btn:active {
+  transform: translateY(1px);
+}
+
+.nbc-find-btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.nbc-status {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+/* ── Results grid ────────────────────────────────────────────────────────── */
+
+.nbc-results-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+/* ── Comp card ───────────────────────────────────────────────────────────── */
+
+.nbc-card {
+  background: rgba(5, 6, 10, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  padding: 0.85rem 0.95rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.nbc-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.nbc-card-round {
+  font-size: 0.7rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 999px;
+  padding: 0.18rem 0.55rem;
+  white-space: nowrap;
+}
+
+.nbc-card-empty {
+  border-style: dashed;
+  border-color: rgba(255, 255, 255, 0.07);
+  opacity: 0.55;
+  min-height: 120px;
+  align-items: center;
+  justify-content: center;
+}
+
+.nbc-card-empty-label {
+  color: var(--text-muted);
+  font-size: 0.82rem;
+  text-align: center;
+}
+
+.nbc-card-time {
+  font-size: 1rem;
+  font-weight: 900;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.nbc-card-player {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.3;
+}
+
+.nbc-card-player strong {
+  color: var(--text);
+  font-weight: 600;
+}
+
+/* Hero icons row */
+.nbc-icons-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  align-items: flex-start;
+}
+
+.nbc-icon-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+}
+
+.nbc-icon-img {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.02);
+  display: block;
+}
+
+.nbc-icon-img.is-pet {
+  border-radius: 50%;
+  border-color: rgba(242, 193, 79, 0.25);
+}
+
+.nbc-icon-badges {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.1rem;
+  min-height: 24px;
+}
+
+.nbc-badge {
+  font-size: 0.62rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+  padding: 0.05rem 0.3rem;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.nbc-badge.si {
+  color: #82c8f4;
+  background: rgba(130, 200, 244, 0.10);
+}
+
+.nbc-badge.furn {
+  color: #b89aff;
+  background: rgba(184, 154, 255, 0.10);
+}
+
+/* ── Pet blacklist ───────────────────────────────────────────────────────── */
+
+.nbc-pet-bl-section {
+  margin-bottom: 1.25rem;
+}
+
+.nbc-pet-bl-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.nbc-pet-bl-add {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+.nbc-pet-bl-select {
+  width: auto;
+  min-width: 150px;
+  flex-shrink: 0;
+}
+
+.nbc-pet-bl-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.38rem 0.85rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  background: rgba(255, 107, 107, 0.07);
+  color: var(--danger);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.nbc-pet-bl-btn:hover {
+  background: rgba(255, 107, 107, 0.14);
+  border-color: rgba(255, 107, 107, 0.5);
+}
+
+/* Tags row */
+.nbc-pet-bl-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  min-height: 1.6rem; /* keeps layout stable when empty */
+}
+
+.nbc-pet-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.2rem 0.35rem 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: rgba(255, 107, 107, 0.10);
+  border: 1px solid rgba(255, 107, 107, 0.28);
+  font-size: 0.78rem;
+  color: var(--danger);
+  white-space: nowrap;
+}
+
+.nbc-pet-tag-label {
+  font-weight: 500;
+}
+
+.nbc-pet-tag-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.1rem;
+  height: 1.1rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 107, 107, 0.18);
+  color: var(--danger);
+  font: inherit;
+  font-size: 0.78rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: background 0.12s ease;
+  flex-shrink: 0;
+}
+
+.nbc-pet-tag-remove:hover {
+  background: rgba(255, 107, 107, 0.35);
+}
+
+/* ── Empty / loading states ──────────────────────────────────────────────── */
+
+.nbc-empty-hint {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  text-align: center;
+  padding: 3rem 1rem;
+  grid-column: 1 / -1;
+}
+
+/* ── Responsive ──────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .nbc-results-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .nbc-results-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .nbc-merc-select {
+    width: 100%;
+  }
+}
