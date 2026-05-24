@@ -27,6 +27,22 @@
     return `${Number(val).toFixed(2)}s`;
   }
 
+  function formatTotalTime(val) {
+    if (val == null || Number.isNaN(Number(val))) return '—';
+    if (val < 60) return `${val.toFixed(2)}s`;
+    const mins = Math.floor(val / 60);
+    const secs = (val % 60).toFixed(2).padStart(5, '0');
+    return `${mins}m ${secs}s`;
+  }
+
+  function formatTotalTime(val) {
+    if (val == null || Number.isNaN(Number(val))) return '—';
+    if (val < 60) return `${val.toFixed(2)}s`;
+    const mins = Math.floor(val / 60);
+    const secs = (val % 60).toFixed(2).padStart(5, '0');
+    return `${mins}m ${secs}s`;
+  }
+
   // ── Box helpers ────────────────────────────────────────────────────────────
 
   function loadBox() {
@@ -263,7 +279,44 @@
       }
     }
 
-    dfs(0, new Set(), new Set(), new Map(), 0);
+    // ── Greedy warm-start ──────────────────────────────────────────────────────
+    // Before running DFS, find a quick greedy solution to use as an upper bound.
+    // This sets bestCount = maxFillable and bestTotal = greedyTotal immediately,
+    // so the suffix lower-bound pruning fires from the very first DFS branch.
+    // validComps is sorted by time_boss ASC, so greedy naturally picks fast comps.
+    {
+      const greedyNames  = new Set();
+      const greedyRounds = new Set();
+      const greedyChosen = new Map();
+      let   greedyTotal  = 0;
+
+      for (const c of validComps) {
+        if (greedyRounds.has(c.round)) continue;
+        let conflict = false;
+        for (const name of c.nameSet) {
+          if (greedyNames.has(name)) { conflict = true; break; }
+        }
+        if (conflict) continue;
+        for (const name of c.nameSet) greedyNames.add(name);
+        greedyRounds.add(c.round);
+        greedyChosen.set(c.round, c);
+        greedyTotal += c.time_boss;
+        if (greedyRounds.size === maxFillable) break;
+      }
+
+      if (greedyRounds.size === maxFillable) {
+        bestCount  = maxFillable;
+        bestTotal  = greedyTotal;
+        bestResult = greedyChosen;
+      }
+    }
+
+    // If greedy filled all rounds, skip DFS — greedy result is already valid.
+    // DFS is only needed when greedy couldn't fill all rounds (some rounds had
+    // no non-conflicting comp greedily, but might with different earlier picks).
+    if (bestCount < maxFillable) {
+      dfs(0, new Set(), new Set(), new Map(), 0);
+    }
 
     return ROUNDS.map(r => bestResult.get(r) ?? null);
   }
@@ -359,7 +412,7 @@
     player.className = 'nbc-card-player';
     player.innerHTML =
       `<strong>${comp.player_name ?? '—'}</strong>` +
-      ` &middot; Region ${comp.region ?? '—'}` +
+      ` &middot; ${comp.region ?? '—'}` +
       ` &middot; Rank ${comp.rank ?? '?'}`;
 
     const iconsRow = document.createElement('div');
@@ -461,6 +514,24 @@
 
       validComps.sort((a, b) => (a.time_boss ?? Infinity) - (b.time_boss ?? Infinity));
 
+      // Deduplicate: same round + same set of heroes+pet = same comp.
+      // Since sorted ASC, the first occurrence of each unique key is the fastest.
+      // Key: "round:hero1,hero2,...,pet" (names sorted so order doesn't matter).
+      {
+        const seen = new Set();
+        let i = 0;
+        while (i < validComps.length) {
+          const comp = validComps[i];
+          const key  = comp.round + ':' + comp.heroes.map(h => h.name.toLowerCase()).join(',');
+          if (seen.has(key)) {
+            validComps.splice(i, 1);
+          } else {
+            seen.add(key);
+            i++;
+          }
+        }
+      }
+
       const bestPerRound = new Map();
       for (const c of validComps) {
         if (!bestPerRound.has(c.round)) {
@@ -487,7 +558,7 @@
         const totalTime = result
           .filter(Boolean)
           .reduce((acc, c) => acc + (c.time_boss || 0), 0);
-        setStatus(root, `Found ${validCount}/6 rounds · Total time: ${formatTime(totalTime)}`);
+        setStatus(root, `Found ${validCount}/6 rounds · Total time: ${formatTotalTime(totalTime)}`);
       }
 
       renderResults(root, result);
