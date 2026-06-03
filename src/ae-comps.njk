@@ -5,6 +5,9 @@ permalink: "ae-comps.html"
 extraScripts: '<script src="js/ae-comps.js" defer></script>'
 ---
 
+<script>const HERO_LIST = {{ heroes | dump | safe }};</script>
+<script>const PET_LIST  = {{ pets  | dump | safe }};</script>
+
 <main class="page ae-page" id="aePage">
   <header class="page-header">
     <h1 class="page-title">AE Comps</h1>
