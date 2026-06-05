@@ -45,6 +45,11 @@
   const heroFilterList = document.getElementById('aeHeroFilterList');
   const heroFilterAllBtn = document.getElementById('aeHeroFilterAll');
   const heroFilterNoneBtn = document.getElementById('aeHeroFilterNone');
+  const petFilterToggle = document.getElementById('aePetFilterToggle');
+  const petFilterMenu   = document.getElementById('aePetFilterMenu');
+  const petFilterList   = document.getElementById('aePetFilterList');
+  const petFilterAllBtn = document.getElementById('aePetFilterAll');
+  const petFilterNoneBtn = document.getElementById('aePetFilterNone');
   const finderTotalEl = document.getElementById('aeFinderTotal');
 
   const finderState = {
@@ -52,6 +57,8 @@
     averagedComps: [],
     allHeroes: [],
     excludedHeroes: new Set(),
+    allPets: [],
+    excludedPets: new Set(),
   };
 
   function getRequiredCompCount() {
@@ -183,12 +190,10 @@
   }
 
   function getFilteredAveragedComps() {
-    if (!finderState.excludedHeroes.size) {
-      return finderState.averagedComps;
-    }
-
     return finderState.averagedComps.filter((comp) => {
-      return !comp.heroes.some((hero) => finderState.excludedHeroes.has(hero));
+      if (comp.heroes.some((hero) => finderState.excludedHeroes.has(hero))) return false;
+      if (comp.pet && finderState.excludedPets.has(comp.pet)) return false;
+      return true;
     });
   }
 
@@ -818,8 +823,11 @@
       finderState.averagedComps = aggregates;
       finderState.allHeroes = extractUniqueHeroes(finderState.rawRows);
       finderState.excludedHeroes.clear();
+      finderState.allPets = extractUniquePets(finderState.rawRows);
+      finderState.excludedPets.clear();
 
       renderHeroFilter();
+      renderPetFilter();
 
       if (!aggregates.length) {
         renderFinderBoxes([]);
@@ -999,7 +1007,7 @@
     initTabs();
     initBuilder();
     initHeroFilterEvents();
-    initPetFilterEvents();
+  initPetFilterEvents();
     filterHeroGrid();
   }
 
