@@ -896,10 +896,51 @@
     }
 
     document.addEventListener('click', (event) => {
-      if (!heroFilterRoot || !heroFilterMenu) return;
-      if (heroFilterRoot.contains(event.target)) return;
-      heroFilterMenu.setAttribute('hidden', '');
+      if (heroFilterRoot && !heroFilterRoot.contains(event.target)) {
+        heroFilterMenu?.setAttribute('hidden', '');
+      }
+      if (petFilterMenu && petFilterToggle &&
+          !petFilterToggle.contains(event.target) &&
+          !petFilterMenu.contains(event.target)) {
+        petFilterMenu.setAttribute('hidden', '');
+      }
     });
+  }
+
+  function initPetFilterEvents() {
+    if (petFilterToggle && petFilterMenu) {
+      petFilterToggle.addEventListener('click', () => {
+        const isHidden = petFilterMenu.hasAttribute('hidden');
+        if (isHidden) petFilterMenu.removeAttribute('hidden');
+        else petFilterMenu.setAttribute('hidden', '');
+      });
+    }
+    if (petFilterList) {
+      petFilterList.addEventListener('change', (event) => {
+        const input = event.target.closest('input[type="checkbox"][data-pet]');
+        if (!input) return;
+        const pet = input.dataset.pet;
+        if (!pet) return;
+        if (input.checked) finderState.excludedPets.delete(pet);
+        else finderState.excludedPets.add(pet);
+        updatePetFilterToggleLabel();
+        recomputeFinder();
+      });
+    }
+    if (petFilterAllBtn) {
+      petFilterAllBtn.addEventListener('click', () => {
+        finderState.excludedPets.clear();
+        renderPetFilter();
+        recomputeFinder();
+      });
+    }
+    if (petFilterNoneBtn) {
+      petFilterNoneBtn.addEventListener('click', () => {
+        finderState.excludedPets = new Set(finderState.allPets);
+        renderPetFilter();
+        recomputeFinder();
+      });
+    }
   }
 
   function initTabs() {
@@ -958,7 +999,7 @@
     initTabs();
     initBuilder();
     initHeroFilterEvents();
-  initPetFilterEvents();
+    initPetFilterEvents();
     filterHeroGrid();
   }
 
