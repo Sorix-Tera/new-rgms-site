@@ -149,6 +149,39 @@
     }
   }
 
+  function extractUniquePets(rows) {
+    const set = new Set();
+    rows.forEach((row) => {
+      const v = String(row.pet || '').trim().toLowerCase();
+      if (v) set.add(v);
+    });
+    return Array.from(set).sort((a, b) =>
+      a.localeCompare(b, undefined, { sensitivity: 'base', numeric: true })
+    );
+  }
+
+  function renderPetFilter() {
+    if (!petFilterList) return;
+    petFilterList.innerHTML = '';
+    finderState.allPets.forEach((pet) => {
+      const checked = !finderState.excludedPets.has(pet);
+      const label = document.createElement('label');
+      label.className = 'ae-hero-filter__item';
+      label.innerHTML = `<input type="checkbox" data-pet="${pet}" ${checked ? 'checked' : ''}><span>${pet}</span>`;
+      petFilterList.appendChild(label);
+    });
+    updatePetFilterToggleLabel();
+  }
+
+  function updatePetFilterToggleLabel() {
+    if (!petFilterToggle) return;
+    const total = finderState.allPets.length;
+    const selected = total - finderState.excludedPets.size;
+    if (selected === total) petFilterToggle.textContent = 'Filter pets (all)';
+    else if (selected === 0) petFilterToggle.textContent = 'Filter pets (none)';
+    else petFilterToggle.textContent = `Filter pets (${selected}/${total})`;
+  }
+
   function getFilteredAveragedComps() {
     if (!finderState.excludedHeroes.size) {
       return finderState.averagedComps;
@@ -925,6 +958,7 @@
     initTabs();
     initBuilder();
     initHeroFilterEvents();
+  initPetFilterEvents();
     filterHeroGrid();
   }
 
