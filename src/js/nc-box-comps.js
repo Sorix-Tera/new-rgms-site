@@ -345,7 +345,17 @@
 
     wrap.appendChild(img);
 
-    if (!isPet) {
+    if (isPet) {
+      if (hero.si != null) {
+        const badges = document.createElement('div');
+        badges.className = 'nbc-icon-badges';
+        const b = document.createElement('span');
+        b.className = 'nbc-badge pet-level';
+        b.textContent = `Lv${hero.si}`;
+        badges.appendChild(b);
+        wrap.appendChild(badges);
+      }
+    } else {
       const badges = document.createElement('div');
       badges.className = 'nbc-icon-badges';
 
@@ -361,7 +371,7 @@
         b.textContent = `F${hero.furn}`;
         badges.appendChild(b);
       }
-      if (hero.engr != null && hero.engr > 0) {
+      if (hero.engr != null) {
         const b = document.createElement('span');
         b.className = 'nbc-badge engr';
         b.textContent = `E${hero.engr}`;
@@ -409,7 +419,7 @@
     player.className = 'nbc-card-player';
     player.innerHTML =
       `<strong>${comp.player_name ?? '—'}</strong>` +
-      ` &middot; R${comp.region ?? '—'}` +
+      ` &middot; ${comp.region != null ? 'R' + comp.region : '—'}` +
       ` &middot; Rank ${comp.rank ?? '?'}`;
 
     const iconsRow = document.createElement('div');
