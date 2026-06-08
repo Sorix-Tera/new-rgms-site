@@ -1,6 +1,7 @@
 /* ── NC Box Comps page ────────────────────────────────────────────────────── */
 
 /* ── Merc section ────────────────────────────────────────────────────────── */
+
 #nbcPage option {
   color: #05060a;
 }
@@ -293,6 +294,11 @@
 .nbc-badge.engr {
   color: #7defa8;
   background: rgba(125, 239, 168, 0.10);
+}
+
+.nbc-badge.pet-level {
+  color: var(--accent);
+  background: rgba(242, 193, 79, 0.10);
 }
 
 /* ── Pet blacklist ───────────────────────────────────────────────────────── */
