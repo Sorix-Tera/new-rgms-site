@@ -409,7 +409,7 @@
     player.className = 'nbc-card-player';
     player.innerHTML =
       `<strong>${comp.player_name ?? '—'}</strong>` +
-      ` &middot; ${comp.region ?? '—'}` +
+      ` &middot; R${comp.region ?? '—'}` +
       ` &middot; Rank ${comp.rank ?? '?'}`;
 
     const iconsRow = document.createElement('div');
