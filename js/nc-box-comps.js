@@ -163,7 +163,7 @@
     const rounds = await fetchPaginated(
       supabaseClient
         .from('nc_round')
-        .select('id, nc_id, round, comp_key, comp, time_boss, nc(name, region, rank)')
+        .select('id, nc_id, round, comp_key, comp, time_boss, nc(name, region, rank, time_total)')
         .not('time_boss', 'is', null)
         .order('round',     { ascending: true })
         .order('time_boss', { ascending: true })
@@ -417,10 +417,12 @@
 
     const player = document.createElement('div');
     player.className = 'nbc-card-player';
+    const totalTimeStr = comp.time_total != null ? formatTotalTime(comp.time_total) : '—';
     player.innerHTML =
       `<strong>${comp.player_name ?? '—'}</strong>` +
       ` &middot; ${comp.region != null ? 'R' + comp.region : '—'}` +
-      ` &middot; Rank ${comp.rank ?? '?'}`;
+      ` &middot; Rank ${comp.rank ?? '?'}` +
+      ` &middot; ${totalTimeStr}`;
 
     const iconsRow = document.createElement('div');
     iconsRow.className = 'nbc-icons-row';
@@ -510,9 +512,10 @@
           time_boss:   row.time_boss,
           comp_key:    row.comp_key,
           comp:        row.comp,
-          player_name: nc.name   ?? '—',
-          region:      nc.region ?? null,
-          rank:        nc.rank   ?? null,
+          player_name: nc.name       ?? '—',
+          region:      nc.region     ?? null,
+          rank:        nc.rank       ?? null,
+          time_total:  nc.time_total ?? null,
           heroes,
           nameSet: new Set(heroes.map(h => h.name.toLowerCase())),
         });
