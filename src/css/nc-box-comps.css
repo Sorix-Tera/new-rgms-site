@@ -1,6 +1,9 @@
 /* ── NC Box Comps page ────────────────────────────────────────────────────── */
 
 /* ── Merc section ────────────────────────────────────────────────────────── */
+#nbcPage option {
+  color: #05060a;
+}
 
 .nbc-merc-section {
   margin-bottom: 1.5rem;
