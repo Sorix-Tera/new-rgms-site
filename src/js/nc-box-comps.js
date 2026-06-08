@@ -71,36 +71,40 @@
 
   // ── Pet blacklist ──────────────────────────────────────────────────────────
 
-  const blacklistedPets = new Set();
+  // petFilters: Map<lowerCasePetName, maxLevel (number)>
+  const petFilters = new Map();
+  const MAX_PET_FILTERS = 6;
 
-  function renderPetTags(root) {
-    const container = qs('#nbcPetBlTags', root);
+  function renderPetFilterTags(root) {
+    const container = qs('#nbcPetFilterTags', root);
     if (!container) return;
     container.innerHTML = '';
 
-    for (const pet of [...blacklistedPets].sort()) {
+    for (const [pet, maxLevel] of [...petFilters.entries()].sort()) {
       const tag = document.createElement('span');
       tag.className = 'nbc-pet-tag';
 
       const label = document.createElement('span');
       label.className = 'nbc-pet-tag-label';
-      label.textContent = pet;
+      label.textContent = `${pet} ≤ ${maxLevel}`;
 
       const removeBtn = document.createElement('button');
       removeBtn.className = 'nbc-pet-tag-remove';
       removeBtn.type = 'button';
-      removeBtn.setAttribute('aria-label', `Re-add ${pet}`);
-      removeBtn.title = `Re-add ${pet}`;
+      removeBtn.setAttribute('aria-label', `Remove filter for ${pet}`);
+      removeBtn.title = `Remove filter for ${pet}`;
       removeBtn.textContent = '\u00d7';
 
       removeBtn.addEventListener('click', () => {
-        blacklistedPets.delete(pet);
-        const sel = qs('#nbcPetBlSelect', root);
+        petFilters.delete(pet);
+        // Re-enable option in select
+        const sel = qs('#nbcPetFilterSelect', root);
         if (sel) {
           const opt = sel.querySelector(`option[value="${pet}"]`);
           if (opt) opt.disabled = false;
         }
-        renderPetTags(root);
+        renderPetFilterTags(root);
+        updateAddBtn(root);
       });
 
       tag.appendChild(label);
@@ -109,19 +113,39 @@
     }
   }
 
+  function updateAddBtn(root) {
+    const btn = qs('#nbcPetFilterBtn', root);
+    if (!btn) return;
+    const atMax = petFilters.size >= MAX_PET_FILTERS;
+    btn.disabled = atMax;
+    btn.textContent = atMax ? `Max ${MAX_PET_FILTERS} filters reached` : '+ Add pet filter';
+  }
+
   function initPetBlacklist(root) {
-    const select = qs('#nbcPetBlSelect', root);
-    const btn    = qs('#nbcPetBlBtn', root);
-    if (!select || !btn) return;
+    const select   = qs('#nbcPetFilterSelect', root);
+    const levelIn  = qs('#nbcPetFilterLevel', root);
+    const btn      = qs('#nbcPetFilterBtn', root);
+    if (!select || !levelIn || !btn) return;
 
     btn.addEventListener('click', () => {
-      const pet = select.value;
-      if (!pet || blacklistedPets.has(pet.toLowerCase())) return;
-      blacklistedPets.add(pet.toLowerCase());
-      const opt = select.querySelector(`option[value="${pet}"]`);
+      const pet = select.value.toLowerCase();
+      if (!pet) return;
+      if (petFilters.size >= MAX_PET_FILTERS) return;
+
+      const raw = levelIn.value.trim();
+      if (raw === '' || isNaN(Number(raw))) return;
+      const maxLevel = parseInt(raw, 10);
+
+      petFilters.set(pet, maxLevel);
+
+      // Disable this pet in the select so it can't be added twice
+      const opt = select.querySelector(`option[value="${select.value}"]`);
       if (opt) opt.disabled = true;
       select.value = '';
-      renderPetTags(root);
+      levelIn.value = '';
+
+      renderPetFilterTags(root);
+      updateAddBtn(root);
     });
   }
 
@@ -500,9 +524,13 @@
         if (!heroes || heroes.length === 0) continue;
         if (!compMatchesBox(heroes, box)) continue;
 
-        const hasBannedPet = heroes.some(
-          h => h.type === 'pet' && blacklistedPets.has(h.name.toLowerCase())
-        );
+        // Pet level filter: reject comp if any pet exceeds its configured max level
+        const hasBannedPet = heroes.some(h => {
+          if (h.type !== 'pet') return false;
+          const maxLevel = petFilters.get(h.name.toLowerCase());
+          if (maxLevel == null) return false;     // no filter for this pet
+          return (h.si ?? 0) > maxLevel;          // si holds pet level
+        });
         if (hasBannedPet) continue;
 
         const nc = row.nc || {};
