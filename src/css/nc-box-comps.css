@@ -301,19 +301,19 @@
   background: rgba(242, 193, 79, 0.10);
 }
 
-/* ── Pet blacklist ───────────────────────────────────────────────────────── */
+/* ── Pet level filter ────────────────────────────────────────────────────── */
 
-.nbc-pet-bl-section {
+.nbc-pet-filter-section {
   margin-bottom: 1.25rem;
 }
 
-.nbc-pet-bl-controls {
+.nbc-pet-filter-controls {
   display: flex;
   flex-direction: column;
   gap: 0.6rem;
 }
 
-.nbc-pet-bl-add {
+.nbc-pet-filter-add {
   display: flex;
   align-items: center;
   gap: 0.6rem;
@@ -332,6 +332,28 @@
   font: inherit;
   font-size: 0.85rem;
   cursor: pointer;
+}
+
+.nbc-pet-filter-level {
+  width: 90px;
+  flex-shrink: 0;
+  padding: 0.38rem 0.7rem;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: #171b27;
+  color: var(--text);
+  font: inherit;
+  font-size: 0.85rem;
+}
+
+.nbc-pet-filter-level:focus {
+  outline: none;
+  border-color: rgba(242, 193, 79, 0.4);
+}
+
+.nbc-pet-filter-level::placeholder {
+  color: var(--text-muted);
+  opacity: 0.6;
 }
 
 .nbc-pet-bl-btn {
