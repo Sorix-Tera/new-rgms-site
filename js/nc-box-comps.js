@@ -4,11 +4,10 @@
 //
 // Algorithm (inspired by ae-comps.js buildTopBoxes):
 //   1. Fetch all nc_round + nc_heroes rows.
-//   2. JS-side filter: keep only comps where every hero is owned at >= required SI/Furn.
-//   3. Build a flat list of all valid comps sorted by time_boss ASC.
-//   4. DFS with pruning: pick 6 non-overlapping comps (unique heroes+pets, one per round)
-//      that minimise total time_boss. Uses an optimistic lower-bound per unused round
-//      to prune branches early.
+//   2. JS-side filter: keep only comps where every hero is owned at >= required SI/Furn/Engr.
+//   3. Deduplicate comps by unique hero+pet combination (keep fastest per combo).
+//   4. Greedy warm-start + DFS solver: pick 6 non-overlapping comps (unique heroes+pets,
+//      one per round) that minimise total time_boss.
 
 (function () {
   const STORAGE_KEY = 'yourBox';
@@ -35,14 +34,6 @@
     return `${mins}m ${secs}s`;
   }
 
-  function formatTotalTime(val) {
-    if (val == null || Number.isNaN(Number(val))) return '—';
-    if (val < 60) return `${val.toFixed(2)}s`;
-    const mins = Math.floor(val / 60);
-    const secs = (val % 60).toFixed(2).padStart(5, '0');
-    return `${mins}m ${secs}s`;
-  }
-
   // ── Box helpers ────────────────────────────────────────────────────────────
 
   function loadBox() {
@@ -52,7 +43,7 @@
     } catch { return {}; }
   }
 
-  // Returns a Map: lowerCaseName -> { si, furn }  (owned heroes only)
+  // Returns a Map: lowerCaseName -> { si, furn, engr }  (owned heroes only)
   function buildEffectiveBox(mercData) {
     const stored = loadBox();
     const box = new Map();
@@ -63,6 +54,7 @@
       box.set(hero.toLowerCase(), {
         si:   data.si   ?? 0,
         furn: data.furn ?? 0,
+        engr: data.engr ?? 0,
       });
     }
 
@@ -70,6 +62,7 @@
       box.set(mercData.name.toLowerCase(), {
         si:   mercData.si   ?? 0,
         furn: mercData.furn ?? 0,
+        engr: mercData.engr ?? 0,
       });
     }
 
@@ -144,9 +137,9 @@
 
     return {
       name,
-      si:   parseInt(qs('#nbcMercSi',   root)?.value ?? '0',  10),
-      furn: parseInt(qs('#nbcMercFurn', root)?.value ?? '0',  10),
-      engr: parseInt(qs('#nbcMercEngr', root)?.value ?? '0',  10),
+      si:   parseInt(qs('#nbcMercSi',   root)?.value ?? '0', 10),
+      furn: parseInt(qs('#nbcMercFurn', root)?.value ?? '0', 10),
+      engr: parseInt(qs('#nbcMercEngr', root)?.value ?? '0', 10),
     };
   }
 
@@ -159,6 +152,7 @@
       if (!owned)                      return false;
       if (owned.si   < (h.si   ?? 0)) return false;
       if (owned.furn < (h.furn ?? 0)) return false;
+      if (owned.engr < (h.engr ?? 0)) return false;
     }
     return true;
   }
@@ -178,7 +172,7 @@
     const heroes = await fetchPaginated(
       supabaseClient
         .from('nc_heroes')
-        .select('nc_id, round, name, si, furn, type')
+        .select('nc_id, round, name, si, furn, engr, type')
     );
 
     return { rounds, heroes };
@@ -279,11 +273,8 @@
       }
     }
 
-    // ── Greedy warm-start ──────────────────────────────────────────────────────
-    // Before running DFS, find a quick greedy solution to use as an upper bound.
-    // This sets bestCount = maxFillable and bestTotal = greedyTotal immediately,
-    // so the suffix lower-bound pruning fires from the very first DFS branch.
-    // validComps is sorted by time_boss ASC, so greedy naturally picks fast comps.
+    // Greedy warm-start: find a quick full solution to set an upper bound,
+    // so DFS pruning fires from the very first branch.
     {
       const greedyNames  = new Set();
       const greedyRounds = new Set();
@@ -308,16 +299,16 @@
         bestCount  = maxFillable;
         bestTotal  = greedyTotal;
         bestResult = greedyChosen;
+        console.debug(`Greedy warm-start: ${bestCount}/${maxFillable} rounds, ${greedyTotal.toFixed(2)}s`);
       }
     }
 
-    // If greedy filled all rounds, skip DFS — greedy result is already valid.
-    // DFS is only needed when greedy couldn't fill all rounds (some rounds had
-    // no non-conflicting comp greedily, but might with different earlier picks).
+    // Only run DFS if greedy didn't fill all rounds.
     if (bestCount < maxFillable) {
       dfs(0, new Set(), new Set(), new Map(), 0);
     }
 
+    console.debug(`Solver: best ${bestCount}/${maxFillable} rounds, total time ${bestTotal.toFixed(2)}s`);
     return ROUNDS.map(r => bestResult.get(r) ?? null);
   }
 
@@ -368,6 +359,12 @@
         const b = document.createElement('span');
         b.className = 'nbc-badge furn';
         b.textContent = `F${hero.furn}`;
+        badges.appendChild(b);
+      }
+      if (hero.engr != null && hero.engr > 0) {
+        const b = document.createElement('span');
+        b.className = 'nbc-badge engr';
+        b.textContent = `E${hero.engr}`;
         badges.appendChild(b);
       }
 
@@ -471,6 +468,7 @@
       setStatus(root, `Fetched ${roundRows.length} comps — filtering…`);
       await new Promise(resolve => setTimeout(resolve, 0));
 
+      // Build hero lookup: "nc_id:round" -> [hero objects]
       const heroMap = new Map();
       for (const h of heroRows) {
         const key = `${h.nc_id}:${h.round}`;
@@ -478,7 +476,7 @@
         heroMap.get(key).push(h);
       }
 
-      const validComps = [];
+      const validComps   = [];
       const countByRound = {};
       for (const r of ROUNDS) countByRound[r] = 0;
 
@@ -512,11 +510,11 @@
         countByRound[r]++;
       }
 
+      // Sort ASC — fastest comps first for greedy and solver
       validComps.sort((a, b) => (a.time_boss ?? Infinity) - (b.time_boss ?? Infinity));
 
-      // Deduplicate: same round + same set of heroes+pet = same comp.
-      // Since sorted ASC, the first occurrence of each unique key is the fastest.
-      // Key: "round:hero1,hero2,...,pet" (names sorted so order doesn't matter).
+      // Deduplicate: same round + same ordered hero+pet names = same comp.
+      // Already sorted ASC so the first occurrence is the fastest.
       {
         const seen = new Set();
         let i = 0;
@@ -539,6 +537,11 @@
         }
       }
 
+      for (const r of ROUNDS) {
+        console.debug(`R${r}: ${countByRound[r]} valid comps`);
+      }
+      console.debug(`Total valid comps after dedup: ${validComps.length}`);
+
       if (validComps.length === 0) {
         setStatus(root, 'No comps match your box. Try adding a merc or adjusting your investments.');
         renderResults(root, new Array(6).fill(null));
@@ -549,9 +552,9 @@
       setStatus(root, 'Solving…');
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      const result = solve(validComps, bestPerRound);
-
+      const result     = solve(validComps, bestPerRound);
       const validCount = result.filter(Boolean).length;
+
       if (validCount === 0) {
         setStatus(root, 'Could not find non-overlapping comps with your current box.');
       } else {
