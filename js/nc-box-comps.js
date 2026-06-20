@@ -147,41 +147,22 @@
   }
 
   // ── JS-side filtering ──────────────────────────────────────────────────────
-
-  let _debugLogsLeft = 30; // cap so console doesn't flood
-
   function compMatchesBox(heroes, box) {
     for (const h of heroes) {
       if (h.type === 'pet') continue;
       const owned = box.get(h.name.toLowerCase());
       if (!owned) {
-        if (_debugLogsLeft > 0) {
-          console.debug('[REJECT not-owned]', h.name, 'required:', { si: h.si, furn: h.furn, engr: h.engr });
-          _debugLogsLeft--;
-        }
         return false;
       }
       if (owned.si < (h.si ?? 0)) {
-        if (_debugLogsLeft > 0) {
-          console.debug('[REJECT si]', h.name, 'owned.si=', owned.si, 'required h.si=', h.si);
-          _debugLogsLeft--;
-        }
         return false;
       }
       if (owned.furn < (h.furn ?? 0)) {
-        if (_debugLogsLeft > 0) {
-          console.debug('[REJECT furn]', h.name, 'owned.furn=', owned.furn, 'required h.furn=', h.furn);
-          _debugLogsLeft--;
-        }
         return false;
       }
-      if (owned.engr < (h.engr ?? 0)) {
-        if (_debugLogsLeft > 0) {
-          console.debug('[REJECT engr]', h.name, 'owned.engr=', owned.engr, 'required h.engr=', h.engr, 'typeof owned.engr:', typeof owned.engr, 'typeof h.engr:', typeof h.engr);
-          _debugLogsLeft--;
-        }
+      /*if (owned.engr < (h.engr ?? 0)) {
         return false;
-      }
+      }*/
     }
     return true;
   }
