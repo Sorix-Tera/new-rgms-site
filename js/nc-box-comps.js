@@ -160,9 +160,9 @@
       if (owned.furn < (h.furn ?? 0)) {
         return false;
       }
-      /*if (owned.engr < (h.engr ?? 0)) {
+      if (owned.engr < (h.engr ?? 0)) {
         return false;
-      }*/
+      }
     }
     return true;
   }
