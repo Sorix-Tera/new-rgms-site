@@ -590,15 +590,20 @@
             <option value="80">80</option>
           </select>
         </div>
+
+        <span class="nbc-merc-engr-note" title="Engraving data will be added in a future update">
+          Engr not yet tracked
+        </span>
+
       </div>
     </div>
   </section>
 
   <!-- Pet blacklist section -->
-  <section class="nbc-pet-filter-section" aria-label="Pet level filters">
+  <section class="nbc-pet-filter-section" aria-label="Pet blacklist">
     <div class="nbc-pet-filter-controls">
       <div class="nbc-pet-filter-add">
-        <select id="nbcPetFilterSelect" class="nbc-merc-select nbc-pet-bl-select" aria-label="Select pet to filter">
+        <select id="nbcPetFilterSelect" class="nbc-merc-select nbc-pet-bl-select" aria-label="Select pet to remove">
           <option value="">— Select a pet —</option>
           
             <option value="bellbellow">bellbellow</option>
@@ -660,21 +665,12 @@
             <option value="tufty">tufty</option>
           
         </select>
-        <input
-          id="nbcPetFilterLevel"
-          class="nbc-pet-filter-level"
-          type="number"
-          min="0"
-          max="999"
-          placeholder="Max level"
-          aria-label="Maximum pet level"
-        />
         <button id="nbcPetFilterBtn" class="nbc-pet-bl-btn" type="button">
-          + Add pet filter
+          Remove pet
         </button>
       </div>
 
-      <div id="nbcPetFilterTags" class="nbc-pet-bl-tags" aria-label="Active pet filters" aria-live="polite">
+      <div id="nbcPetFilterTags" class="nbc-pet-bl-tags" aria-label="Removed pets" aria-live="polite">
         <!-- Tags injected by JS -->
       </div>
     </div>
