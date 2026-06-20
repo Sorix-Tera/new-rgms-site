@@ -4,10 +4,11 @@
 //
 // Algorithm (inspired by ae-comps.js buildTopBoxes):
 //   1. Fetch all nc_round + nc_heroes rows.
-//   2. JS-side filter: keep only comps where every hero is owned at >= required SI/Furn/Engr.
-//   3. Deduplicate comps by unique hero+pet combination (keep fastest per combo).
-//   4. Greedy warm-start + DFS solver: pick 6 non-overlapping comps (unique heroes+pets,
-//      one per round) that minimise total time_boss.
+//   2. JS-side filter: keep only comps where every hero is owned at >= required SI/Furn.
+//   3. Build a flat list of all valid comps sorted by time_boss ASC.
+//   4. DFS with pruning: pick 6 non-overlapping comps (unique heroes+pets, one per round)
+//      that minimise total time_boss. Uses an optimistic lower-bound per unused round
+//      to prune branches early.
 
 (function () {
   const STORAGE_KEY = 'yourBox';
@@ -43,7 +44,7 @@
     } catch { return {}; }
   }
 
-  // Returns a Map: lowerCaseName -> { si, furn, engr }  (owned heroes only)
+  // Returns a Map: lowerCaseName -> { si, furn }  (owned heroes only)
   function buildEffectiveBox(mercData) {
     const stored = loadBox();
     const box = new Map();
@@ -54,7 +55,6 @@
       box.set(hero.toLowerCase(), {
         si:   data.si   ?? 0,
         furn: data.furn ?? 0,
-        engr: data.engr ?? 0,
       });
     }
 
@@ -62,7 +62,6 @@
       box.set(mercData.name.toLowerCase(), {
         si:   mercData.si   ?? 0,
         furn: mercData.furn ?? 0,
-        engr: mercData.engr ?? 0,
       });
     }
 
@@ -74,7 +73,7 @@
   const blacklistedPets = new Set();
 
   function renderPetTags(root) {
-    const container = qs('#nbcPetFilterTags', root);
+    const container = qs('#nbcPetBlTags', root);
     if (!container) return;
     container.innerHTML = '';
 
@@ -95,7 +94,7 @@
 
       removeBtn.addEventListener('click', () => {
         blacklistedPets.delete(pet);
-        const sel = qs('#nbcPetFilterSelect', root);
+        const sel = qs('#nbcPetBlSelect', root);
         if (sel) {
           const opt = sel.querySelector(`option[value="${pet}"]`);
           if (opt) opt.disabled = false;
@@ -110,10 +109,11 @@
   }
 
   function initPetBlacklist(root) {
-    const select = qs('#nbcPetFilterSelect', root);
-    const btn    = qs('#nbcPetFilterBtn', root);
+    const select = qs('#nbcPetBlSelect', root);
+    const btn    = qs('#nbcPetBlBtn', root);
     if (!select || !btn) return;
-
+    blacklistedPets.add("Unknown");
+    blacklistedPets.add("unknown");
     btn.addEventListener('click', () => {
       const pet = select.value;
       if (!pet || blacklistedPets.has(pet.toLowerCase())) return;
@@ -137,9 +137,9 @@
 
     return {
       name,
-      si:   parseInt(qs('#nbcMercSi',   root)?.value ?? '0', 10),
-      furn: parseInt(qs('#nbcMercFurn', root)?.value ?? '0', 10),
-      engr: parseInt(qs('#nbcMercEngr', root)?.value ?? '0', 10),
+      si:   parseInt(qs('#nbcMercSi',   root)?.value ?? '0',  10),
+      furn: parseInt(qs('#nbcMercFurn', root)?.value ?? '0',  10),
+      engr: parseInt(qs('#nbcMercEngr', root)?.value ?? '0',  10),
     };
   }
 
@@ -152,7 +152,6 @@
       if (!owned)                      return false;
       if (owned.si   < (h.si   ?? 0)) return false;
       if (owned.furn < (h.furn ?? 0)) return false;
-      if (owned.engr < (h.engr ?? 0)) return false;
     }
     return true;
   }
@@ -172,7 +171,7 @@
     const heroes = await fetchPaginated(
       supabaseClient
         .from('nc_heroes')
-        .select('nc_id, round, name, si, furn, engr, type')
+        .select('nc_id, round, name, si, furn, type')
     );
 
     return { rounds, heroes };
@@ -273,8 +272,11 @@
       }
     }
 
-    // Greedy warm-start: find a quick full solution to set an upper bound,
-    // so DFS pruning fires from the very first branch.
+    // ── Greedy warm-start ──────────────────────────────────────────────────────
+    // Before running DFS, find a quick greedy solution to use as an upper bound.
+    // This sets bestCount = maxFillable and bestTotal = greedyTotal immediately,
+    // so the suffix lower-bound pruning fires from the very first DFS branch.
+    // validComps is sorted by time_boss ASC, so greedy naturally picks fast comps.
     {
       const greedyNames  = new Set();
       const greedyRounds = new Set();
@@ -299,16 +301,16 @@
         bestCount  = maxFillable;
         bestTotal  = greedyTotal;
         bestResult = greedyChosen;
-        console.debug(`Greedy warm-start: ${bestCount}/${maxFillable} rounds, ${greedyTotal.toFixed(2)}s`);
       }
     }
 
-    // Only run DFS if greedy didn't fill all rounds.
+    // If greedy filled all rounds, skip DFS — greedy result is already valid.
+    // DFS is only needed when greedy couldn't fill all rounds (some rounds had
+    // no non-conflicting comp greedily, but might with different earlier picks).
     if (bestCount < maxFillable) {
       dfs(0, new Set(), new Set(), new Map(), 0);
     }
 
-    console.debug(`Solver: best ${bestCount}/${maxFillable} rounds, total time ${bestTotal.toFixed(2)}s`);
     return ROUNDS.map(r => bestResult.get(r) ?? null);
   }
 
@@ -345,17 +347,7 @@
 
     wrap.appendChild(img);
 
-    if (isPet) {
-      if (hero.si != null) {
-        const badges = document.createElement('div');
-        badges.className = 'nbc-icon-badges';
-        const b = document.createElement('span');
-        b.className = 'nbc-badge pet-level';
-        b.textContent = `Lv${hero.si}`;
-        badges.appendChild(b);
-        wrap.appendChild(badges);
-      }
-    } else {
+    if (!isPet) {
       const badges = document.createElement('div');
       badges.className = 'nbc-icon-badges';
 
@@ -369,12 +361,6 @@
         const b = document.createElement('span');
         b.className = 'nbc-badge furn';
         b.textContent = `F${hero.furn}`;
-        badges.appendChild(b);
-      }
-      if (hero.engr != null) {
-        const b = document.createElement('span');
-        b.className = 'nbc-badge engr';
-        b.textContent = `E${hero.engr}`;
         badges.appendChild(b);
       }
 
@@ -420,7 +406,7 @@
     const totalTimeStr = comp.time_total != null ? formatTotalTime(comp.time_total) : '—';
     player.innerHTML =
       `<strong>${comp.player_name ?? '—'}</strong>` +
-      ` &middot; ${comp.region != null ? 'R' + comp.region : '—'}` +
+      ` &middot; ${comp.region ?? '—'}` +
       ` &middot; Rank ${comp.rank ?? '?'}` +
       ` &middot; ${totalTimeStr}`;
 
@@ -480,7 +466,6 @@
       setStatus(root, `Fetched ${roundRows.length} comps — filtering…`);
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      // Build hero lookup: "nc_id:round" -> [hero objects]
       const heroMap = new Map();
       for (const h of heroRows) {
         const key = `${h.nc_id}:${h.round}`;
@@ -488,7 +473,7 @@
         heroMap.get(key).push(h);
       }
 
-      const validComps   = [];
+      const validComps = [];
       const countByRound = {};
       for (const r of ROUNDS) countByRound[r] = 0;
 
@@ -500,15 +485,6 @@
         if (!heroes || heroes.length === 0) continue;
         if (!compMatchesBox(heroes, box)) continue;
 
-        // Reject comps with no identifiable pet — screenshot pipeline sometimes
-        // misses the pet icon if it loads last, producing either no pet row at
-        // all, or a pet row with name "Unknown" / "unknown".
-        const hasValidPet = heroes.some(
-          h => h.type === 'pet' && h.name && h.name.toLowerCase() !== 'unknown'
-        );
-        if (!hasValidPet) continue;
-
-        // Hard pet blacklist: reject comp if it uses an excluded pet
         const hasBannedPet = heroes.some(
           h => h.type === 'pet' && blacklistedPets.has(h.name.toLowerCase())
         );
@@ -532,11 +508,11 @@
         countByRound[r]++;
       }
 
-      // Sort ASC — fastest comps first for greedy and solver
       validComps.sort((a, b) => (a.time_boss ?? Infinity) - (b.time_boss ?? Infinity));
 
-      // Deduplicate: same round + same ordered hero+pet names = same comp.
-      // Already sorted ASC so the first occurrence is the fastest.
+      // Deduplicate: same round + same set of heroes+pet = same comp.
+      // Since sorted ASC, the first occurrence of each unique key is the fastest.
+      // Key: "round:hero1,hero2,...,pet" (names sorted so order doesn't matter).
       {
         const seen = new Set();
         let i = 0;
@@ -559,11 +535,6 @@
         }
       }
 
-      for (const r of ROUNDS) {
-        console.debug(`R${r}: ${countByRound[r]} valid comps`);
-      }
-      console.debug(`Total valid comps after dedup: ${validComps.length}`);
-
       if (validComps.length === 0) {
         setStatus(root, 'No comps match your box. Try adding a merc or adjusting your investments.');
         renderResults(root, new Array(6).fill(null));
@@ -574,9 +545,9 @@
       setStatus(root, 'Solving…');
       await new Promise(resolve => setTimeout(resolve, 0));
 
-      const result     = solve(validComps, bestPerRound);
-      const validCount = result.filter(Boolean).length;
+      const result = solve(validComps, bestPerRound);
 
+      const validCount = result.filter(Boolean).length;
       if (validCount === 0) {
         setStatus(root, 'Could not find non-overlapping comps with your current box.');
       } else {
