@@ -113,6 +113,8 @@
     const btn    = qs('#nbcPetFilterBtn', root);
     if (!select || !btn) return;
 
+    blacklistedPets.add("Unknown");
+    blacklistedPets.add("unknown");
     btn.addEventListener('click', () => {
       const pet = select.value;
       if (!pet || blacklistedPets.has(pet.toLowerCase())) return;
