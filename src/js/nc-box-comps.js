@@ -500,10 +500,13 @@
         if (!heroes || heroes.length === 0) continue;
         if (!compMatchesBox(heroes, box)) continue;
 
-        // Reject comps with no pet at all — screenshot pipeline sometimes
-        // misses the pet icon if it loads last, producing an incomplete comp.
-        const hasPet = heroes.some(h => h.type === 'pet');
-        if (!hasPet) continue;
+        // Reject comps with no identifiable pet — screenshot pipeline sometimes
+        // misses the pet icon if it loads last, producing either no pet row at
+        // all, or a pet row with name "Unknown" / "unknown".
+        const hasValidPet = heroes.some(
+          h => h.type === 'pet' && h.name && h.name.toLowerCase() !== 'unknown'
+        );
+        if (!hasValidPet) continue;
 
         // Hard pet blacklist: reject comp if it uses an excluded pet
         const hasBannedPet = heroes.some(
