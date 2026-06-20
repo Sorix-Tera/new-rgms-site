@@ -73,7 +73,7 @@
   const blacklistedPets = new Set();
 
   function renderPetTags(root) {
-    const container = qs('#nbcPetBlTags', root);
+    const container = qs('#nbcPetFilterTags', root);
     if (!container) return;
     container.innerHTML = '';
 
@@ -94,7 +94,7 @@
 
       removeBtn.addEventListener('click', () => {
         blacklistedPets.delete(pet);
-        const sel = qs('#nbcPetBlSelect', root);
+        const sel = qs('#nbcPetFilterSelect', root);
         if (sel) {
           const opt = sel.querySelector(`option[value="${pet}"]`);
           if (opt) opt.disabled = false;
@@ -109,11 +109,10 @@
   }
 
   function initPetBlacklist(root) {
-    const select = qs('#nbcPetBlSelect', root);
-    const btn    = qs('#nbcPetBlBtn', root);
+    const select = qs('#nbcPetFilterSelect', root);
+    const btn    = qs('#nbcPetFilterBtn', root);
     if (!select || !btn) return;
-    blacklistedPets.add("Unknown");
-    blacklistedPets.add("unknown");
+
     btn.addEventListener('click', () => {
       const pet = select.value;
       if (!pet || blacklistedPets.has(pet.toLowerCase())) return;
@@ -406,7 +405,7 @@
     const totalTimeStr = comp.time_total != null ? formatTotalTime(comp.time_total) : '—';
     player.innerHTML =
       `<strong>${comp.player_name ?? '—'}</strong>` +
-      ` &middot; ${comp.region ?? '—'}` +
+      ` &middot; R${comp.region ?? '—'}` +
       ` &middot; Rank ${comp.rank ?? '?'}` +
       ` &middot; ${totalTimeStr}`;
 
