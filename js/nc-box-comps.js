@@ -4,7 +4,7 @@
 //
 // Algorithm (inspired by ae-comps.js buildTopBoxes):
 //   1. Fetch all nc_round + nc_heroes rows.
-//   2. JS-side filter: keep only comps where every hero is owned at >= required SI/Furn.
+//   2. JS-side filter: keep only comps where every hero is owned at >= required SI/Furn/Engr.
 //   3. Build a flat list of all valid comps sorted by time_boss ASC.
 //   4. DFS with pruning: pick 6 non-overlapping comps (unique heroes+pets, one per round)
 //      that minimise total time_boss. Uses an optimistic lower-bound per unused round
@@ -44,7 +44,7 @@
     } catch { return {}; }
   }
 
-  // Returns a Map: lowerCaseName -> { si, furn }  (owned heroes only)
+  // Returns a Map: lowerCaseName -> { si, furn, engr }  (owned heroes only)
   function buildEffectiveBox(mercData) {
     const stored = loadBox();
     const box = new Map();
@@ -55,6 +55,7 @@
       box.set(hero.toLowerCase(), {
         si:   data.si   ?? 0,
         furn: data.furn ?? 0,
+        engr: data.engr ?? 0,
       });
     }
 
@@ -62,6 +63,7 @@
       box.set(mercData.name.toLowerCase(), {
         si:   mercData.si   ?? 0,
         furn: mercData.furn ?? 0,
+        engr: mercData.engr ?? 0,
       });
     }
 
@@ -153,6 +155,7 @@
       if (!owned)                      return false;
       if (owned.si   < (h.si   ?? 0)) return false;
       if (owned.furn < (h.furn ?? 0)) return false;
+      if (owned.engr < (h.engr ?? 0)) return false;
     }
     return true;
   }
@@ -172,7 +175,7 @@
     const heroes = await fetchPaginated(
       supabaseClient
         .from('nc_heroes')
-        .select('nc_id, round, name, si, furn, type')
+        .select('nc_id, round, name, si, furn, engr, type')
     );
 
     return { rounds, heroes };
@@ -362,6 +365,12 @@
         const b = document.createElement('span');
         b.className = 'nbc-badge furn';
         b.textContent = `F${hero.furn}`;
+        badges.appendChild(b);
+      }
+      if (hero.engr != null) {
+        const b = document.createElement('span');
+        b.className = 'nbc-badge engr';
+        b.textContent = `E${hero.engr}`;
         badges.appendChild(b);
       }
 
